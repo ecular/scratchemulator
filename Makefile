@@ -10,4 +10,4 @@ cpu.o : cpu.cpp cpu.h
 	$(CC) $(cflag) cpu.cpp cpu.h
 	
 clean:
-	rm -f *.o *.gch
+	rm -f *.o *.gch main
