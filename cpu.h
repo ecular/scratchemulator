@@ -16,7 +16,8 @@ public:
 
     //Cpu();
     //~Cpu();
-    //int Init();
+    int Init();
+    int Reset();
 
     /*set reg*/
     void SetAX(uint16_t value);
