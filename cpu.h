@@ -16,7 +16,7 @@ public:
 
     //Cpu();
     //~Cpu();
-    int Init();
+    int Init(unsigned int ram_size);
     int Reset();
 
     /*set reg*/
@@ -72,7 +72,17 @@ public:
     uint16_t GetSS();
     uint16_t GetES();
 
+    /*write ram*/
+    void WriteRam8(unsigned int location, uint8_t value);
+    void WriteRam16(unsigned int location, uint16_t value);
+
+    /*read ram*/
+    uint8_t ReadRam8(unsigned int location);
+    uint16_t ReadRam16(unsigned int location);
+
 private:
+
+    uint8_t *ram;
 
     uint16_t universal_reg_ax, universal_reg_bx, universal_reg_cx, universal_reg_dx,
              universal_reg_sp, universal_reg_bp, universal_reg_si, universal_reg_di;

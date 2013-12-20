@@ -1,7 +1,8 @@
 #include "cpu.h"
 
-int Cpu::Init()
+int Cpu::Init(unsigned int ram_size)
 {
+    ram = new uint8_t[ram_size];
     Reset();
     return 0;
 }
@@ -25,7 +26,7 @@ inline void Cpu::SetAX(uint16_t value)
 }
 inline void Cpu::SetAH(uint8_t value)
 {
-    universal_reg_ax = (universal_reg_ax & 0x00FF) | ((static_cast<uint16_t>(value) & 0x00FF) << 8);
+    universal_reg_ax = (universal_reg_ax & 0x00FF) | ((value & 0x00FF) << 8);
 }
 inline void Cpu::SetAL(uint8_t value)
 {
@@ -38,7 +39,7 @@ inline void Cpu::SetBX(uint16_t value)
 }
 inline void Cpu::SetBH(uint8_t value)
 {
-    universal_reg_bx = (universal_reg_bx & 0x00FF) | ((static_cast<uint16_t>(value) & 0x00FF) << 8);
+    universal_reg_bx = (universal_reg_bx & 0x00FF) | ((value & 0x00FF) << 8);
 }
 inline void Cpu::SetBL(uint8_t value)
 {
@@ -51,7 +52,7 @@ inline void Cpu::SetCX(uint16_t value)
 }
 inline void Cpu::SetCH(uint8_t value)
 {
-    universal_reg_cx = (universal_reg_cx & 0x00FF) | ((static_cast<uint16_t>(value) & 0x00FF) << 8);
+    universal_reg_cx = (universal_reg_cx & 0x00FF) | ((value & 0x00FF) << 8);
 }
 inline void Cpu::SetCL(uint8_t value)
 {
@@ -64,7 +65,7 @@ inline void Cpu::SetDX(uint16_t value)
 }
 inline void Cpu::SetDH(uint8_t value)
 {
-    universal_reg_dx = (universal_reg_dx & 0x00FF) | ((static_cast<uint16_t>(value) & 0x00FF) << 8);
+    universal_reg_dx = (universal_reg_dx & 0x00FF) | ((value & 0x00FF) << 8);
 }
 inline void Cpu::SetDL(uint8_t value)
 {
@@ -222,5 +223,29 @@ inline uint16_t Cpu::GetSS()
 inline uint16_t Cpu::GetES()
 {
     return seg_reg_es;
+}
+
+
+/*write ram*/
+inline void Cpu::WriteRam8(unsigned int location, uint8_t value)
+{
+    ram[location] = value & 0x00FF;
+}
+
+inline void Cpu::WriteRam16(unsigned int location, uint16_t value)
+{
+    WriteRam8(location++, value & 0x00FF);
+    WriteRam8(location, value >> 8);
+}
+
+/*read ram*/
+inline uint8_t Cpu::ReadRam8(unsigned int location)
+{
+    return ram[location];
+}
+
+inline uint16_t Cpu::ReadRam16(unsigned int location)
+{
+    return ram[location] + (ram[location + 1] << 8);
 }
 
