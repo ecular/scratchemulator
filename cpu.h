@@ -14,10 +14,8 @@ class Cpu {
      * */
 public:
 
-    //Cpu();
+    Cpu();
     //~Cpu();
-    int Init(unsigned int ram_size);
-    int Reset();
 
     /*set reg*/
     void SetAX(uint16_t value);
@@ -72,6 +70,13 @@ public:
     uint16_t GetSS();
     uint16_t GetES();
 
+    void IPStep(unsigned int);
+
+    /*this two functions only used in Exec() */
+    uint8_t ReadData8InExe();
+    uint16_t ReadData16InExe();
+
+
     /*write ram*/
     void WriteRam8(unsigned int location, uint8_t value);
     void WriteRam16(unsigned int location, uint16_t value);
@@ -80,12 +85,24 @@ public:
     uint8_t ReadRam8(unsigned int location);
     uint16_t ReadRam16(unsigned int location);
 
+    int Init(unsigned int ram_size);
+    int Reset();
+    void Exec();
+
 private:
+
+    uint8_t *CalculateReg8();
+    uint16_t *CalculateReg16();
+    uint8_t *CalculateRM();
 
     uint8_t *ram;
 
     uint16_t universal_reg_ax, universal_reg_bx, universal_reg_cx, universal_reg_dx,
              universal_reg_sp, universal_reg_bp, universal_reg_si, universal_reg_di;
+    uint8_t *universal_reg_ah, *universal_reg_al;
+    uint8_t *universal_reg_bh, *universal_reg_bl;
+    uint8_t *universal_reg_ch, *universal_reg_cl;
+    uint8_t *universal_reg_dh, *universal_reg_dl;
     //uint8_t universal_reg_ah, universal_reg_al, universal_reg_bh, universal_reg_bl,
     //      universal_reg_ch, universal_reg_cl, universal_reg_dh, universal_reg_dl;
     uint16_t control_reg_ip, control_reg_flag;

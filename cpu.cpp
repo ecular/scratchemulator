@@ -1,23 +1,16 @@
 #include "cpu.h"
 
-int Cpu::Init(unsigned int ram_size)
+Cpu::Cpu()
 {
-    ram = new uint8_t[ram_size];
-    Reset();
-    return 0;
+    universal_reg_al = reinterpret_cast<uint8_t *>(&universal_reg_ax);
+    universal_reg_ah = reinterpret_cast<uint8_t *>(&universal_reg_ax) + 1;
+    universal_reg_bl = reinterpret_cast<uint8_t *>(&universal_reg_bx);
+    universal_reg_ah = reinterpret_cast<uint8_t *>(&universal_reg_bx) + 1;
+    universal_reg_cl = reinterpret_cast<uint8_t *>(&universal_reg_cx);
+    universal_reg_ch = reinterpret_cast<uint8_t *>(&universal_reg_cx) + 1;
+    universal_reg_dl = reinterpret_cast<uint8_t *>(&universal_reg_dx);
+    universal_reg_dh = reinterpret_cast<uint8_t *>(&universal_reg_dx) + 1;
 }
-
-int Cpu::Reset()
-{
-    control_reg_flag = 0x0;
-    control_reg_ip = 0x0;
-    seg_reg_cs = 0xFFFF;
-    seg_reg_ds = 0x0;
-    seg_reg_ss = 0x0;
-    seg_reg_es = 0x0;
-    return 0;
-}
-
 
 /*set reg*/
 inline void Cpu::SetAX(uint16_t value)
@@ -26,11 +19,13 @@ inline void Cpu::SetAX(uint16_t value)
 }
 inline void Cpu::SetAH(uint8_t value)
 {
-    universal_reg_ax = (universal_reg_ax & 0x00FF) | ((value & 0x00FF) << 8);
+    //universal_reg_ax = (universal_reg_ax & 0x00FF) | ((value & 0x00FF) << 8);
+    *universal_reg_ah = value & 0xFF;
 }
 inline void Cpu::SetAL(uint8_t value)
 {
-    universal_reg_ax = (universal_reg_ax & 0xFF00) | (value & 0x00FF);
+    //   universal_reg_ax = (universal_reg_ax & 0xFF00) | (value & 0x00FF);
+    *universal_reg_al = value & 0xFF;
 }
 
 inline void Cpu::SetBX(uint16_t value)
@@ -225,6 +220,23 @@ inline uint16_t Cpu::GetES()
     return seg_reg_es;
 }
 
+inline void Cpu::IPStep(unsigned int steps)
+{
+    control_reg_ip += steps;
+}
+
+inline uint8_t Cpu::ReadData8InExe()
+{
+    uint8_t data = ReadRam8(seg_reg_cs << 4 + control_reg_ip); //get 1byte form Ram
+    IPStep(1);
+    return data;
+}
+inline uint16_t Cpu::ReadData16InExe()
+{
+    uint8_t data_low = ReadData8InExe();
+    uint8_t data_high - ReadData8InExe();
+    return static_cast<uint16_t>(data_high) << 8 + data_low;
+}
 
 /*write ram*/
 inline void Cpu::WriteRam8(unsigned int location, uint8_t value)
@@ -246,6 +258,197 @@ inline uint8_t Cpu::ReadRam8(unsigned int location)
 
 inline uint16_t Cpu::ReadRam16(unsigned int location)
 {
-    return ram[location] + (ram[location + 1] << 8);
+    return ram[location] | (ram[location + 1] << 8);
 }
 
+/*calculate Mod byte*/
+uint8_t *Cpu::CalculateReg8(uint8_t mod_byte)
+{
+    switch((mod_byte >> 3) & 0x7)
+    {
+    case(0x0):
+        return universal_reg_al;
+    case(0x1):
+        return universal_reg_cl;
+    case(0x2):
+        return universal_reg_dl;
+    case(0x3):
+        return universal_reg_bl;
+    case(0x4):
+        return universal_reg_ah;
+    case(0x5):
+        return universal_reg_ch;
+    case(0x6):
+        return universal_reg_dh;
+    case(0x7):
+        return universal_reg_bh;
+    }
+    return NULL;//will never be here
+}
+
+inline uint16_t *Cpu::CalculateReg16(uint8_t mod_byte)
+{
+    switch((mod_byte >> 3) & 0x7)
+    {
+    case(0x0):
+        return universal_reg_ax;
+    case(0x1):
+        return universal_reg_cx;
+    case(0x2):
+        return universal_reg_dx;
+    case(0x3):
+        return universal_reg_bx;
+    case(0x4):
+        return universal_reg_sp;
+    case(0x5):
+        return universal_reg_bp;
+    case(0x6):
+        return universal_reg_si;
+    case(0x7):
+        return universal_reg_di;
+    }
+    return NULL;//will never be here
+}
+
+uint8_t *Cpu::CalculateRM(uint8_t mod_byte, uint8_t opcode)
+{
+    uint8_t rm = mod_byte & 0x7;
+    uint8_t mod_bit = (mod_byte >> 6) & 0x3;
+    opcode = opcode & 0x1;
+    switch(mod_bit)
+    {
+    case(0x0):
+        switch(rm)
+        {
+        case(0x00):
+            return &ram[seg_reg_ds << 4 + universal_reg_bx + universal_reg_si];
+        case(0x01):
+            return &ram[seg_reg_ds << 4 + universal_reg_bx + universal_reg_di];
+        case(0x02):
+            return &ram[seg_reg_ds << 4 + universal_reg_bp + universal_reg_si];
+        case(0x03):
+            return &ram[seg_reg_ds << 4 + universal_reg_bp + universal_reg_di];
+        case(0x04):
+            return &ram[seg_reg_ds << 4 + universal_reg_si];
+        case(0x05):
+            return &ram[seg_reg_ds << 4 + universal_reg_di];
+        case(0x06):
+            return &ram[seg_reg_ds << 4 + ReadData16InExe()];
+        case(0x07):
+            return &ram[seg_reg_ds << 4 + universal_reg_bx];
+        }
+
+    case(0x1):
+        switch(rm)
+        {
+        case(0x00):
+            return &ram[seg_reg_ds << 4 + universal_reg_bx + universal_reg_si + ReadData8InExe()];
+        case(0x01):
+            return &ram[seg_reg_ds << 4 + universal_reg_bx + universal_reg_di + ReadData8InExe()];
+        case(0x02):
+            return &ram[seg_reg_ds << 4 + universal_reg_bp + universal_reg_si + ReadData8InExe()];
+        case(0x03):
+            return &ram[seg_reg_ds << 4 + universal_reg_bp + universal_reg_di + ReadData8InExe()];
+        case(0x04):
+            return &ram[seg_reg_ds << 4 + universal_reg_si + ReadData8InExe()];
+        case(0x05):
+            return &ram[seg_reg_ds << 4 + universal_reg_di + ReadData8InExe()];
+        case(0x06):
+            return &ram[seg_reg_ds << 4 + universal_reg_bp + ReadData8InExe()];
+        case(0x07):
+            return &ram[seg_reg_ds << 4 + universal_reg_bx + ReadData8InExe()];
+        }
+
+    case(0x2):
+        switch(rm)
+        {
+        case(0x00):
+            return &ram[seg_reg_ds << 4 + universal_reg_bx + universal_reg_si + ReadData16InExe()];
+        case(0x01):
+            return &ram[seg_reg_ds << 4 + universal_reg_bx + universal_reg_di + ReadData16InExe()];
+        case(0x02):
+            return &ram[seg_reg_ds << 4 + universal_reg_bp + universal_reg_si + ReadData16InExe()];
+        case(0x03):
+            return &ram[seg_reg_ds << 4 + universal_reg_bp + universal_reg_di + ReadData16InExe()];
+        case(0x04):
+            return &ram[seg_reg_ds << 4 + universal_reg_si + ReadData16InExe()];
+        case(0x05):
+            return &ram[seg_reg_ds << 4 + universal_reg_di + ReadData16InExe()];
+        case(0x06):
+            return &ram[seg_reg_ds << 4 + universal_reg_bp + ReadData16InExe()];
+        case(0x07):
+            return &ram[seg_reg_ds << 4 + universal_reg_bx + ReadData16InExe()];
+        }
+    case(0x3):
+        if(opcode == 0x0)
+        {
+            switch(rm)
+            {
+            case(0x0):
+                return universal_reg_al;
+            case(0x1):
+                return universal_reg_cl;
+            case(0x2):
+                return universal_reg_dl;
+            case(0x3):
+                return universal_reg_bl;
+            case(0x4):
+                return universal_reg_ah;
+            case(0x5):
+                return universal_reg_ch;
+            case(0x6):
+                return universal_reg_dh;
+            case(0x7):
+                return universal_reg_bh;
+            }
+        }
+        else//W = 1
+        {
+        case(0x0):
+            return reinterpret_cast<uint8_t *>(&universal_reg_ax);
+        case(0x1):
+            return reinterpret_cast<uint8_t *>(&universal_reg_cx);
+        case(0x2):
+            return reinterpret_cast<uint8_t *>(&universal_reg_dx);
+        case(0x3):
+            return reinterpret_cast<uint8_t *>(&universal_reg_bx);
+        case(0x4):
+            return reinterpret_cast<uint8_t *>(&universal_reg_sp);
+        case(0x5):
+            return reinterpret_cast<uint8_t *>(&universal_reg_bp);
+        case(0x6):
+            return reinterpret_cast<uint8_t *>(&universal_reg_si);
+        case(0x7):
+            return reinterpret_cast<uint8_t *>(&universal_reg_di);
+        }
+        return NULL;//will never be here
+    }
+
+}
+inline uint16_t *Cpu::CalculateRM16(uint8_t mod)
+{
+}
+
+int Cpu::Init(unsigned int ram_size)
+{
+    ram = new uint8_t[ram_size];
+    Reset();
+    return 0;
+}
+
+int Cpu::Reset()
+{
+    control_reg_flag = 0x0;
+    control_reg_ip = 0x0;
+    seg_reg_cs = 0xFFFF;
+    seg_reg_ds = 0x0;
+    seg_reg_ss = 0x0;
+    seg_reg_es = 0x0;
+    return 0;
+}
+
+void Exec()
+{
+    uint8_t &opcode_8bit;
+
+}
