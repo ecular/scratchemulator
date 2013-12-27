@@ -1,4 +1,4 @@
-CC = g++ -g -Wall
+CC = g++ -g -Wall -O0
 CFLAG = -c -fkeep-inline-functions
 LDFLAG = 
 
