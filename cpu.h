@@ -85,6 +85,10 @@ public:
     uint8_t ReadRam8(unsigned int location);
     uint16_t ReadRam16(unsigned int location);
 
+    /*some basic operates*/
+    void Push(uint16_t);
+    uint16_t Pop();
+
     int Init(unsigned int ram_size);
     int Reset();
     void Exec();

@@ -16,18 +16,22 @@ int main()
     //cpu.SetDX(0xabcd);
 
 
-    cpu.WriteRam8(0x10 * 16 + 0x20, 0x05);
+    cpu.WriteRam8(0x10 * 16 + 0x20, 0x6);
     //cpu.WriteRam8(0x10 * 16 + 0x21, 0x34);
     //cpu.WriteRam8(0x10*16+0x22,disp8);
-    cpu.WriteRam16(0x10 * 16 + 0x21, disp16);
-    cpu.SetSI(0x8);
-    cpu.SetDS(0x2);
-    cpu.SetDI(0x3);
-    cpu.SetBP(0x4);
+    //cpu.WriteRam16(0x10 * 16 + 0x21, disp16);
+    //cpu.SetSI(0x8);
+    //cpu.SetDS(0x2);
+    //cpu.SetDI(0x3);
+    //cpu.SetBP(0x4);
+    cpu.SetES(0x1234);
     //cpu.WriteRam16(cpu.GetDS() * 16 + cpu.GetBX() +cpu.GetSI() + disp16, 0x5678);
+    cpu.WriteRam16(cpu.GetSS() * 16 + cpu.GetSP(), 0x1234);
     cpu.Exec();
-    printf("%x\n", cpu.GetAX());
-
+    cpu.SetES(0);
+    cpu.WriteRam8(0x10 * 16 + 0x21, 0x7);
+    cpu.Exec();
+    printf("%x\n", cpu.GetES());
     //    cpu.Init(0x100);
     //    cpu.WriteRam8(20, value1);
     //    cpu.WriteRam8(21, value2);
