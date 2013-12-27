@@ -10,13 +10,13 @@ int main()
     cpu.Init(0x10000);
     cpu.SetCS(0x10);
     cpu.SetIP(0x20);
-    cpu.SetAX(0x1234);
-    cpu.SetBX(0x5);
-    cpu.SetCX(0x6789);
-    cpu.SetDX(0xabcd);
+    //cpu.SetAX(0x1234);
+    //cpu.SetBX(0x5);
+    //cpu.SetCX(0x6789);
+    //cpu.SetDX(0xabcd);
 
 
-    cpu.WriteRam8(0x10 * 16 + 0x20, 0x01);
+    cpu.WriteRam8(0x10 * 16 + 0x20, 0x02);
     cpu.WriteRam8(0x10 * 16 + 0x21, 0x87);
     //cpu.WriteRam8(0x10*16+0x22,disp8);
     cpu.WriteRam16(0x10 * 16 + 0x22, disp16);
@@ -24,8 +24,9 @@ int main()
     cpu.SetDS(0x2);
     cpu.SetDI(0x3);
     cpu.SetBP(0x4);
+    cpu.WriteRam8(cpu.GetDS() * 16 + cpu.GetBX() + disp16, 0x33);
     cpu.Exec();
-    printf("%x\n", cpu.ReadRam16(cpu.GetDS() * 16 + cpu.GetBX() + disp16));
+    printf("%x\n", cpu.GetAL());
 
     //    cpu.Init(0x100);
     //    cpu.WriteRam8(20, value1);

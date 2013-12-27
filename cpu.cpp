@@ -494,5 +494,14 @@ void Cpu::Exec()
         *opt1_16bit = *opt1_16bit + *opt2_16bit;
         break;
     }
+
+    case(0x02)://ADD Gb Eb
+    {
+        mod_byte = ReadData8InExe();
+        opt1_8bit = CalculateReg8(mod_byte);
+        opt2_8bit = CalculateRM(mod_byte, opcode);
+        *opt1_8bit = *opt1_8bit + *opt2_8bit;
+        break;
+    }
     }
 }
