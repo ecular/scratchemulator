@@ -1,0 +1,96 @@
+!_TAG_FILE_FORMAT	2	/extended format; --format=1 will not append ;" to lines/
+!_TAG_FILE_SORTED	1	/0=unsorted, 1=sorted, 2=foldcase/
+!_TAG_PROGRAM_AUTHOR	Darren Hiebert	/dhiebert@users.sourceforge.net/
+!_TAG_PROGRAM_NAME	Exuberant Ctags	//
+!_TAG_PROGRAM_URL	http://ctags.sourceforge.net	/official site/
+!_TAG_PROGRAM_VERSION	5.9~svn20110310	//
+BIN	./Makefile	/^BIN  = emu$/;"	m
+CC	./Makefile	/^CC = g++ -g -Wall -O0$/;"	m
+CFLAG	./Makefile	/^CFLAG = -c -fkeep-inline-functions$/;"	m
+CalculateRM	./cpu.cpp	/^uint8_t *Cpu::CalculateRM(uint8_t mod_byte, uint8_t opcode)$/;"	f	class:Cpu
+CalculateReg16	./cpu.cpp	/^uint16_t *Cpu::CalculateReg16(uint8_t mod_byte)$/;"	f	class:Cpu
+CalculateReg8	./cpu.cpp	/^uint8_t *Cpu::CalculateReg8(uint8_t mod_byte)$/;"	f	class:Cpu
+Cpu	./cpu.cpp	/^Cpu::Cpu()$/;"	f	class:Cpu
+Cpu	./cpu.h	/^class Cpu {$/;"	c
+EMU_CPU_H_	./cpu.h	2;"	d
+Exec	./cpu.cpp	/^void Cpu::Exec()$/;"	f	class:Cpu
+GetAH	./cpu.cpp	/^inline uint8_t Cpu::GetAH()$/;"	f	class:Cpu
+GetAL	./cpu.cpp	/^inline uint8_t Cpu::GetAL()$/;"	f	class:Cpu
+GetAX	./cpu.cpp	/^inline uint16_t Cpu::GetAX()$/;"	f	class:Cpu
+GetBH	./cpu.cpp	/^inline uint8_t Cpu::GetBH()$/;"	f	class:Cpu
+GetBL	./cpu.cpp	/^inline uint8_t Cpu::GetBL()$/;"	f	class:Cpu
+GetBP	./cpu.cpp	/^inline uint16_t Cpu::GetBP()$/;"	f	class:Cpu
+GetBX	./cpu.cpp	/^inline uint16_t Cpu::GetBX()$/;"	f	class:Cpu
+GetCH	./cpu.cpp	/^inline uint8_t Cpu::GetCH()$/;"	f	class:Cpu
+GetCL	./cpu.cpp	/^inline uint8_t Cpu::GetCL()$/;"	f	class:Cpu
+GetCS	./cpu.cpp	/^inline uint16_t Cpu::GetCS()$/;"	f	class:Cpu
+GetCX	./cpu.cpp	/^inline uint16_t Cpu::GetCX()$/;"	f	class:Cpu
+GetDH	./cpu.cpp	/^inline uint8_t Cpu::GetDH()$/;"	f	class:Cpu
+GetDI	./cpu.cpp	/^inline uint16_t Cpu::GetDI()$/;"	f	class:Cpu
+GetDL	./cpu.cpp	/^inline uint8_t Cpu::GetDL()$/;"	f	class:Cpu
+GetDS	./cpu.cpp	/^inline uint16_t Cpu::GetDS()$/;"	f	class:Cpu
+GetDX	./cpu.cpp	/^inline uint16_t Cpu::GetDX()$/;"	f	class:Cpu
+GetES	./cpu.cpp	/^inline uint16_t Cpu::GetES()$/;"	f	class:Cpu
+GetFlag	./cpu.cpp	/^inline uint16_t Cpu::GetFlag()$/;"	f	class:Cpu
+GetIP	./cpu.cpp	/^inline uint16_t Cpu::GetIP()$/;"	f	class:Cpu
+GetSI	./cpu.cpp	/^inline uint16_t Cpu::GetSI()$/;"	f	class:Cpu
+GetSP	./cpu.cpp	/^inline uint16_t Cpu::GetSP()$/;"	f	class:Cpu
+GetSS	./cpu.cpp	/^inline uint16_t Cpu::GetSS()$/;"	f	class:Cpu
+IPStep	./cpu.cpp	/^inline void Cpu::IPStep(unsigned int steps)$/;"	f	class:Cpu
+Init	./cpu.cpp	/^int Cpu::Init(unsigned int ram_size)$/;"	f	class:Cpu
+LDFLAG	./Makefile	/^LDFLAG = $/;"	m
+OBJ	./Makefile	/^OBJ = $(patsubst %.cpp,%.o,$(wildcard *.cpp)) $/;"	m
+ReadData16InExe	./cpu.cpp	/^inline uint16_t Cpu::ReadData16InExe()$/;"	f	class:Cpu
+ReadData8InExe	./cpu.cpp	/^inline uint8_t Cpu::ReadData8InExe()$/;"	f	class:Cpu
+ReadRam16	./cpu.cpp	/^inline uint16_t Cpu::ReadRam16(unsigned int location)$/;"	f	class:Cpu
+ReadRam8	./cpu.cpp	/^inline uint8_t Cpu::ReadRam8(unsigned int location)$/;"	f	class:Cpu
+Reset	./cpu.cpp	/^int Cpu::Reset()$/;"	f	class:Cpu
+SetAH	./cpu.cpp	/^inline void Cpu::SetAH(uint8_t value)$/;"	f	class:Cpu
+SetAL	./cpu.cpp	/^inline void Cpu::SetAL(uint8_t value)$/;"	f	class:Cpu
+SetAX	./cpu.cpp	/^inline void Cpu::SetAX(uint16_t value)$/;"	f	class:Cpu
+SetBH	./cpu.cpp	/^inline void Cpu::SetBH(uint8_t value)$/;"	f	class:Cpu
+SetBL	./cpu.cpp	/^inline void Cpu::SetBL(uint8_t value)$/;"	f	class:Cpu
+SetBP	./cpu.cpp	/^inline void Cpu::SetBP(uint16_t value)$/;"	f	class:Cpu
+SetBX	./cpu.cpp	/^inline void Cpu::SetBX(uint16_t value)$/;"	f	class:Cpu
+SetCH	./cpu.cpp	/^inline void Cpu::SetCH(uint8_t value)$/;"	f	class:Cpu
+SetCL	./cpu.cpp	/^inline void Cpu::SetCL(uint8_t value)$/;"	f	class:Cpu
+SetCS	./cpu.cpp	/^inline void Cpu::SetCS(uint16_t value)$/;"	f	class:Cpu
+SetCX	./cpu.cpp	/^inline void Cpu::SetCX(uint16_t value)$/;"	f	class:Cpu
+SetDH	./cpu.cpp	/^inline void Cpu::SetDH(uint8_t value)$/;"	f	class:Cpu
+SetDI	./cpu.cpp	/^inline void Cpu::SetDI(uint16_t value)$/;"	f	class:Cpu
+SetDL	./cpu.cpp	/^inline void Cpu::SetDL(uint8_t value)$/;"	f	class:Cpu
+SetDS	./cpu.cpp	/^inline void Cpu::SetDS(uint16_t value)$/;"	f	class:Cpu
+SetDX	./cpu.cpp	/^inline void Cpu::SetDX(uint16_t value)$/;"	f	class:Cpu
+SetES	./cpu.cpp	/^inline void Cpu::SetES(uint16_t value)$/;"	f	class:Cpu
+SetFlag	./cpu.cpp	/^inline void Cpu::SetFlag(uint16_t value)$/;"	f	class:Cpu
+SetIP	./cpu.cpp	/^inline void Cpu::SetIP(uint16_t value)$/;"	f	class:Cpu
+SetSI	./cpu.cpp	/^inline void Cpu::SetSI(uint16_t value)$/;"	f	class:Cpu
+SetSP	./cpu.cpp	/^inline void Cpu::SetSP(uint16_t value)$/;"	f	class:Cpu
+SetSS	./cpu.cpp	/^inline void Cpu::SetSS(uint16_t value)$/;"	f	class:Cpu
+WriteRam16	./cpu.cpp	/^inline void Cpu::WriteRam16(unsigned int location, uint16_t value)$/;"	f	class:Cpu
+WriteRam8	./cpu.cpp	/^inline void Cpu::WriteRam8(unsigned int location, uint8_t value)$/;"	f	class:Cpu
+control_reg_flag	./cpu.h	/^    uint16_t control_reg_ip, control_reg_flag;$/;"	m	class:Cpu
+control_reg_ip	./cpu.h	/^    uint16_t control_reg_ip, control_reg_flag;$/;"	m	class:Cpu
+main	./main.cpp	/^int main()$/;"	f
+ram	./cpu.h	/^    uint8_t *ram;$/;"	m	class:Cpu
+seg_reg_cs	./cpu.h	/^    uint16_t seg_reg_cs, seg_reg_ds, seg_reg_ss, seg_reg_es;$/;"	m	class:Cpu
+seg_reg_ds	./cpu.h	/^    uint16_t seg_reg_cs, seg_reg_ds, seg_reg_ss, seg_reg_es;$/;"	m	class:Cpu
+seg_reg_es	./cpu.h	/^    uint16_t seg_reg_cs, seg_reg_ds, seg_reg_ss, seg_reg_es;$/;"	m	class:Cpu
+seg_reg_replace	./cpu.h	/^    uint16_t *seg_reg_replace;$/;"	m	class:Cpu
+seg_reg_ss	./cpu.h	/^    uint16_t seg_reg_cs, seg_reg_ds, seg_reg_ss, seg_reg_es;$/;"	m	class:Cpu
+universal_reg_ah	./cpu.h	/^    uint8_t *universal_reg_ah, *universal_reg_al;$/;"	m	class:Cpu
+universal_reg_al	./cpu.h	/^    uint8_t *universal_reg_ah, *universal_reg_al;$/;"	m	class:Cpu
+universal_reg_ax	./cpu.h	/^    uint16_t universal_reg_ax, universal_reg_bx, universal_reg_cx, universal_reg_dx,$/;"	m	class:Cpu
+universal_reg_bh	./cpu.h	/^    uint8_t *universal_reg_bh, *universal_reg_bl;$/;"	m	class:Cpu
+universal_reg_bl	./cpu.h	/^    uint8_t *universal_reg_bh, *universal_reg_bl;$/;"	m	class:Cpu
+universal_reg_bp	./cpu.h	/^             universal_reg_sp, universal_reg_bp, universal_reg_si, universal_reg_di;$/;"	m	class:Cpu
+universal_reg_bx	./cpu.h	/^    uint16_t universal_reg_ax, universal_reg_bx, universal_reg_cx, universal_reg_dx,$/;"	m	class:Cpu
+universal_reg_ch	./cpu.h	/^    uint8_t *universal_reg_ch, *universal_reg_cl;$/;"	m	class:Cpu
+universal_reg_cl	./cpu.h	/^    uint8_t *universal_reg_ch, *universal_reg_cl;$/;"	m	class:Cpu
+universal_reg_cx	./cpu.h	/^    uint16_t universal_reg_ax, universal_reg_bx, universal_reg_cx, universal_reg_dx,$/;"	m	class:Cpu
+universal_reg_dh	./cpu.h	/^    uint8_t *universal_reg_dh, *universal_reg_dl;$/;"	m	class:Cpu
+universal_reg_di	./cpu.h	/^             universal_reg_sp, universal_reg_bp, universal_reg_si, universal_reg_di;$/;"	m	class:Cpu
+universal_reg_dl	./cpu.h	/^    uint8_t *universal_reg_dh, *universal_reg_dl;$/;"	m	class:Cpu
+universal_reg_dx	./cpu.h	/^    uint16_t universal_reg_ax, universal_reg_bx, universal_reg_cx, universal_reg_dx,$/;"	m	class:Cpu
+universal_reg_si	./cpu.h	/^             universal_reg_sp, universal_reg_bp, universal_reg_si, universal_reg_di;$/;"	m	class:Cpu
+universal_reg_sp	./cpu.h	/^             universal_reg_sp, universal_reg_bp, universal_reg_si, universal_reg_di;$/;"	m	class:Cpu
