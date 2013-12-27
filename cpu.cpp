@@ -512,5 +512,18 @@ void Cpu::Exec()
         *opt1_16bit = *opt1_16bit + *opt2_16bit;
         break;
     }
+
+    case(0x04)://ADD AL Ib
+    {
+        *universal_reg_al = *universal_reg_al + ReadData8InExe();
+        break;
+    }
+
+    case(0x05)://ADD Ax Iv
+    {
+        universal_reg_ax = universal_reg_ax + ReadData16InExe();
+        break;
+    }
+
     }
 }
