@@ -466,21 +466,33 @@ void Cpu::Exec()
     seg_reg_replace = &seg_reg_ds;
     opcode = ReadData8InExe();
     switch(opcode)
-        /*seg prefix
-         * case(0x26):
-         seg_reg_replace = &seg_reg_es;//es prefix
-         case(0x2E):
-         seg_reg_replace = &seg_reg_cs;//cs prefix
-         case(0x36):
-         seg_reg_replace = &seg_reg_ss;//ss prefix
-         case(0x3E):
-         seg_reg_replace = &seg_reg_ds;//ds prefix
-         */
+    {
+    /*seg prefix
+     * case(0x26):
+     seg_reg_replace = &seg_reg_es;//es prefix
+     case(0x2E):
+     seg_reg_replace = &seg_reg_cs;//cs prefix
+     case(0x36):
+     seg_reg_replace = &seg_reg_ss;//ss prefix
+     case(0x3E):
+     seg_reg_replace = &seg_reg_ds;//ds prefix
+     */
     case(0x00)://ADD Eb Gb
-{
-    mod_byte = ReadData8InExe();
-    opt1_8bit = CalculateRM(mod_byte, opcode);
-    opt2_8bit = CalculateReg8(mod_byte);
-    *opt1_8bit = *opt1_8bit + *opt2_8bit;
+    {
+        mod_byte = ReadData8InExe();
+        opt1_8bit = CalculateRM(mod_byte, opcode);
+        opt2_8bit = CalculateReg8(mod_byte);
+        *opt1_8bit = *opt1_8bit + *opt2_8bit;
+        break;
+    }
+
+    case(0x01)://ADD Ev Gv
+    {
+        mod_byte = ReadData8InExe();
+        opt1_16bit = reinterpret_cast<uint16_t  *>(CalculateRM(mod_byte, opcode));
+        opt2_16bit = CalculateReg16(mod_byte);
+        *opt1_16bit = *opt1_16bit + *opt2_16bit;
+        break;
+    }
     }
 }

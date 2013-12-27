@@ -5,7 +5,7 @@
 int main()
 {
     Cpu cpu;
-    uint16_t disp16= 0x1234;
+    uint16_t disp16 = 0x1234;
     uint8_t disp8 = 0x12;
     cpu.Init(0x10000);
     cpu.SetCS(0x10);
@@ -16,16 +16,16 @@ int main()
     cpu.SetDX(0xabcd);
 
 
-    cpu.WriteRam8(0x10*16+0x20,0x00);
-    cpu.WriteRam8(0x10*16+0x21,0x8F);
+    cpu.WriteRam8(0x10 * 16 + 0x20, 0x01);
+    cpu.WriteRam8(0x10 * 16 + 0x21, 0x87);
     //cpu.WriteRam8(0x10*16+0x22,disp8);
-    cpu.WriteRam16(0x10*16+0x22,disp16);
+    cpu.WriteRam16(0x10 * 16 + 0x22, disp16);
     cpu.SetSI(0x8);
     cpu.SetDS(0x2);
     cpu.SetDI(0x3);
     cpu.SetBP(0x4);
     cpu.Exec();
-    printf("%x\n",cpu.ReadRam8(cpu.GetDS()*16 + cpu.GetBX() + disp16));
+    printf("%x\n", cpu.ReadRam16(cpu.GetDS() * 16 + cpu.GetBX() + disp16));
 
     //    cpu.Init(0x100);
     //    cpu.WriteRam8(20, value1);
