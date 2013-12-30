@@ -10,14 +10,26 @@ int main()
     cpu.Init(0x10000);
     cpu.SetCS(0x10);
     cpu.SetIP(0x20);
+    cpu.SetBP(0x21);
+    cpu.SetSI(0x777);
     cpu.SetAX(0x1234);
     //cpu.SetBX(0x5);
     cpu.SetCX(0x7659);
     //cpu.SetDX(0xabcd);
 
 
-    cpu.WriteRam8(0x10 * 16 + 0x20, 0x2b);
-    cpu.WriteRam8(0x10 * 16 + 0x21, 0x08);
+    cpu.SetAX(0x1234);
+    cpu.SetBX(0x1234);
+    cpu.SetCX(0x1234);
+    cpu.SetDX(0x1234);
+
+    cpu.SetSP(0x1234);
+    cpu.SetBP(0x1234);
+    cpu.SetSI(0x1234);
+    cpu.SetDI(0x1234);
+
+    cpu.WriteRam8(0x10 * 16 + 0x20, 0x60);
+    cpu.WriteRam8(0x10 * 16 + 0x21, 0x00);
     //cpu.WriteRam8(0x10 * 16 + 0x22, 0x12);
     //cpu.WriteRam8(0x10*16+0x22,disp8);
     //cpu.WriteRam16(0x10 * 16 + 0x21, disp16);
@@ -31,10 +43,17 @@ int main()
     //cpu.Exec();
     //cpu.SetES(0);
     //cpu.WriteRam8(0x10 * 16 + 0x21, 0x7);
-    cpu.WriteRam16(cpu.GetDS() * 16 + cpu.GetBX() + cpu.GetSI(), 0x4532);
+
+    printf("sP:%x\n", cpu.GetSP());
     cpu.Exec();
+    printf("sP:%x\n", cpu.GetSP());
+    printf("[sp]=%x\n", cpu.ReadRam16(cpu.GetSS() * 16 + cpu.GetSP()));
+    cpu.SetAX(0x1111);
+    cpu.WriteRam8(0x10 * 16 + 0x21, 0x61);
+    cpu.Exec();
+    printf("sP:%x\n", cpu.GetSP());
     //aprintf("%x\n", cpu.ReadRam16(cpu.GetDS() * 16 + cpu.GetBX()+cpu.GetSI()));
-    printf("%x\n", cpu.GetCX());
+    printf("%x\n", cpu.GetAX());
     printf("%x\n", cpu.GetFlag());
     //    cpu.Init(0x100);
     //    cpu.WriteRam8(20, value1);

@@ -1064,7 +1064,7 @@ void Cpu::Exec()
                 break;
             }
 
-            /*no case(0x26).0x26 is EX prefix*/
+            /*no case(0x26).0x26 is ES prefix*/
 
         case(0x27)://DAA AL
             {
@@ -1189,5 +1189,632 @@ void Cpu::Exec()
                     );
                 break;
             }
+
+            /*no case(0x2E).0x2E is CS prefix*/
+
+        case(0x2F)://DAS AL
+            {
+                __asm__
+                    (
+                     "MOVB %0,%%AL;\n\t"
+                     "DAS;\n\t"
+                     "MOVB %%AL,%0;\n\t"
+                     "PUSHF;\n\t"
+                     "POP %%EAX;\n\t"
+                     "MOVW %%AX,%1;\n\t"
+                     :"+r"(*universal_reg_al), "=r"(control_reg_flag) /* output */
+                     :
+                     :"eax"
+                    );
+                break;
+            }
+
+        case(0x30)://XOR Eb Gb
+            {
+                mod_byte = ReadData8InExe();
+                opt1_8bit = CalculateRM(mod_byte, opcode);
+                opt2_8bit = CalculateReg8(mod_byte);
+                __asm__
+                    (
+                     "XORB %2,%0;\n\t"
+                     "PUSHF;\n\t"
+                     "POP %%EAX;\n\t"
+                     "MOVW %%AX,%1;\n\t"
+                     :"+r"(*opt1_8bit), "=r"(control_reg_flag) /* output */
+                     :"r"(*opt2_8bit)       /* input */
+                     :"eax"
+                    );
+                break;
+            }
+
+        case(0x31)://XOR Ev Gv
+            {
+                mod_byte = ReadData8InExe();
+                opt1_16bit = reinterpret_cast<uint16_t  *>(CalculateRM(mod_byte, opcode));
+                opt2_16bit = CalculateReg16(mod_byte);
+                __asm__
+                    (
+                     "XORW %2,%0;\n\t"
+                     "PUSHF;\n\t"
+                     "POP %%EAX;\n\t"
+                     "MOVW %%AX,%1;\n\t"
+                     :"+r"(*opt1_16bit), "=r"(control_reg_flag) /* output */
+                     :"r"(*opt2_16bit)       /* input */
+                     :"eax"
+                    );
+                break;
+            }
+
+        case(0x32)://XOR Gb Eb
+            {
+                mod_byte = ReadData8InExe();
+                opt1_8bit = CalculateReg8(mod_byte);
+                opt2_8bit = CalculateRM(mod_byte, opcode);
+                __asm__
+                    (
+                     "XORB %2,%0;\n\t"
+                     "PUSHF;\n\t"
+                     "POP %%EAX;\n\t"
+                     "MOVW %%AX,%1;\n\t"
+                     :"+r"(*opt1_8bit), "=r"(control_reg_flag) /* output */
+                     :"r"(*opt2_8bit)       /* input */
+                     :"eax"
+                    );
+                break;
+            }
+
+        case(0x33)://XOR Gv Ev
+            {
+                mod_byte = ReadData8InExe();
+                opt1_16bit = CalculateReg16(mod_byte);
+                opt2_16bit = reinterpret_cast<uint16_t  *>(CalculateRM(mod_byte, opcode));
+                __asm__
+                    (
+                     "XORW %2,%0;\n\t"
+                     "PUSHF;\n\t"
+                     "POP %%EAX;\n\t"
+                     "MOVW %%AX,%1;\n\t"
+                     :"+r"(*opt1_16bit), "=r"(control_reg_flag) /* output */
+                     :"r"(*opt2_16bit)       /* input */
+                     :"eax"
+                    );
+                break;
+            }
+
+        case(0x34)://XOR AL Ib
+            {
+                opt1_8bit = universal_reg_al;
+                __asm__
+                    (
+                     "XORB %2,%0;\n\t"
+                     "PUSHF;\n\t"
+                     "POP %%EAX;\n\t"
+                     "MOVW %%AX,%1;\n\t"
+                     :"+r"(*opt1_8bit), "=r"(control_reg_flag) /* output */
+                     :"r"(ReadData8InExe())       /* input */
+                     :"eax"
+                    );
+                break;
+            }
+
+        case(0x35)://XOR AX Iv
+            {
+                __asm__
+                    (
+                     "XORW %2,%0;\n\t"
+                     "PUSHF;\n\t"
+                     "POP %%EAX;\n\t"
+                     "MOVW %%AX,%1;\n\t"
+                     :"+r"(universal_reg_ax), "=r"(control_reg_flag) /* output */
+                     :"r"(ReadData16InExe())       /* input */
+                     :"eax"
+                    );
+                break;
+            }
+
+            /*no case(0x36).0x36 is SS prefix*/
+
+        case(0x37)://AAA AL AH
+            {
+                __asm__
+                    (
+                     "MOVB %0,%%AL;\n\t"
+                     "MOVB %1,%%AH;\n\t"
+                     "AAA;\n\t"
+                     "MOVB %%AL,%0;\n\t"
+                     "MOVB %%AH,%1;\n\t"
+                     "PUSHF;\n\t"
+                     "POP %%EAX;\n\t"
+                     "MOVW %%AX,%2;\n\t"
+                     :"+r"(*universal_reg_al), "+r"(*universal_reg_ah), "=r"(control_reg_flag) /* output */
+                     :
+                     :"eax"
+                    );
+                break;
+            }
+
+        case(0x38)://CMP Eb Gb
+            {
+                mod_byte = ReadData8InExe();
+                opt1_8bit = CalculateRM(mod_byte, opcode);
+                opt2_8bit = CalculateReg8(mod_byte);
+                // *opt1_8bit = *opt1_8bit + *opt2_8bit;
+                __asm__
+                    (
+                     "CMPB %2,%1;\n\t"
+                     "PUSHF;\n\t"
+                     "POP %%EAX;\n\t"
+                     "MOVW %%AX,%0;\n\t"
+                     :"=r"(control_reg_flag) /* output */
+                     :"r"(*opt1_8bit), "r"(*opt2_8bit)      /* input */
+                     :"eax"
+                    );
+                break;
+            }
+
+        case(0x39)://CMP Ev Gv
+            {
+                mod_byte = ReadData8InExe();
+                opt1_16bit = reinterpret_cast<uint16_t  *>(CalculateRM(mod_byte, opcode));
+                opt2_16bit = CalculateReg16(mod_byte);
+                //*opt1_16bit = *opt1_16bit + *opt2_16bit;
+                __asm__
+                    (
+                     "CMPW %2,%1;\n\t"
+                     "PUSHF;\n\t"
+                     "POP %%EAX;\n\t"
+                     "MOVW %%AX,%0;\n\t"
+                     :"=r"(control_reg_flag) /* output */
+                     :"r"(*opt1_16bit), "r"(*opt2_16bit)      /* input */
+                     :"eax"
+                    );
+                break;
+            }
+
+        case(0x3a)://CMP Gb Eb
+            {
+                mod_byte = ReadData8InExe();
+                opt1_8bit = CalculateReg8(mod_byte);
+                opt2_8bit = CalculateRM(mod_byte, opcode);
+                //*opt1_8bit = *opt1_8bit + *opt2_8bit;
+                __asm__
+                    (
+                     "CMPB %2,%1;\n\t"
+                     "PUSHF;\n\t"
+                     "POP %%EAX;\n\t"
+                     "MOVW %%AX,%0;\n\t"
+                     :"=r"(control_reg_flag) /* output */
+                     :"r"(*opt1_8bit), "r"(*opt2_8bit)      /* input */
+                     :"eax"
+                    );
+                break;
+            }
+
+        case(0x3b)://CMP Gv Ev
+            {
+                mod_byte = ReadData8InExe();
+                opt1_16bit = CalculateReg16(mod_byte);
+                opt2_16bit = reinterpret_cast<uint16_t  *>(CalculateRM(mod_byte, opcode));
+                //*opt1_16bit = *opt1_16bit + *opt2_16bit;
+                __asm__
+                    (
+                     "CMPW %2,%1;\n\t"
+                     "PUSHF;\n\t"
+                     "POP %%EAX;\n\t"
+                     "MOVW %%AX,%0;\n\t"
+                     :"=r"(control_reg_flag) /* output */
+                     :"r"(*opt1_16bit), "r"(*opt2_16bit)      /* input */
+                     :"eax"
+                    );
+                break;
+            }
+
+        case(0x3c)://CMP AL Ib
+            {
+                opt1_8bit = universal_reg_al;
+                __asm__
+                    (
+                     "SUBB %2,%1;\n\t"
+                     "PUSHF;\n\t"
+                     "POP %%EAX;\n\t"
+                     "MOVW %%AX,%0;\n\t"
+                     :"=r"(control_reg_flag) /* output */
+                     :"r"(*opt1_8bit), "r"(ReadData8InExe())      /* input */
+                     :"eax"
+                    );
+                break;
+            }
+
+        case(0x3d)://CMP AX Iv
+            {
+                __asm__
+                    (
+                     "SUBW %2,%1;\n\t"
+                     "PUSHF;\n\t"
+                     "POP %%EAX;\n\t"
+                     "MOVW %%AX,%0;\n\t"
+                     :"=r"(control_reg_flag) /* output */
+                     :"r"(universal_reg_ax), "r"(ReadData16InExe())      /* input */
+                     :"eax"
+                    );
+                break;
+            }
+
+            /*no case(0x3E).0x3E is DS prefix*/
+
+        case(0x3F)://AAS AL AH
+            {
+                __asm__
+                    (
+                     "MOVB %0,%%AL;\n\t"
+                     "MOVB %1,%%AH;\n\t"
+                     "AAS;\n\t"
+                     "MOVB %%AL,%0;\n\t"
+                     "MOVB %%AH,%1;\n\t"
+                     "PUSHF;\n\t"
+                     "POP %%EAX;\n\t"
+                     "MOVW %%AX,%2;\n\t"
+                     :"+r"(*universal_reg_al), "+r"(*universal_reg_ah), "=r"(control_reg_flag) /* output */
+                     :
+                     :"eax"
+                    );
+                break;
+            }
+
+        case(0x40)://INC eAX  不影响CF位
+            {
+                __asm__
+                    (
+                     "MOVW %0,%%AX;\n\t"
+                     "INCW %%AX;\n\t"
+                     "MOVW %%AX,%0;\n\t"
+                     "PUSHF;\n\t"
+                     "POP %%EAX;\n\t"
+                     "MOVW %%AX,%1;\n\t"
+                     :"+r"(universal_reg_ax), "=r"(control_reg_flag) /* output */
+                     :
+                     :"eax"
+                    );
+                break;
+            }
+        case(0x41)://INC eCX
+            {
+                __asm__
+                    (
+                     "MOVW %0,%%AX;\n\t"
+                     "INCW %%AX;\n\t"
+                     "MOVW %%AX,%0;\n\t"
+                     "PUSHF;\n\t"
+                     "POP %%EAX;\n\t"
+                     "MOVW %%AX,%1;\n\t"
+                     :"+r"(universal_reg_cx), "=r"(control_reg_flag) /* output */
+                     :
+                     :"eax"
+                    );
+                break;
+            }
+        case(0x42)://INC eDX
+            {
+                __asm__
+                    (
+                     "MOVW %0,%%AX;\n\t"
+                     "INCW %%AX;\n\t"
+                     "MOVW %%AX,%0;\n\t"
+                     "PUSHF;\n\t"
+                     "POP %%EAX;\n\t"
+                     "MOVW %%AX,%1;\n\t"
+                     :"+r"(universal_reg_dx), "=r"(control_reg_flag) /* output */
+                     :
+                     :"eax"
+                    );
+                break;
+            }
+        case(0x43)://INC eBX
+            {
+                __asm__
+                    (
+                     "MOVW %0,%%AX;\n\t"
+                     "INCW %%AX;\n\t"
+                     "MOVW %%AX,%0;\n\t"
+                     "PUSHF;\n\t"
+                     "POP %%EAX;\n\t"
+                     "MOVW %%AX,%1;\n\t"
+                     :"+r"(universal_reg_bx), "=r"(control_reg_flag) /* output */
+                     :
+                     :"eax"
+                    );
+                break;
+            }
+
+        case(0x44)://INC eSP
+            {
+                __asm__
+                    (
+                     "MOVW %0,%%AX;\n\t"
+                     "INCW %%AX;\n\t"
+                     "MOVW %%AX,%0;\n\t"
+                     "PUSHF;\n\t"
+                     "POP %%EAX;\n\t"
+                     "MOVW %%AX,%1;\n\t"
+                     :"+r"(universal_reg_sp), "=r"(control_reg_flag) /* output */
+                     :
+                     :"eax"
+                    );
+                break;
+            }
+
+        case(0x45)://INC eBP
+            {
+                __asm__
+                    (
+                     "MOVW %0,%%AX;\n\t"
+                     "INCW %%AX;\n\t"
+                     "MOVW %%AX,%0;\n\t"
+                     "PUSHF;\n\t"
+                     "POP %%EAX;\n\t"
+                     "MOVW %%AX,%1;\n\t"
+                     :"+r"(universal_reg_bp), "=r"(control_reg_flag) /* output */
+                     :
+                     :"eax"
+                    );
+                break;
+            }
+
+        case(0x46)://INC eSI
+            {
+                __asm__
+                    (
+                     "MOVW %0,%%AX;\n\t"
+                     "INCW %%AX;\n\t"
+                     "MOVW %%AX,%0;\n\t"
+                     "PUSHF;\n\t"
+                     "POP %%EAX;\n\t"
+                     "MOVW %%AX,%1;\n\t"
+                     :"+r"(universal_reg_si), "=r"(control_reg_flag) /* output */
+                     :
+                     :"eax"
+                    );
+                break;
+            }
+
+        case(0x47)://INC eDI
+            {
+                __asm__
+                    (
+                     "MOVW %0,%%AX;\n\t"
+                     "INCW %%AX;\n\t"
+                     "MOVW %%AX,%0;\n\t"
+                     "PUSHF;\n\t"
+                     "POP %%EAX;\n\t"
+                     "MOVW %%AX,%1;\n\t"
+                     :"+r"(universal_reg_di), "=r"(control_reg_flag) /* output */
+                     :
+                     :"eax"
+                    );
+                break;
+            }
+
+        case(0x48)://DEC eAX  不影响CF位
+            {
+                __asm__
+                    (
+                     "MOVW %0,%%AX;\n\t"
+                     "DECW %%AX;\n\t"
+                     "MOVW %%AX,%0;\n\t"
+                     "PUSHF;\n\t"
+                     "POP %%EAX;\n\t"
+                     "MOVW %%AX,%1;\n\t"
+                     :"+r"(universal_reg_ax), "=r"(control_reg_flag) /* output */
+                     :
+                     :"eax"
+                    );
+                break;
+            }
+        case(0x49)://DEC eCX
+            {
+                __asm__
+                    (
+                     "MOVW %0,%%AX;\n\t"
+                     "DECW %%AX;\n\t"
+                     "MOVW %%AX,%0;\n\t"
+                     "PUSHF;\n\t"
+                     "POP %%EAX;\n\t"
+                     "MOVW %%AX,%1;\n\t"
+                     :"+r"(universal_reg_cx), "=r"(control_reg_flag) /* output */
+                     :
+                     :"eax"
+                    );
+                break;
+            }
+        case(0x4A)://DEC eDX
+            {
+                __asm__
+                    (
+                     "MOVW %0,%%AX;\n\t"
+                     "DECW %%AX;\n\t"
+                     "MOVW %%AX,%0;\n\t"
+                     "PUSHF;\n\t"
+                     "POP %%EAX;\n\t"
+                     "MOVW %%AX,%1;\n\t"
+                     :"+r"(universal_reg_dx), "=r"(control_reg_flag) /* output */
+                     :
+                     :"eax"
+                    );
+                break;
+            }
+        case(0x4B)://DEC eBX
+            {
+                __asm__
+                    (
+                     "MOVW %0,%%AX;\n\t"
+                     "DECW %%AX;\n\t"
+                     "MOVW %%AX,%0;\n\t"
+                     "PUSHF;\n\t"
+                     "POP %%EAX;\n\t"
+                     "MOVW %%AX,%1;\n\t"
+                     :"+r"(universal_reg_bx), "=r"(control_reg_flag) /* output */
+                     :
+                     :"eax"
+                    );
+                break;
+            }
+
+        case(0x4C)://DEC eSP
+            {
+                __asm__
+                    (
+                     "MOVW %0,%%AX;\n\t"
+                     "DECW %%AX;\n\t"
+                     "MOVW %%AX,%0;\n\t"
+                     "PUSHF;\n\t"
+                     "POP %%EAX;\n\t"
+                     "MOVW %%AX,%1;\n\t"
+                     :"+r"(universal_reg_sp), "=r"(control_reg_flag) /* output */
+                     :
+                     :"eax"
+                    );
+                break;
+            }
+
+        case(0x4D)://DEC eBP
+            {
+                __asm__
+                    (
+                     "MOVW %0,%%AX;\n\t"
+                     "DECW %%AX;\n\t"
+                     "MOVW %%AX,%0;\n\t"
+                     "PUSHF;\n\t"
+                     "POP %%EAX;\n\t"
+                     "MOVW %%AX,%1;\n\t"
+                     :"+r"(universal_reg_bp), "=r"(control_reg_flag) /* output */
+                     :
+                     :"eax"
+                    );
+                break;
+            }
+
+        case(0x4E)://DEC eSI
+            {
+                __asm__
+                    (
+                     "MOVW %0,%%AX;\n\t"
+                     "DECW %%AX;\n\t"
+                     "MOVW %%AX,%0;\n\t"
+                     "PUSHF;\n\t"
+                     "POP %%EAX;\n\t"
+                     "MOVW %%AX,%1;\n\t"
+                     :"+r"(universal_reg_si), "=r"(control_reg_flag) /* output */
+                     :
+                     :"eax"
+                    );
+                break;
+            }
+
+        case(0x4F)://DEC eDI
+            {
+                __asm__
+                    (
+                     "MOVW %0,%%AX;\n\t"
+                     "DECW %%AX;\n\t"
+                     "MOVW %%AX,%0;\n\t"
+                     "PUSHF;\n\t"
+                     "POP %%EAX;\n\t"
+                     "MOVW %%AX,%1;\n\t"
+                     :"+r"(universal_reg_di), "=r"(control_reg_flag) /* output */
+                     :
+                     :"eax"
+                    );
+                break;
+            }
+
+
+        case(0x50)://PUSH rAX
+            {
+                Push(universal_reg_ax);
+                break;
+            }
+        case(0x51)://PUSH rCX
+            {
+                Push(universal_reg_cx);
+                break;
+            }
+        case(0x52)://PUSH rDX
+            {
+                Push(universal_reg_dx);
+                break;
+            }
+        case(0x53)://PUSH rBX
+            {
+                Push(universal_reg_bx);
+                break;
+            }
+        case(0x54)://PUSH rSP
+            {
+                Push(universal_reg_sp);
+                break;
+            }
+        case(0x55)://PUSH rBP
+            {
+                Push(universal_reg_bp);
+                break;
+            }
+        case(0x56)://PUSH rSI
+            {
+                Push(universal_reg_si);
+                break;
+            }
+        case(0x57)://PUSH rDI
+            {
+                Push(universal_reg_di);
+                break;
+            }
+        case(0x58)://POP rAX
+            {
+                universal_reg_ax = Pop();
+                break;
+            }
+
+        case(0x59)://POP rCX
+            {
+                universal_reg_cx = Pop();
+                break;
+            }
+
+        case(0x5A)://POP rDX
+            {
+                universal_reg_dx = Pop();
+                break;
+            }
+
+        case(0x5B)://POP rBX
+            {
+                universal_reg_bx = Pop();
+                break;
+            }
+
+        case(0x5C)://POP rSP
+            {
+                universal_reg_sp = Pop();
+                break;
+            }
+
+        case(0x5D)://POP rBP
+            {
+                universal_reg_bp = Pop();
+                break;
+            }
+
+        case(0x5E)://POP rSI
+            {
+                universal_reg_si = Pop();
+                break;
+            }
+
+        case(0x5F)://POP rDI
+            {
+                universal_reg_di = Pop();
+                break;
+            }
+
     }
 }

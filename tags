@@ -5,7 +5,7 @@
 !_TAG_PROGRAM_URL	http://ctags.sourceforge.net	/official site/
 !_TAG_PROGRAM_VERSION	5.9~svn20110310	//
 BIN	./Makefile	/^BIN  = emu$/;"	m
-CC	./Makefile	/^CC = g++ -g -Wall -O0$/;"	m
+CC	./Makefile	/^CC = g++ -g -Wall -O0 -m32$/;"	m
 CFLAG	./Makefile	/^CFLAG = -c -fkeep-inline-functions$/;"	m
 CalculateRM	./cpu.cpp	/^uint8_t *Cpu::CalculateRM(uint8_t mod_byte, uint8_t opcode)$/;"	f	class:Cpu
 CalculateReg16	./cpu.cpp	/^uint16_t *Cpu::CalculateReg16(uint8_t mod_byte)$/;"	f	class:Cpu
@@ -40,6 +40,8 @@ IPStep	./cpu.cpp	/^inline void Cpu::IPStep(unsigned int steps)$/;"	f	class:Cpu
 Init	./cpu.cpp	/^int Cpu::Init(unsigned int ram_size)$/;"	f	class:Cpu
 LDFLAG	./Makefile	/^LDFLAG = $/;"	m
 OBJ	./Makefile	/^OBJ = $(patsubst %.cpp,%.o,$(wildcard *.cpp)) $/;"	m
+Pop	./cpu.cpp	/^inline uint16_t Cpu::Pop()$/;"	f	class:Cpu
+Push	./cpu.cpp	/^inline void Cpu::Push(uint16_t data)$/;"	f	class:Cpu
 ReadData16InExe	./cpu.cpp	/^inline uint16_t Cpu::ReadData16InExe()$/;"	f	class:Cpu
 ReadData8InExe	./cpu.cpp	/^inline uint8_t Cpu::ReadData8InExe()$/;"	f	class:Cpu
 ReadRam16	./cpu.cpp	/^inline uint16_t Cpu::ReadRam16(unsigned int location)$/;"	f	class:Cpu
