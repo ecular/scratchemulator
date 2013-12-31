@@ -1816,5 +1816,33 @@ void Cpu::Exec()
                 break;
             }
 
+        case(0x60)://PUSHA
+            {
+                uint16_t sp_tmp = universal_reg_sp;
+                Push(universal_reg_ax);
+                Push(universal_reg_cx);
+                Push(universal_reg_dx);
+                Push(universal_reg_bx);
+                Push(sp_tmp);
+                Push(universal_reg_bp);
+                Push(universal_reg_si);
+                Push(universal_reg_di);
+                break;
+            }
+
+        case(0x61)://POPA
+            {
+                uint16_t sp_tmp;
+                universal_reg_di = Pop();
+                universal_reg_si = Pop();
+                universal_reg_bp = Pop();
+                sp_tmp = Pop();
+                universal_reg_bx = Pop();
+                universal_reg_dx = Pop();
+                universal_reg_cx = Pop();
+                universal_reg_ax = Pop();
+                universal_reg_sp = sp_tmp;
+                break;
+            }
     }
 }

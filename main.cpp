@@ -44,13 +44,35 @@ int main()
     //cpu.SetES(0);
     //cpu.WriteRam8(0x10 * 16 + 0x21, 0x7);
 
-    printf("sP:%x\n", cpu.GetSP());
+    printf("ax:%x\n", cpu.GetAX());
+    printf("bx:%x\n", cpu.GetBX());
+    printf("cx:%x\n", cpu.GetCX());
+    printf("dx:%x\n", cpu.GetDX());
+    printf("si:%x\n", cpu.GetSI());
+    printf("bp:%x\n", cpu.GetBP());
+    printf("bx:%x\n", cpu.GetBX());
+    printf("sp:%x\n", cpu.GetSP());
     cpu.Exec();
-    printf("sP:%x\n", cpu.GetSP());
-    printf("[sp]=%x\n", cpu.ReadRam16(cpu.GetSS() * 16 + cpu.GetSP()));
-    cpu.SetAX(0x1111);
+    //printf("[sp]=%x\n", cpu.ReadRam16(cpu.GetSS() * 16 + cpu.GetSP()));
+    cpu.SetAX(0x12de);
+    cpu.SetBX(0x12de);
+    cpu.SetCX(0x12de);
+    cpu.SetDX(0x12de);
+
+    cpu.SetBP(0x12de);
+    cpu.SetDI(0x12de);
+
     cpu.WriteRam8(0x10 * 16 + 0x21, 0x61);
+
     cpu.Exec();
+    printf("ax:%x\n", cpu.GetAX());
+    printf("bx:%x\n", cpu.GetBX());
+    printf("cx:%x\n", cpu.GetCX());
+    printf("dx:%x\n", cpu.GetDX());
+    printf("si:%x\n", cpu.GetSI());
+    printf("bp:%x\n", cpu.GetBP());
+    printf("bx:%x\n", cpu.GetBX());
+    printf("sp:%x\n", cpu.GetSP());
     printf("sP:%x\n", cpu.GetSP());
     //aprintf("%x\n", cpu.ReadRam16(cpu.GetDS() * 16 + cpu.GetBX()+cpu.GetSI()));
     printf("%x\n", cpu.GetAX());
