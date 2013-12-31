@@ -1816,7 +1816,7 @@ void Cpu::Exec()
                 break;
             }
 
-        case(0x60)://PUSHA
+        case(0x60)://PUSHA (80186)
             {
                 uint16_t sp_tmp = universal_reg_sp;
                 Push(universal_reg_ax);
@@ -1830,7 +1830,7 @@ void Cpu::Exec()
                 break;
             }
 
-        case(0x61)://POPA
+        case(0x61)://POPA (80186)
             {
                 uint16_t sp_tmp;
                 universal_reg_di = Pop();
@@ -1844,5 +1844,30 @@ void Cpu::Exec()
                 universal_reg_sp = sp_tmp;
                 break;
             }
+
+        case(0x62)://BOUND Gv Ma (80186)
+            {
+                mod_byte = ReadData8InExe();
+                opt1_16bit = CalculateReg16(mod_byte);
+                opt2_16bit = reinterpret_cast<uint16_t  *>(CalculateRM(mod_byte, opcode));
+                if(static_cast<uint32_t>(*opt1_16bit) < static_cast<uint32_t>(*opt2_16bit))
+                    ;//Int(5); int 5;
+                if(static_cast<uint32_t>(*opt1_16bit) > static_cast<uint32_t>(*(opt2_16bit + 1)));
+                ;//Int(5); int 5;
+                break;
+            }
+
+            //case(0x63)://ARPL Ew Gw (80286)
+            //case(0x64)://FS prefix (80386)
+            //case(0x65)://GS prefix (80386)
+            //case(0x66)://Operand-size override prefix (80386)
+            //case(0x67)://Address-size override prefix (80386)
+
+        case(0x68)://PUSH Iz (80186)
+            {
+                Push(ReadData16InExe());
+                break;
+            }
+
     }
 }
