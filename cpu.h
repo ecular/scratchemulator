@@ -97,6 +97,7 @@ private:
 
     uint8_t *CalculateReg8(uint8_t mod_byte);
     uint16_t *CalculateReg16(uint8_t mod_byte);
+    uint16_t *CalculateSeg16(uint8_t mod_byte);
     uint8_t *CalculateRM(uint8_t mod_byte, uint8_t opcode);
 
     uint8_t *ram;
@@ -110,7 +111,7 @@ private:
     uint16_t control_reg_ip, control_reg_flag;
     uint16_t seg_reg_cs, seg_reg_ds, seg_reg_ss, seg_reg_es;
 
-    uint16_t *seg_reg_replace;
+    uint16_t *seg_reg_replace_ds, *seg_reg_replace_ss;
 
 };
 

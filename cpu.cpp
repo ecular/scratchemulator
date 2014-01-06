@@ -319,6 +319,22 @@ uint16_t *Cpu::CalculateReg16(uint8_t mod_byte)
     return NULL;//will never be here
 }
 
+uint16_t *Cpu::CalculateSeg16(uint8_t mod_byte)
+{
+    switch((mod_byte >> 3) & 0x3)
+    {
+        case(0x0):
+            return &seg_reg_es;
+        case(0x1):
+            return &seg_reg_cs;
+        case(0x2):
+            return &seg_reg_ss;
+        case(0x3):
+            return &seg_reg_ds;
+    }
+    return NULL;//will never be here
+}
+
 uint8_t *Cpu::CalculateRM(uint8_t mod_byte, uint8_t opcode)
 {
     uint8_t rm = mod_byte & 0x7;
@@ -330,63 +346,63 @@ uint8_t *Cpu::CalculateRM(uint8_t mod_byte, uint8_t opcode)
             switch(rm)
         {
             case(0x00):
-                return &ram[(*seg_reg_replace << 4) + universal_reg_bx + universal_reg_si];
+                return &ram[(*seg_reg_replace_ds << 4) + universal_reg_bx + universal_reg_si];
             case(0x01):
-                return &ram[(*seg_reg_replace << 4) + universal_reg_bx + universal_reg_di];
+                return &ram[(*seg_reg_replace_ds << 4) + universal_reg_bx + universal_reg_di];
             case(0x02):
-                return &ram[(*seg_reg_replace << 4) + universal_reg_bp + universal_reg_si];
+                return &ram[(*seg_reg_replace_ss << 4) + universal_reg_bp + universal_reg_si];
             case(0x03):
-                return &ram[(*seg_reg_replace << 4) + universal_reg_bp + universal_reg_di];
+                return &ram[(*seg_reg_replace_ss << 4) + universal_reg_bp + universal_reg_di];
             case(0x04):
-                return &ram[(*seg_reg_replace << 4) + universal_reg_si];
+                return &ram[(*seg_reg_replace_ds << 4) + universal_reg_si];
             case(0x05):
-                return &ram[(*seg_reg_replace << 4) + universal_reg_di];
+                return &ram[(*seg_reg_replace_ds << 4) + universal_reg_di];
             case(0x06):
-                return &ram[(*seg_reg_replace << 4) + ReadData16InExe()];
+                return &ram[(*seg_reg_replace_ds << 4) + ReadData16InExe()];
             case(0x07):
-                return &ram[(*seg_reg_replace << 4) + universal_reg_bx];
+                return &ram[(*seg_reg_replace_ds << 4) + universal_reg_bx];
         }
 
         case(0x1):
             switch(rm)
         {
             case(0x00):
-                return &ram[(*seg_reg_replace << 4) + universal_reg_bx + universal_reg_si + ReadData8InExe()];
+                return &ram[(*seg_reg_replace_ds << 4) + universal_reg_bx + universal_reg_si + ReadData8InExe()];
             case(0x01):
-                return &ram[(*seg_reg_replace << 4) + universal_reg_bx + universal_reg_di + ReadData8InExe()];
+                return &ram[(*seg_reg_replace_ds << 4) + universal_reg_bx + universal_reg_di + ReadData8InExe()];
             case(0x02):
-                return &ram[(*seg_reg_replace << 4) + universal_reg_bp + universal_reg_si + ReadData8InExe()];
+                return &ram[(*seg_reg_replace_ss << 4) + universal_reg_bp + universal_reg_si + ReadData8InExe()];
             case(0x03):
-                return &ram[(*seg_reg_replace << 4) + universal_reg_bp + universal_reg_di + ReadData8InExe()];
+                return &ram[(*seg_reg_replace_ss << 4) + universal_reg_bp + universal_reg_di + ReadData8InExe()];
             case(0x04):
-                return &ram[(*seg_reg_replace << 4) + universal_reg_si + ReadData8InExe()];
+                return &ram[(*seg_reg_replace_ds << 4) + universal_reg_si + ReadData8InExe()];
             case(0x05):
-                return &ram[(*seg_reg_replace << 4) + universal_reg_di + ReadData8InExe()];
+                return &ram[(*seg_reg_replace_ds << 4) + universal_reg_di + ReadData8InExe()];
             case(0x06):
-                return &ram[(*seg_reg_replace << 4) + universal_reg_bp + ReadData8InExe()];
+                return &ram[(*seg_reg_replace_ss << 4) + universal_reg_bp + ReadData8InExe()];
             case(0x07):
-                return &ram[(*seg_reg_replace << 4) + universal_reg_bx + ReadData8InExe()];
+                return &ram[(*seg_reg_replace_ds << 4) + universal_reg_bx + ReadData8InExe()];
         }
 
         case(0x2):
             switch(rm)
         {
             case(0x00):
-                return &ram[(*seg_reg_replace << 4) + universal_reg_bx + universal_reg_si + ReadData16InExe()];
+                return &ram[(*seg_reg_replace_ds << 4) + universal_reg_bx + universal_reg_si + ReadData16InExe()];
             case(0x01):
-                return &ram[(*seg_reg_replace << 4) + universal_reg_bx + universal_reg_di + ReadData16InExe()];
+                return &ram[(*seg_reg_replace_ds << 4) + universal_reg_bx + universal_reg_di + ReadData16InExe()];
             case(0x02):
-                return &ram[(*seg_reg_replace << 4) + universal_reg_bp + universal_reg_si + ReadData16InExe()];
+                return &ram[(*seg_reg_replace_ss << 4) + universal_reg_bp + universal_reg_si + ReadData16InExe()];
             case(0x03):
-                return &ram[(*seg_reg_replace << 4) + universal_reg_bp + universal_reg_di + ReadData16InExe()];
+                return &ram[(*seg_reg_replace_ss << 4) + universal_reg_bp + universal_reg_di + ReadData16InExe()];
             case(0x04):
-                return &ram[(*seg_reg_replace << 4) + universal_reg_si + ReadData16InExe()];
+                return &ram[(*seg_reg_replace_ds << 4) + universal_reg_si + ReadData16InExe()];
             case(0x05):
-                return &ram[(*seg_reg_replace << 4) + universal_reg_di + ReadData16InExe()];
+                return &ram[(*seg_reg_replace_ds << 4) + universal_reg_di + ReadData16InExe()];
             case(0x06):
-                return &ram[(*seg_reg_replace << 4) + universal_reg_bp + ReadData16InExe()];
+                return &ram[(*seg_reg_replace_ss << 4) + universal_reg_bp + ReadData16InExe()];
             case(0x07):
-                return &ram[(*seg_reg_replace << 4) + universal_reg_bx + ReadData16InExe()];
+                return &ram[(*seg_reg_replace_ds << 4) + universal_reg_bx + ReadData16InExe()];
         }
         case(0x3):
             if(opcode == 0x0)
@@ -476,7 +492,8 @@ void Cpu::Exec()
     uint8_t mod_byte;
     uint8_t *opt1_8bit, *opt2_8bit;
     uint16_t *opt1_16bit, *opt2_16bit;
-    seg_reg_replace = &seg_reg_ds;
+    seg_reg_replace_ds = &seg_reg_ds;
+    seg_reg_replace_ss = &seg_reg_ss;
     opcode = ReadData8InExe();
     switch(opcode)
     {
@@ -1815,7 +1832,7 @@ void Cpu::Exec()
                 universal_reg_di = Pop();
                 break;
             }
-
+#ifdef CPU_80186
         case(0x60)://PUSHA (80186)
             {
                 uint16_t sp_tmp = universal_reg_sp;
@@ -1869,5 +1886,1522 @@ void Cpu::Exec()
                 break;
             }
 
+        case(0x69)://IMUL Gv Ev Iz (80186)
+            {
+                mod_byte = ReadData8InExe();
+                opt1_16bit = CalculateReg16(mod_byte);
+                opt2_16bit = reinterpret_cast<uint16_t  *>(CalculateRM(mod_byte, opcode));
+                __asm__
+                    (
+                     "MOVW %3,%%AX;\n\t"
+                     "IMULW %2,%%AX;\n\t"
+                     "MOVW %%AX,%0;\n\t"
+                     "PUSHF;\n\t"
+                     "POP %%EAX;\n\t"
+                     "MOVW %%AX,%1;\n\t"
+                     :"=r"(*opt1_16bit), "=r"(control_reg_flag) /* output */
+                     :"r"(*opt2_16bit), "r"(ReadData16InExe())   /* input */
+                     :"eax"
+                    );
+                break;
+            }
+
+        case(0x6A)://PUSH Ib (80186)
+            {
+                Push(static_cast<uint16_t>(ReadData8InExe()));
+                break;
+            }
+
+        case(0x6B)://IMUL Gv Ev Ib (80186)
+            {
+                mod_byte = ReadData8InExe();
+                opt1_16bit = CalculateReg16(mod_byte);
+                opt2_16bit = reinterpret_cast<uint16_t  *>(CalculateRM(mod_byte, opcode));
+                __asm__
+                    (
+                     "MOVW %3,%%AX;\n\t"
+                     "IMULW %2,%%AX;\n\t"
+                     "MOVW %%AX,%0;\n\t"
+                     "PUSHF;\n\t"
+                     "POP %%EAX;\n\t"
+                     "MOVW %%AX,%1;\n\t"
+                     :"=r"(*opt1_16bit), "=r"(control_reg_flag) /* output */
+                     :"r"(*opt2_16bit), "r"(static_cast<uint16_t>(ReadData8InExe()))   /* input */
+                     :"eax"
+                    );
+                break;
+            }
+
+            /* remain to fix */
+
+        case(0x6C)://INSB (80186)
+            {
+                if(rep && universal_reg_cx == 0)
+                    break;
+                WriteRam8(*seg_reg_replace << 4 + universal_reg_si, read_form_port(universal_reg_dx));
+                uint8_t flag_df = (control_reg_flag >> 10) & 0x1;
+                if(flag_df) {
+                    universal_reg_si = runiversal_reg_si - 1;
+                    universal_reg_di = runiversal_reg_di - 1;
+                }
+                else {
+                    universal_reg_si = runiversal_reg_si + 1;
+                    universal_reg_di = runiversal_reg_di + 1;
+                }
+
+                if(rep) {
+                    universal_reg_cx = universal_reg_cx - 1;
+                }
+
+                totalexec++;
+                loopcount++;
+
+                if(!rep) {
+                    break;
+                }
+
+                ip = firstip;
+                break;
+            }
+
+
+
+            /* remain to fix */
+
+        case(0x6D)://INSD (80186)
+            {
+                if(rep && universal_reg_cx == 0)
+                    break;
+                WriteRam16(*seg_reg_replace << 4 + universal_reg_si, read_from_port(universal_reg_dx));
+                uint8_t flag_df = (control_reg_flag >> 10) & 0x1;
+                if(flag_df) {
+                    universal_reg_si = runiversal_reg_si - 2;
+                    universal_reg_di = runiversal_reg_di - 2;
+                }
+                else {
+                    universal_reg_si = runiversal_reg_si + 2;
+                    universal_reg_di = runiversal_reg_di + 2;
+                }
+
+                if(rep) {
+                    universal_reg_cx = universal_reg_cx - 1;
+                }
+
+                totalexec++;
+                loopcount++;
+
+                if(!rep) {
+                    break;
+                }
+
+                ip = firstip;
+                break;
+            }
+
+
+            /* remain to fix */
+
+        case(0x6E)://OUSB (80186)
+            {
+                if(rep && universal_reg_cx == 0)
+                    break;
+                Write_to_port(universal_reg_dx, ReadRam8(*seg_reg_replace << 4 + universal_reg_si));
+                uint8_t flag_df = (control_reg_flag >> 10) & 0x1;
+                if(flag_df) {
+                    universal_reg_si = runiversal_reg_si - 1;
+                    universal_reg_di = runiversal_reg_di - 1;
+                }
+                else {
+                    universal_reg_si = runiversal_reg_si + 1;
+                    universal_reg_di = runiversal_reg_di + 1;
+                }
+
+                if(rep) {
+                    universal_reg_cx = universal_reg_cx - 1;
+                }
+
+                totalexec++;
+                loopcount++;
+
+                if(!rep) {
+                    break;
+                }
+
+                ip = firstip;
+                break;
+            }
+
+
+            /* remain to fix */
+
+        case(0x6F)://OUSW (80186)
+            {
+                if(rep && universal_reg_cx == 0)
+                    break;
+                Write_to_port(universal_reg_dx, ReadRam16(*seg_reg_replace << 4 + universal_reg_si));
+                uint8_t flag_df = (control_reg_flag >> 10) & 0x1;
+                if(flag_df) {
+                    universal_reg_si = runiversal_reg_si - 2;
+                    universal_reg_di = runiversal_reg_di - 2;
+                }
+                else {
+                    universal_reg_si = runiversal_reg_si + 2;
+                    universal_reg_di = runiversal_reg_di + 2;
+                }
+
+                if(rep) {
+                    universal_reg_cx = universal_reg_cx - 1;
+                }
+
+                totalexec++;
+                loopcount++;
+
+                if(!rep) {
+                    break;
+                }
+
+                control_reg_ip = firstip;
+                break;
+            }
+#endif
+        case(0x70)://JO Jb
+            {
+                uint16_t tmp_data = static_cast<uint16_t>(ReadData8InExe());
+                uint8_t flag_of = (control_reg_flag >> 11) & 0x1;
+                if(flag_of)
+                    control_reg_ip = control_reg_ip + tmp_data;
+                break;
+            }
+
+        case(0x71)://JNO Jb
+            {
+                uint16_t tmp_data = static_cast<uint16_t>(ReadData8InExe());
+                uint8_t flag_of = (control_reg_flag >> 11) & 0x1;
+                if(!flag_of)
+                    control_reg_ip = control_reg_ip + tmp_data;
+                break;
+            }
+
+        case(0x72)://JB Jb
+            {
+                uint16_t tmp_data = static_cast<uint16_t>(ReadData8InExe());
+                uint8_t flag_cf = control_reg_flag & 0x1;
+                if(flag_cf)
+                    control_reg_ip = control_reg_ip + tmp_data;
+                break;
+            }
+
+        case(0x73)://JNB Jb
+            {
+                uint16_t tmp_data = static_cast<uint16_t>(ReadData8InExe());
+                uint8_t flag_cf = control_reg_flag & 0x1;
+                if(!flag_cf)
+                    control_reg_ip = control_reg_ip + tmp_data;
+                break;
+            }
+
+        case(0x74)://JZ Jb
+            {
+                uint16_t tmp_data = static_cast<uint16_t>(ReadData8InExe());
+                uint8_t flag_zf = (control_reg_flag >> 6) & 0x1;
+                if(flag_zf)
+                    control_reg_ip = control_reg_ip + tmp_data;
+                break;
+            }
+
+        case(0x75)://JNZ Jb
+            {
+                uint16_t tmp_data = static_cast<uint16_t>(ReadData8InExe());
+                uint8_t flag_zf = (control_reg_flag >> 6) & 0x1;
+                if(!flag_zf)
+                    control_reg_ip = control_reg_ip + tmp_data;
+                break;
+            }
+
+        case(0x76)://JBE Jb
+            {
+                uint16_t tmp_data = static_cast<uint16_t>(ReadData8InExe());
+                uint8_t flag_cf = control_reg_flag & 0x1;
+                uint8_t flag_zf = (control_reg_flag >> 6) & 0x1;
+                if(flag_zf || flag_cf)
+                    control_reg_ip = control_reg_ip + tmp_data;
+                break;
+            }
+
+        case(0x77)://JNBE Jb
+            {
+                uint16_t tmp_data = static_cast<uint16_t>(ReadData8InExe());
+                uint8_t flag_cf = control_reg_flag & 0x1;
+                uint8_t flag_zf = (control_reg_flag >> 6) & 0x1;
+                if(flag_zf == 0 || flag_cf == 0)
+                    control_reg_ip = control_reg_ip + tmp_data;
+                break;
+            }
+
+        case(0x78)://JS Jb
+            {
+                uint16_t tmp_data = static_cast<uint16_t>(ReadData8InExe());
+                uint8_t flag_sf = (control_reg_flag >> 7) & 0x1;
+                if(flag_sf)
+                    control_reg_ip = control_reg_ip + tmp_data;
+                break;
+            }
+
+        case(0x79)://JNS Jb
+            {
+                uint16_t tmp_data = static_cast<uint16_t>(ReadData8InExe());
+                uint8_t flag_sf = (control_reg_flag >> 7) & 0x1;
+                if(!flag_sf)
+                    control_reg_ip = control_reg_ip + tmp_data;
+                break;
+            }
+
+        case(0x7A)://JP Jb
+            {
+                uint16_t tmp_data = static_cast<uint16_t>(ReadData8InExe());
+                uint8_t flag_pf = (control_reg_flag >> 2) & 0x1;
+                if(flag_pf)
+                    control_reg_ip = control_reg_ip + tmp_data;
+                break;
+            }
+
+        case(0x7B)://JNP Jb
+            {
+                uint16_t tmp_data = static_cast<uint16_t>(ReadData8InExe());
+                uint8_t flag_pf = (control_reg_flag >> 2) & 0x1;
+                if(!flag_pf)
+                    control_reg_ip = control_reg_ip + tmp_data;
+                break;
+            }
+
+        case(0x7C)://JL Jb
+            {
+                uint16_t tmp_data = static_cast<uint16_t>(ReadData8InExe());
+                uint8_t flag_sf = (control_reg_flag >> 7) & 0x1;
+                uint8_t flag_of = (control_reg_flag >> 11) & 0x1;
+                if(flag_sf != flag_of)
+                    control_reg_ip = control_reg_ip + tmp_data;
+                break;
+            }
+
+        case(0x7D)://JNL Jb
+            {
+                uint16_t tmp_data = static_cast<uint16_t>(ReadData8InExe());
+                uint8_t flag_sf = (control_reg_flag >> 7) & 0x1;
+                uint8_t flag_of = (control_reg_flag >> 11) & 0x1;
+                if(flag_sf == flag_of)
+                    control_reg_ip = control_reg_ip + tmp_data;
+                break;
+            }
+
+        case(0x7E)://JLE Jb
+            {
+                uint16_t tmp_data = static_cast<uint16_t>(ReadData8InExe());
+                uint8_t flag_zf = (control_reg_flag >> 6) & 0x1;
+                uint8_t flag_sf = (control_reg_flag >> 7) & 0x1;
+                uint8_t flag_of = (control_reg_flag >> 11) & 0x1;
+                if(flag_zf || flag_of != flag_sf)
+                    control_reg_ip = control_reg_ip + tmp_data;
+                break;
+            }
+
+        case(0x7F)://JNLE Jb
+            {
+                uint16_t tmp_data = static_cast<uint16_t>(ReadData8InExe());
+                uint8_t flag_zf = (control_reg_flag >> 6) & 0x1;
+                uint8_t flag_sf = (control_reg_flag >> 7) & 0x1;
+                uint8_t flag_of = (control_reg_flag >> 11) & 0x1;
+                if(flag_zf == 0 && flag_of == flag_sf)
+                    control_reg_ip = control_reg_ip + tmp_data;
+                break;
+            }
+
+        case(0x80)://group Eb Ib
+        case(0x82)://group Eb Ib (i64)
+            {
+                mod_byte = ReadData8InExe();
+                uint8_t group_index = (mod_byte >> 3) & 0x7;
+                opt1_8bit = CalculateRM(mod_byte, opcode);
+                switch(group_index)
+                {
+                    case(0x00)://ADD Eb Ib
+                        {
+                            __asm__
+                                (
+                                 "ADDB %2,%0;\n\t"
+                                 "PUSHF;\n\t"
+                                 "POP %%EAX;\n\t"
+                                 "MOVW %%AX,%1;\n\t"
+                                 :"+r"(*opt1_8bit), "=r"(control_reg_flag) /* output */
+                                 :"r"(ReadData8InExe())       /* input */
+                                 :"eax"
+                                );
+                            break;
+                        }
+
+                    case(0x01)://OR Eb Ib
+                        {
+                            __asm__
+                                (
+                                 "ORB %2,%0;\n\t"
+                                 "PUSHF;\n\t"
+                                 "POP %%EAX;\n\t"
+                                 "MOVW %%AX,%1;\n\t"
+                                 :"+r"(*opt1_8bit), "=r"(control_reg_flag) /* output */
+                                 :"r"(ReadData8InExe())       /* input */
+                                 :"eax"
+                                );
+                            break;
+                        }
+
+                    case(0x02)://ADC Eb Ib
+                        {
+                            __asm__
+                                (
+                                 "ADCB %2,%0;\n\t"
+                                 "PUSHF;\n\t"
+                                 "POP %%EAX;\n\t"
+                                 "MOVW %%AX,%1;\n\t"
+                                 :"+r"(*opt1_8bit), "=r"(control_reg_flag) /* output */
+                                 :"r"(ReadData8InExe())       /* input */
+                                 :"eax"
+                                );
+                            break;
+                        }
+
+                    case(0x03)://SBB Eb Ib
+                        {
+                            __asm__
+                                (
+                                 "SBBB %2,%0;\n\t"
+                                 "PUSHF;\n\t"
+                                 "POP %%EAX;\n\t"
+                                 "MOVW %%AX,%1;\n\t"
+                                 :"+r"(*opt1_8bit), "=r"(control_reg_flag) /* output */
+                                 :"r"(ReadData8InExe())       /* input */
+                                 :"eax"
+                                );
+                            break;
+                        }
+
+                    case(0x04)://AND Eb Ib
+                        {
+                            __asm__
+                                (
+                                 "ANDB %2,%0;\n\t"
+                                 "PUSHF;\n\t"
+                                 "POP %%EAX;\n\t"
+                                 "MOVW %%AX,%1;\n\t"
+                                 :"+r"(*opt1_8bit), "=r"(control_reg_flag) /* output */
+                                 :"r"(ReadData8InExe())       /* input */
+                                 :"eax"
+                                );
+                            break;
+                        }
+
+                    case(0x05)://SUB Eb Ib
+                        {
+                            __asm__
+                                (
+                                 "SUBB %2,%0;\n\t"
+                                 "PUSHF;\n\t"
+                                 "POP %%EAX;\n\t"
+                                 "MOVW %%AX,%1;\n\t"
+                                 :"+r"(*opt1_8bit), "=r"(control_reg_flag) /* output */
+                                 :"r"(ReadData8InExe())       /* input */
+                                 :"eax"
+                                );
+                            break;
+                        }
+
+                    case(0x06)://XOR Eb Ib
+                        {
+                            __asm__
+                                (
+                                 "XORB %2,%0;\n\t"
+                                 "PUSHF;\n\t"
+                                 "POP %%EAX;\n\t"
+                                 "MOVW %%AX,%1;\n\t"
+                                 :"+r"(*opt1_8bit), "=r"(control_reg_flag) /* output */
+                                 :"r"(ReadData8InExe())       /* input */
+                                 :"eax"
+                                );
+                            break;
+                        }
+
+                    case(0x07)://CMP Eb Ib
+                        {
+                            __asm__
+                                (
+                                 "CMPB %2,%1;\n\t"
+                                 "PUSHF;\n\t"
+                                 "POP %%EAX;\n\t"
+                                 "MOVW %%AX,%0;\n\t"
+                                 :"=r"(control_reg_flag) /* output */
+                                 :"r"(*opt1_8bit), "r"(ReadData8InExe())      /* input */
+                                 :"eax"
+                                );
+                            break;
+                        }
+                }
+                break;
+            }
+
+        case(0x81)://group Ev Iz
+            {
+                mod_byte = ReadData8InExe();
+                uint8_t group_index = (mod_byte >> 3) & 0x7;
+                opt1_16bit = reinterpret_cast<uint16_t  *>(CalculateRM(mod_byte, opcode));
+                switch(group_index)
+                {
+                    case(0x00)://ADD Ev Iz
+                        {
+                            __asm__
+                                (
+                                 "ADDW %2,%0;\n\t"
+                                 "PUSHF;\n\t"
+                                 "POP %%EAX;\n\t"
+                                 "MOVW %%AX,%1;\n\t"
+                                 :"+r"(*opt1_16bit), "=r"(control_reg_flag) /* output */
+                                 :"r"(ReadData16InExe())       /* input */
+                                 :"eax"
+                                );
+                            break;
+                        }
+
+                    case(0x01)://OR Ev Iz
+                        {
+                            __asm__
+                                (
+                                 "ORW %2,%0;\n\t"
+                                 "PUSHF;\n\t"
+                                 "POP %%EAX;\n\t"
+                                 "MOVW %%AX,%1;\n\t"
+                                 :"+r"(*opt1_16bit), "=r"(control_reg_flag) /* output */
+                                 :"r"(ReadData16InExe())       /* input */
+                                 :"eax"
+                                );
+                            break;
+                        }
+
+                    case(0x02)://ADC Ev Iz
+                        {
+                            __asm__
+                                (
+                                 "ADCW %2,%0;\n\t"
+                                 "PUSHF;\n\t"
+                                 "POP %%EAX;\n\t"
+                                 "MOVW %%AX,%1;\n\t"
+                                 :"+r"(*opt1_16bit), "=r"(control_reg_flag) /* output */
+                                 :"r"(ReadData16InExe())       /* input */
+                                 :"eax"
+                                );
+                            break;
+                        }
+
+                    case(0x03)://SBB Ev Iz
+                        {
+                            __asm__
+                                (
+                                 "SBBW %2,%0;\n\t"
+                                 "PUSHF;\n\t"
+                                 "POP %%EAX;\n\t"
+                                 "MOVW %%AX,%1;\n\t"
+                                 :"+r"(*opt1_16bit), "=r"(control_reg_flag) /* output */
+                                 :"r"(ReadData16InExe())       /* input */
+                                 :"eax"
+                                );
+                            break;
+                        }
+
+                    case(0x04)://AND Ev Iz
+                        {
+                            __asm__
+                                (
+                                 "ANDW %2,%0;\n\t"
+                                 "PUSHF;\n\t"
+                                 "POP %%EAX;\n\t"
+                                 "MOVW %%AX,%1;\n\t"
+                                 :"+r"(*opt1_16bit), "=r"(control_reg_flag) /* output */
+                                 :"r"(ReadData16InExe())       /* input */
+                                 :"eax"
+                                );
+                            break;
+                        }
+
+                    case(0x05)://SUB Ev Iz
+                        {
+                            __asm__
+                                (
+                                 "SUBW %2,%0;\n\t"
+                                 "PUSHF;\n\t"
+                                 "POP %%EAX;\n\t"
+                                 "MOVW %%AX,%1;\n\t"
+                                 :"+r"(*opt1_16bit), "=r"(control_reg_flag) /* output */
+                                 :"r"(ReadData16InExe())       /* input */
+                                 :"eax"
+                                );
+                            break;
+                        }
+
+                    case(0x06)://XOR Ev Iz
+                        {
+                            __asm__
+                                (
+                                 "XORW %2,%0;\n\t"
+                                 "PUSHF;\n\t"
+                                 "POP %%EAX;\n\t"
+                                 "MOVW %%AX,%1;\n\t"
+                                 :"+r"(*opt1_16bit), "=r"(control_reg_flag) /* output */
+                                 :"r"(ReadData16InExe())       /* input */
+                                 :"eax"
+                                );
+                            break;
+                        }
+
+                    case(0x07)://CMP Ev Iz
+                        {
+                            __asm__
+                                (
+                                 "CMPW %2,%1;\n\t"
+                                 "PUSHF;\n\t"
+                                 "POP %%EAX;\n\t"
+                                 "MOVW %%AX,%0;\n\t"
+                                 :"=r"(control_reg_flag) /* output */
+                                 :"r"(*opt1_16bit), "r"(ReadData16InExe())      /* input */
+                                 :"eax"
+                                );
+                            break;
+                        }
+                }
+                break;
+            }
+
+        case(0x83)://group Ev Ib
+            {
+                mod_byte = ReadData8InExe();
+                uint8_t group_index = (mod_byte >> 3) & 0x7;
+                opt1_16bit = reinterpret_cast<uint16_t  *>(CalculateRM(mod_byte, opcode));
+                switch(group_index)
+                {
+                    case(0x00)://ADD Ev Ib
+                        {
+                            __asm__
+                                (
+                                 "ADDW %2,%0;\n\t"
+                                 "PUSHF;\n\t"
+                                 "POP %%EAX;\n\t"
+                                 "MOVW %%AX,%1;\n\t"
+                                 :"+r"(*opt1_16bit), "=r"(control_reg_flag) /* output */
+                                 :"r"(static_cast<uint16_t>(ReadData8InExe()))       /* input */
+                                 :"eax"
+                                );
+                            break;
+                        }
+
+                    case(0x01)://OR Ev Ib
+                        {
+                            __asm__
+                                (
+                                 "ORW %2,%0;\n\t"
+                                 "PUSHF;\n\t"
+                                 "POP %%EAX;\n\t"
+                                 "MOVW %%AX,%1;\n\t"
+                                 :"+r"(*opt1_16bit), "=r"(control_reg_flag) /* output */
+                                 :"r"(static_cast<uint16_t>(ReadData8InExe()))       /* input */
+                                 :"eax"
+                                );
+                            break;
+                        }
+
+                    case(0x02)://ADC Ev Ib
+                        {
+                            __asm__
+                                (
+                                 "ADCW %2,%0;\n\t"
+                                 "PUSHF;\n\t"
+                                 "POP %%EAX;\n\t"
+                                 "MOVW %%AX,%1;\n\t"
+                                 :"+r"(*opt1_16bit), "=r"(control_reg_flag) /* output */
+                                 :"r"(static_cast<uint16_t>(ReadData8InExe()))       /* input */
+                                 :"eax"
+                                );
+                            break;
+                        }
+
+                    case(0x03)://SBB Ev Ib
+                        {
+                            __asm__
+                                (
+                                 "SBBW %2,%0;\n\t"
+                                 "PUSHF;\n\t"
+                                 "POP %%EAX;\n\t"
+                                 "MOVW %%AX,%1;\n\t"
+                                 :"+r"(*opt1_16bit), "=r"(control_reg_flag) /* output */
+                                 :"r"(static_cast<uint16_t>(ReadData8InExe()))       /* input */
+                                 :"eax"
+                                );
+                            break;
+                        }
+
+                    case(0x04)://AND Ev Ib
+                        {
+                            __asm__
+                                (
+                                 "ANDW %2,%0;\n\t"
+                                 "PUSHF;\n\t"
+                                 "POP %%EAX;\n\t"
+                                 "MOVW %%AX,%1;\n\t"
+                                 :"+r"(*opt1_16bit), "=r"(control_reg_flag) /* output */
+                                 :"r"(static_cast<uint16_t>(ReadData8InExe()))       /* input */
+                                 :"eax"
+                                );
+                            break;
+                        }
+
+                    case(0x05)://SUB Ev Ib
+                        {
+                            __asm__
+                                (
+                                 "SUBW %2,%0;\n\t"
+                                 "PUSHF;\n\t"
+                                 "POP %%EAX;\n\t"
+                                 "MOVW %%AX,%1;\n\t"
+                                 :"+r"(*opt1_16bit), "=r"(control_reg_flag) /* output */
+                                 :"r"(static_cast<uint16_t>(ReadData8InExe()))       /* input */
+                                 :"eax"
+                                );
+                            break;
+                        }
+
+                    case(0x06)://XOR Ev Ib
+                        {
+                            __asm__
+                                (
+                                 "XORW %2,%0;\n\t"
+                                 "PUSHF;\n\t"
+                                 "POP %%EAX;\n\t"
+                                 "MOVW %%AX,%1;\n\t"
+                                 :"+r"(*opt1_16bit), "=r"(control_reg_flag) /* output */
+                                 :"r"(static_cast<uint16_t>(ReadData8InExe()))       /* input */
+                                 :"eax"
+                                );
+                            break;
+                        }
+
+                    case(0x07)://CMP Ev Ib
+                        {
+                            __asm__
+                                (
+                                 "CMPW %2,%1;\n\t"
+                                 "PUSHF;\n\t"
+                                 "POP %%EAX;\n\t"
+                                 "MOVW %%AX,%0;\n\t"
+                                 :"=r"(control_reg_flag) /* output */
+                                 :"r"(*opt1_16bit), "r"(static_cast<uint16_t>(ReadData8InExe()))      /* input */
+                                 :"eax"
+                                );
+                            break;
+                        }
+                }
+                break;
+            }
+
+        case(0x84)://TEST Eb Gb
+            {
+                mod_byte = ReadData8InExe();
+                opt1_8bit = CalculateRM(mod_byte, opcode);
+                opt2_8bit = CalculateReg8(mod_byte);
+                __asm__
+                    (
+                     "TESTB %2,%1;\n\t"
+                     "PUSHF;\n\t"
+                     "POP %%EAX;\n\t"
+                     "MOVW %%AX,%0;\n\t"
+                     :"=r"(control_reg_flag) /* output */
+                     :"r"(*opt1_8bit), "r"(*opt2_8bit)      /* input */
+                     :"eax"
+                    );
+                break;
+            }
+
+        case(0x85)://TEST Ev Gv
+            {
+                mod_byte = ReadData8InExe();
+                opt1_16bit = reinterpret_cast<uint16_t  *>(CalculateRM(mod_byte, opcode));
+                opt2_16bit = CalculateReg16(mod_byte);
+                __asm__
+                    (
+                     "TESTW %2,%1;\n\t"
+                     "PUSHF;\n\t"
+                     "POP %%EAX;\n\t"
+                     "MOVW %%AX,%0;\n\t"
+                     :"=r"(control_reg_flag) /* output */
+                     :"r"(*opt1_16bit), "r"(*opt2_16bit)      /* input */
+                     :"eax"
+                    );
+                break;
+            }
+
+        case(0x86)://XCHG Eb Gb
+            {
+                uint8_t tmp_data;
+                mod_byte = ReadData8InExe();
+                opt1_8bit = CalculateRM(mod_byte, opcode);
+                opt2_8bit = CalculateReg8(mod_byte);
+                tmp_data = *opt1_8bit;
+                *opt1_8bit = *opt2_8bit;
+                *opt2_8bit = tmp_data;
+                break;
+            }
+
+        case(0x87)://XCHG Ev Gv
+            {
+                uint16_t tmp_data;
+                mod_byte = ReadData8InExe();
+                opt1_16bit = reinterpret_cast<uint16_t  *>(CalculateRM(mod_byte, opcode));
+                opt2_16bit = CalculateReg16(mod_byte);
+                tmp_data = *opt1_16bit;
+                *opt1_16bit = *opt2_16bit;
+                *opt2_16bit = tmp_data;
+                break;
+            }
+
+        case(0x88)://MOV Eb Gb
+            {
+                mod_byte = ReadData8InExe();
+                opt1_8bit = CalculateRM(mod_byte, opcode);
+                opt2_8bit = CalculateReg8(mod_byte);
+                *opt1_8bit = *opt2_8bit;
+                break;
+            }
+
+        case(0x89)://MOV Ev Gv
+            {
+                mod_byte = ReadData8InExe();
+                opt1_16bit = reinterpret_cast<uint16_t  *>(CalculateRM(mod_byte, opcode));
+                opt2_16bit = CalculateReg16(mod_byte);
+                *opt1_16bit = *opt2_16bit;
+                break;
+            }
+
+        case(0x8A)://MOV Gb Eb
+            {
+                mod_byte = ReadData8InExe();
+                opt1_8bit = CalculateReg8(mod_byte);
+                opt2_8bit = CalculateRM(mod_byte, opcode);
+                *opt1_8bit = *opt2_8bit;
+                break;
+            }
+
+        case(0x8B)://MOV Gv Ev
+            {
+                mod_byte = ReadData8InExe();
+                opt1_16bit = CalculateReg16(mod_byte);
+                opt2_16bit = reinterpret_cast<uint16_t  *>(CalculateRM(mod_byte, opcode));
+                *opt1_16bit = *opt2_16bit;
+                break;
+            }
+
+        case(0x8C)://MOV Rw Sw
+            {
+                mod_byte = ReadData8InExe();
+                opt1_16bit = reinterpret_cast<uint16_t  *>(CalculateRM(mod_byte, opcode));
+                opt2_16bit = CalculateSeg16(mod_byte);
+                *opt1_16bit = *opt2_16bit;
+                break;
+            }
+
+        case(0x8D)://LEA Gv M
+            {
+                mod_byte = ReadData8InExe();
+                uint8_t rm = mod_byte & 0x7;
+                uint8_t mod_bit = (mod_byte >> 6) & 0x3;
+                opt1_16bit = CalculateReg16(mod_byte);
+                opt2_16bit = reinterpret_cast<uint16_t  *>(CalculateRM(mod_byte, opcode));
+                if((mod_bit == 0x0 && (rm == 0x2 || rm == 0x3)) || (mod_bit != 0x0 && (rm == 0x2 || rm == 0x3 || rm == 0x6)))
+                    *opt1_16bit = (reinterpret_cast<uint8_t  *>(opt2_16bit) - &ram[0]) - (*seg_reg_replace_ss << 4);
+                else
+                    *opt1_16bit = (reinterpret_cast<uint8_t  *>(opt2_16bit) - &ram[0]) - (*seg_reg_replace_ds << 4);
+                break;
+            }
+
+        case(0x8E)://MOV Sw Rw
+            {
+                mod_byte = ReadData8InExe();
+                opt1_16bit = CalculateSeg16(mod_byte);
+                opt2_16bit = reinterpret_cast<uint16_t  *>(CalculateRM(mod_byte, opcode));
+                *opt1_16bit = *opt2_16bit;
+                break;
+            }
+
+        case(0x8F)://POP Ev
+            {
+                mod_byte = ReadData8InExe();
+                opt1_16bit = reinterpret_cast<uint16_t  *>(CalculateRM(mod_byte, opcode));
+                *opt1_16bit = Pop();
+                break;
+            }
+
+        case(0x90)://NOP
+            {
+                break;
+            }
+
+        case(0x91)://XCHG eCX eAX
+            {
+                uint16_t tmp_data;
+                tmp_data = universal_reg_ax;
+                universal_reg_ax = universal_reg_cx;
+                universal_reg_cx = tmp_data;
+                break;
+            }
+
+        case(0x92)://XCHG eDX eAX
+            {
+                uint16_t tmp_data;
+                tmp_data = universal_reg_ax;
+                universal_reg_ax = universal_reg_dx;
+                universal_reg_dx = tmp_data;
+                break;
+            }
+
+        case(0x93)://XCHG eBX eAX
+            {
+                uint16_t tmp_data;
+                tmp_data = universal_reg_ax;
+                universal_reg_ax = universal_reg_bx;
+                universal_reg_bx = tmp_data;
+                break;
+            }
+
+        case(0x94)://XCHG eSP eAX
+            {
+                uint16_t tmp_data;
+                tmp_data = universal_reg_ax;
+                universal_reg_ax = universal_reg_sp;
+                universal_reg_sp = tmp_data;
+                break;
+            }
+
+        case(0x95)://XCHG eBP eAX
+            {
+                uint16_t tmp_data;
+                tmp_data = universal_reg_ax;
+                universal_reg_ax = universal_reg_bp;
+                universal_reg_bp = tmp_data;
+                break;
+            }
+
+        case(0x96)://XCHG eSI eAX
+            {
+                uint16_t tmp_data;
+                tmp_data = universal_reg_ax;
+                universal_reg_ax = universal_reg_si;
+                universal_reg_si = tmp_data;
+                break;
+            }
+
+        case(0x97)://XCHG eDI eAX
+            {
+                uint16_t tmp_data;
+                tmp_data = universal_reg_ax;
+                universal_reg_ax = universal_reg_di;
+                universal_reg_di = tmp_data;
+                break;
+            }
+
+        case(0x98)://CBW
+            {
+                if((*universal_reg_al & 0x80) == 0x80)
+                    *universal_reg_ah = 0xFF;
+                else
+                    *universal_reg_ah = 0x0;
+                break;
+            }
+
+        case(0x99)://CWD
+            {
+                if((*universal_reg_ah & 0x80) == 0x80)
+                    universal_reg_dx = 0xFFFF;
+                else
+                    universal_reg_dx = 0x0;
+                break;
+            }
+
+        case(0x9A)://CALL Ap
+            {
+                uint16_t offset = ReadData16InExe();//offset
+                uint16_t seletor = ReadData16InExe();//seletor
+                Push(seg_reg_cs);
+                Push(control_reg_ip);
+                control_reg_ip = offset;
+                seg_reg_cs = seletor;
+                break;
+            }
+
+        case(0x9B)://WAIT
+            {
+                break;
+            }
+
+        case(0x9C)://PUSHF
+            {
+                Push(control_reg_flag);
+                break;
+            }
+
+        case(0x9D)://POPF
+            {
+                control_reg_flag = Pop();
+                break;
+            }
+
+        case(0x9E)://SAHF
+            {
+                control_reg_flag = (control_reg_flag & 0xFF00) | ((*universal_reg_ah & 0xD7) | 0x2);
+                break;
+            }
+
+        case(0x9F)://LAHF
+            {
+                *universal_reg_ah = ((control_reg_flag & 0xD7) | 0x2);
+                break;
+            }
+
+        case(0xA0)://MOV AL Ob
+            {
+                uint16_t offset = ReadData16InExe();//offset
+                *universal_reg_al = ReadRam8((*seg_reg_replace_ds << 4) + offset);
+                break;
+            }
+
+        case(0xA1)://MOV eAX Ov
+            {
+                uint16_t offset = ReadData16InExe();//offset
+                universal_reg_ax = ReadRam16((*seg_reg_replace_ds << 4) + offset);
+                break;
+            }
+
+        case(0xA2)://MOV Ob AL
+            {
+                uint16_t offset = ReadData16InExe();//offset
+                WriteRam8((*seg_reg_replace_ds << 4) + offset, *universal_reg_al);
+                break;
+            }
+
+        case(0xA3)://MOV Ov eAX
+            {
+                uint16_t offset = ReadData16InExe();//offset
+                WriteRam16((*seg_reg_replace_ds << 4) + offset, universal_reg_ax);
+                break;
+            }
+
+            /*remain to fix*/
+            /*
+               case(0xA4)://MOVS Yb Xb
+               {
+               if(reptype && (universal_reg_cx == 0))
+               break;
+
+               uint8_t df = control_reg_flag >> 10 & 0x1;
+               WriteRam8((seg_reg_es << 4) + universal_reg_di, ReadRam8((*seg_reg_replace_ds << 4) + universal_reg_si));
+
+               if(df)
+               {
+               universal_reg_di = universal_reg_di - 1;
+               universal_reg_si = universal_reg_si - 1;
+               }
+               else
+               {
+               universal_reg_di = universal_reg_di + 1;
+               universal_reg_si = universal_reg_si + 1;
+               }
+
+               totalexec++;
+               loopcount++;
+
+               if(reptype)
+               universal_reg_cx = universal_reg_cx - 1;
+               else
+               break;
+
+               control_reg_ip = firstip;
+               break;
+               }
+               */
+
+            /*remain to fix*/
+            /*
+               case(0xA5)://MOVS Yv Xv
+               {
+               if(reptype && (universal_reg_cx == 0))
+               break;
+
+               uint8_t df = control_reg_flag >> 10 & 0x1;
+               WriteRam16((seg_reg_es << 4) + universal_reg_di, ReadRam16((*seg_reg_replace_ds << 4) + universal_reg_si));
+
+               if(df)
+               {
+               universal_reg_di = universal_reg_di - 2;
+               universal_reg_si = universal_reg_si - 2;
+               }
+               else
+               {
+               universal_reg_di = universal_reg_di + 2;
+               universal_reg_si = universal_reg_si + 2;
+               }
+
+               totalexec++;
+               loopcount++;
+
+               if(reptype)
+               universal_reg_cx = universal_reg_cx - 1;
+               else
+               break;
+
+               control_reg_ip = firstip;
+               break;
+               }
+               */
+
+            /*remain to fix*/
+            /*
+               case(0xA6)://CMPS Yb Xb
+               */
+
+            /*remain to fix*/
+            /*
+               case(0xA7)://CMPS Yv Xv
+               */
+
+        case(0xA8)://TEST AL Ib
+            {
+                opt1_8bit = universal_reg_al;
+                __asm__
+                    (
+                     "TESTB %2,%1;\n\t"
+                     "PUSHF;\n\t"
+                     "POP %%EAX;\n\t"
+                     "MOVW %%AX,%0;\n\t"
+                     :"=r"(control_reg_flag) /* output */
+                     :"r"(*opt1_8bit), "r"(ReadData8InExe())      /* input */
+                     :"eax"
+                    );
+                break;
+            }
+
+        case(0xA9)://TEST eAX Iz
+            {
+                opt1_16bit = &universal_reg_ax;
+                __asm__
+                    (
+                     "TESTW %2,%1;\n\t"
+                     "PUSHF;\n\t"
+                     "POP %%EAX;\n\t"
+                     "MOVW %%AX,%0;\n\t"
+                     :"=r"(control_reg_flag) /* output */
+                     :"r"(*opt1_16bit), "r"(ReadData16InExe())      /* input */
+                     :"eax"
+                    );
+                break;
+            }
+
+            /*remain to fix*/
+            /*
+               case(0xAA)://STOS Yb AL
+               */
+
+            /*remain to fix*/
+            /*
+               case(0xAB)://STOS Yv rAX
+               */
+
+            /*remain to fix*/
+            /*
+               case(0xAC)://LODS AL Xb
+               */
+
+            /*remain to fix*/
+            /*
+               case(0xAD)://LODS rAX Xv
+               */
+
+            /*remain to fix*/
+            /*
+               case(0xAE)://SCAS Yb AL
+               */
+
+            /*remain to fix*/
+            /*
+               case(0xAF)://SCAS Yv rAX
+               */
+
+        case(0xB0)://MOV AL Ib
+            {
+                *universal_reg_al = ReadData8InExe();
+                break;
+            }
+
+        case(0xB1)://MOV CL Ib
+            {
+                *universal_reg_cl = ReadData8InExe();
+                break;
+            }
+
+        case(0xB2)://MOV DL Ib
+            {
+                *universal_reg_dl = ReadData8InExe();
+                break;
+            }
+
+        case(0xB3)://MOV BL Ib
+            {
+                *universal_reg_bl = ReadData8InExe();
+                break;
+            }
+
+        case(0xB4)://MOV AH Ib
+            {
+                *universal_reg_ah = ReadData8InExe();
+                break;
+            }
+
+        case(0xB5)://MOV CH Ib
+            {
+                *universal_reg_ch = ReadData8InExe();
+                break;
+            }
+
+        case(0xB6)://MOV DH Ib
+            {
+                *universal_reg_dh = ReadData8InExe();
+                break;
+            }
+
+        case(0xB7)://MOV BH Ib
+            {
+                *universal_reg_bh = ReadData8InExe();
+                break;
+            }
+
+        case(0xB8)://MOV eAX Iv
+            {
+                universal_reg_ax = ReadData16InExe();
+                break;
+            }
+
+        case(0xB9)://MOV eCX Iv
+            {
+                universal_reg_cx = ReadData16InExe();
+                break;
+            }
+
+        case(0xBA)://MOV eDX Iv
+            {
+                universal_reg_dx = ReadData16InExe();
+                break;
+            }
+
+        case(0xBB)://MOV eBX Iv
+            {
+                universal_reg_bx = ReadData16InExe();
+                break;
+            }
+
+        case(0xBC)://MOV SP Iv
+            {
+                universal_reg_sp = ReadData16InExe();
+                break;
+            }
+
+        case(0xBD)://MOV BP Iv
+            {
+                universal_reg_bp = ReadData16InExe();
+                break;
+            }
+        case(0xBE)://MOV SI Iv
+            {
+                universal_reg_si = ReadData16InExe();
+                break;
+            }
+        case(0xBF)://MOV DI Iv
+            {
+                universal_reg_di = ReadData16InExe();
+                break;
+            }
+
+        case(0xC0)://group Eb Ib (80186)
+            {
+                mod_byte = ReadData8InExe();
+                uint8_t group_index = (mod_byte >> 3) & 0x7;
+                opt1_8bit = CalculateRM(mod_byte, opcode);
+                switch(group_index)
+                {
+                    case(0x00)://ROL Eb Ib
+                        {
+                            __asm__
+                                (
+                                 "ROLB %2,%0;\n\t"
+                                 "PUSHF;\n\t"
+                                 "POP %%EAX;\n\t"
+                                 "MOVW %%AX,%1;\n\t"
+                                 :"+r"(*opt1_8bit), "=r"(control_reg_flag) /* output */
+                                 :"r"(ReadData8InExe())       /* input */
+                                 :"eax"
+                                );
+                            break;
+                        }
+
+                    case(0x01)://ROR Eb Ib
+                        {
+                            __asm__
+                                (
+                                 "RORB %2,%0;\n\t"
+                                 "PUSHF;\n\t"
+                                 "POP %%EAX;\n\t"
+                                 "MOVW %%AX,%1;\n\t"
+                                 :"+r"(*opt1_8bit), "=r"(control_reg_flag) /* output */
+                                 :"r"(ReadData8InExe())       /* input */
+                                 :"eax"
+                                );
+                            break;
+                        }
+
+                    case(0x02)://RCL Eb Ib
+                        {
+                            __asm__
+                                (
+                                 "RCLB %2,%0;\n\t"
+                                 "PUSHF;\n\t"
+                                 "POP %%EAX;\n\t"
+                                 "MOVW %%AX,%1;\n\t"
+                                 :"+r"(*opt1_8bit), "=r"(control_reg_flag) /* output */
+                                 :"r"(ReadData8InExe())       /* input */
+                                 :"eax"
+                                );
+                            break;
+                        }
+
+                    case(0x03)://RCR Eb Ib
+                        {
+                            __asm__
+                                (
+                                 "RCRB %2,%0;\n\t"
+                                 "PUSHF;\n\t"
+                                 "POP %%EAX;\n\t"
+                                 "MOVW %%AX,%1;\n\t"
+                                 :"+r"(*opt1_8bit), "=r"(control_reg_flag) /* output */
+                                 :"r"(ReadData8InExe())       /* input */
+                                 :"eax"
+                                );
+                            break;
+                        }
+
+                    case(0x04)://SHL Eb Ib
+                        {
+                            __asm__
+                                (
+                                 "SHLB %2,%0;\n\t"
+                                 "PUSHF;\n\t"
+                                 "POP %%EAX;\n\t"
+                                 "MOVW %%AX,%1;\n\t"
+                                 :"+r"(*opt1_8bit), "=r"(control_reg_flag) /* output */
+                                 :"r"(ReadData8InExe())       /* input */
+                                 :"eax"
+                                );
+                            break;
+                        }
+
+                    case(0x05)://SHR Eb Ib
+                        {
+                            __asm__
+                                (
+                                 "SHRB %2,%0;\n\t"
+                                 "PUSHF;\n\t"
+                                 "POP %%EAX;\n\t"
+                                 "MOVW %%AX,%1;\n\t"
+                                 :"+r"(*opt1_8bit), "=r"(control_reg_flag) /* output */
+                                 :"r"(ReadData8InExe())       /* input */
+                                 :"eax"
+                                );
+                            break;
+                        }
+
+                    case(0x06)://SAL Eb Ib
+                        {
+                            __asm__
+                                (
+                                 "SALB %2,%0;\n\t"
+                                 "PUSHF;\n\t"
+                                 "POP %%EAX;\n\t"
+                                 "MOVW %%AX,%1;\n\t"
+                                 :"+r"(*opt1_8bit), "=r"(control_reg_flag) /* output */
+                                 :"r"(ReadData8InExe())       /* input */
+                                 :"eax"
+                                );
+                            break;
+                        }
+
+                    case(0x07)://SAR Eb Ib
+                        {
+                            __asm__
+                                (
+                                 "SARB %2,%0;\n\t"
+                                 "PUSHF;\n\t"
+                                 "POP %%EAX;\n\t"
+                                 "MOVW %%AX,%1;\n\t"
+                                 :"+r"(*opt1_8bit), "=r"(control_reg_flag) /* output */
+                                 :"r"(ReadData8InExe())       /* input */
+                                 :"eax"
+                                );
+                            break;
+                        }
+                }
+                break;
+            }
+
+        case(0xC1)://group Ev Ib
+            {
+                mod_byte = ReadData8InExe();
+                uint8_t group_index = (mod_byte >> 3) & 0x7;
+                opt1_16bit = reinterpret_cast<uint16_t  *>(CalculateRM(mod_byte, opcode));
+                switch(group_index)
+                {
+                    case(0x00)://ROL Ev Ib
+                        {
+                            __asm__
+                                (
+                                 "ROLW %2,%0;\n\t"
+                                 "PUSHF;\n\t"
+                                 "POP %%EAX;\n\t"
+                                 "MOVW %%AX,%1;\n\t"
+                                 :"+r"(*opt1_16bit), "=r"(control_reg_flag) /* output */
+                                 :"r"(ReadData8InExe())       /* input */
+                                 :"eax"
+                                );
+                            break;
+                        }
+
+                    case(0x01)://ROR Ev Ib
+                        {
+                            __asm__
+                                (
+                                 "RORW %2,%0;\n\t"
+                                 "PUSHF;\n\t"
+                                 "POP %%EAX;\n\t"
+                                 "MOVW %%AX,%1;\n\t"
+                                 :"+r"(*opt1_16bit), "=r"(control_reg_flag) /* output */
+                                 :"r"(ReadData8InExe())       /* input */
+                                 :"eax"
+                                );
+                            break;
+                        }
+
+                    case(0x02)://RCL Ev Ib
+                        {
+                            __asm__
+                                (
+                                 "RCLW %2,%0;\n\t"
+                                 "PUSHF;\n\t"
+                                 "POP %%EAX;\n\t"
+                                 "MOVW %%AX,%1;\n\t"
+                                 :"+r"(*opt1_16bit), "=r"(control_reg_flag) /* output */
+                                 :"r"(ReadData8InExe())       /* input */
+                                 :"eax"
+                                );
+                            break;
+                        }
+
+                    case(0x03)://RCR Ev Ib
+                        {
+                            __asm__
+                                (
+                                 "RCRW %2,%0;\n\t"
+                                 "PUSHF;\n\t"
+                                 "POP %%EAX;\n\t"
+                                 "MOVW %%AX,%1;\n\t"
+                                 :"+r"(*opt1_16bit), "=r"(control_reg_flag) /* output */
+                                 :"r"(ReadData8InExe())       /* input */
+                                 :"eax"
+                                );
+                            break;
+                        }
+
+                    case(0x04)://SHL Ev Ib
+                        {
+                            __asm__
+                                (
+                                 "SHLW %2,%0;\n\t"
+                                 "PUSHF;\n\t"
+                                 "POP %%EAX;\n\t"
+                                 "MOVW %%AX,%1;\n\t"
+                                 :"+r"(*opt1_16bit), "=r"(control_reg_flag) /* output */
+                                 :"r"(ReadData8InExe())       /* input */
+                                 :"eax"
+                                );
+                            break;
+                        }
+
+                    case(0x05)://SHR Ev Ib
+                        {
+                            __asm__
+                                (
+                                 "SHRW %2,%0;\n\t"
+                                 "PUSHF;\n\t"
+                                 "POP %%EAX;\n\t"
+                                 "MOVW %%AX,%1;\n\t"
+                                 :"+r"(*opt1_16bit), "=r"(control_reg_flag) /* output */
+                                 :"r"(ReadData8InExe())       /* input */
+                                 :"eax"
+                                );
+                            break;
+                        }
+
+                    case(0x06)://SAL Ev Ib
+                        {
+                            __asm__
+                                (
+                                 "SALW %2,%0;\n\t"
+                                 "PUSHF;\n\t"
+                                 "POP %%EAX;\n\t"
+                                 "MOVW %%AX,%1;\n\t"
+                                 :"+r"(*opt1_16bit), "=r"(control_reg_flag) /* output */
+                                 :"r"(ReadData8InExe())       /* input */
+                                 :"eax"
+                                );
+                            break;
+                        }
+
+                    case(0x07)://SAR Ev Ib
+                        {
+                            __asm__
+                                (
+                                 "SARW %2,%0;\n\t"
+                                 "PUSHF;\n\t"
+                                 "POP %%EAX;\n\t"
+                                 "MOVW %%AX,%1;\n\t"
+                                 :"+r"(*opt1_16bit), "=r"(control_reg_flag) /* output */
+                                 :"r"(ReadData8InExe())       /* input */
+                                 :"eax"
+                                );
+                            break;
+                        }
+                }
+                break;
+            }
+
+        case(0xC2)://RETN Iw
+            {
+                control_reg_ip = Pop();
+                universal_reg_sp = universal_reg_sp + ReadData16InExe();
+                break;
+            }
+
+        case(0xC3)://RETN
+            {
+                control_reg_ip = Pop();
+                break;
+            }
     }
 }
