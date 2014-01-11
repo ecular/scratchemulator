@@ -10,6 +10,7 @@ CFLAG	./Makefile	/^CFLAG = -c -fkeep-inline-functions$/;"	m
 CalculateRM	./cpu.cpp	/^uint8_t *Cpu::CalculateRM(uint8_t mod_byte, uint8_t opcode)$/;"	f	class:Cpu
 CalculateReg16	./cpu.cpp	/^uint16_t *Cpu::CalculateReg16(uint8_t mod_byte)$/;"	f	class:Cpu
 CalculateReg8	./cpu.cpp	/^uint8_t *Cpu::CalculateReg8(uint8_t mod_byte)$/;"	f	class:Cpu
+CalculateSeg16	./cpu.cpp	/^uint16_t *Cpu::CalculateSeg16(uint8_t mod_byte)$/;"	f	class:Cpu
 Cpu	./cpu.cpp	/^Cpu::Cpu()$/;"	f	class:Cpu
 Cpu	./cpu.h	/^class Cpu {$/;"	c
 EMU_CPU_H_	./cpu.h	2;"	d
@@ -78,7 +79,8 @@ ram	./cpu.h	/^    uint8_t *ram;$/;"	m	class:Cpu
 seg_reg_cs	./cpu.h	/^    uint16_t seg_reg_cs, seg_reg_ds, seg_reg_ss, seg_reg_es;$/;"	m	class:Cpu
 seg_reg_ds	./cpu.h	/^    uint16_t seg_reg_cs, seg_reg_ds, seg_reg_ss, seg_reg_es;$/;"	m	class:Cpu
 seg_reg_es	./cpu.h	/^    uint16_t seg_reg_cs, seg_reg_ds, seg_reg_ss, seg_reg_es;$/;"	m	class:Cpu
-seg_reg_replace	./cpu.h	/^    uint16_t *seg_reg_replace;$/;"	m	class:Cpu
+seg_reg_replace_ds	./cpu.h	/^    uint16_t *seg_reg_replace_ds, *seg_reg_replace_ss;$/;"	m	class:Cpu
+seg_reg_replace_ss	./cpu.h	/^    uint16_t *seg_reg_replace_ds, *seg_reg_replace_ss;$/;"	m	class:Cpu
 seg_reg_ss	./cpu.h	/^    uint16_t seg_reg_cs, seg_reg_ds, seg_reg_ss, seg_reg_es;$/;"	m	class:Cpu
 universal_reg_ah	./cpu.h	/^    uint8_t *universal_reg_ah, *universal_reg_al;$/;"	m	class:Cpu
 universal_reg_al	./cpu.h	/^    uint8_t *universal_reg_ah, *universal_reg_al;$/;"	m	class:Cpu
