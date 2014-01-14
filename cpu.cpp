@@ -511,15 +511,16 @@ void Cpu::Exec()
                 mod_byte = ReadData8InExe();
                 opt1_8bit = CalculateRM(mod_byte, opcode);
                 opt2_8bit = CalculateReg8(mod_byte);
-                // *opt1_8bit = *opt1_8bit + *opt2_8bit;
                 __asm__
                     (
+                     "PUSHW %3;\n\t"
+                     "POPFW;\n\t"
                      "ADDB %2,%0;\n\t"
                      "PUSHF;\n\t"
                      "POP %%EAX;\n\t"
                      "MOVW %%AX,%1;\n\t"
                      :"+r"(*opt1_8bit), "=r"(control_reg_flag) /* output */
-                     :"r"(*opt2_8bit)       /* input */
+                     :"r"(*opt2_8bit), "r"(control_reg_flag)      /* input */
                      :"eax"
                     );
                 break;
@@ -530,15 +531,16 @@ void Cpu::Exec()
                 mod_byte = ReadData8InExe();
                 opt1_16bit = reinterpret_cast<uint16_t  *>(CalculateRM(mod_byte, opcode));
                 opt2_16bit = CalculateReg16(mod_byte);
-                //*opt1_16bit = *opt1_16bit + *opt2_16bit;
                 __asm__
                     (
-                     "addw %2,%0;\n\t"
+                     "PUSHW %3;\n\t"
+                     "POPFW;\n\t"
+                     "ADDW %2,%0;\n\t"
                      "PUSHF;\n\t"
                      "POP %%EAX;\n\t"
                      "MOVW %%AX,%1;\n\t"
                      :"+r"(*opt1_16bit), "=r"(control_reg_flag) /* output */
-                     :"r"(*opt2_16bit)       /* input */
+                     :"r"(*opt2_16bit)       , "r"(control_reg_flag) /* input */
                      :"eax"
                     );
                 break;
@@ -549,15 +551,16 @@ void Cpu::Exec()
                 mod_byte = ReadData8InExe();
                 opt1_8bit = CalculateReg8(mod_byte);
                 opt2_8bit = CalculateRM(mod_byte, opcode);
-                //*opt1_8bit = *opt1_8bit + *opt2_8bit;
                 __asm__
                     (
+                     "PUSHW %3;\n\t"
+                     "POPFW;\n\t"
                      "ADDB %2,%0;\n\t"
                      "PUSHF;\n\t"
                      "POP %%EAX;\n\t"
                      "MOVW %%AX,%1;\n\t"
                      :"+r"(*opt1_8bit), "=r"(control_reg_flag) /* output */
-                     :"r"(*opt2_8bit)       /* input */
+                     :"r"(*opt2_8bit)       , "r"(control_reg_flag) /* input */
                      :"eax"
                     );
                 break;
@@ -568,15 +571,16 @@ void Cpu::Exec()
                 mod_byte = ReadData8InExe();
                 opt1_16bit = CalculateReg16(mod_byte);
                 opt2_16bit = reinterpret_cast<uint16_t  *>(CalculateRM(mod_byte, opcode));
-                //*opt1_16bit = *opt1_16bit + *opt2_16bit;
                 __asm__
                     (
+                     "PUSHW %3;\n\t"
+                     "POPFW;\n\t"
                      "addw %2,%0;\n\t"
                      "PUSHF;\n\t"
                      "POP %%EAX;\n\t"
                      "MOVW %%AX,%1;\n\t"
                      :"+r"(*opt1_16bit), "=r"(control_reg_flag) /* output */
-                     :"r"(*opt2_16bit)       /* input */
+                     :"r"(*opt2_16bit)       , "r"(control_reg_flag) /* input */
                      :"eax"
                     );
                 break;
@@ -586,12 +590,14 @@ void Cpu::Exec()
             {
                 __asm__
                     (
+                     "PUSHW %3;\n\t"
+                     "POPFW;\n\t"
                      "ADDB %2,%0;\n\t"
                      "PUSHF;\n\t"
                      "POP %%EAX;\n\t"
                      "MOVW %%AX,%1;\n\t"
                      :"+r"(*universal_reg_al), "=r"(control_reg_flag) /* output */
-                     :"r"(ReadData8InExe())       /* input */
+                     :"r"(ReadData8InExe())       , "r"(control_reg_flag) /* input */
                      :"eax"
                     );
                 break;
@@ -601,12 +607,14 @@ void Cpu::Exec()
             {
                 __asm__
                     (
+                     "PUSHW %3;\n\t"
+                     "POPFW;\n\t"
                      "ADDW %2,%0;\n\t"
                      "PUSHF;\n\t"
                      "POP %%EAX;\n\t"
                      "MOVW %%AX,%1;\n\t"
                      :"+r"(universal_reg_ax), "=r"(control_reg_flag) /* output */
-                     :"r"(ReadData16InExe())       /* input */
+                     :"r"(ReadData16InExe())       , "r"(control_reg_flag) /* input */
                      :"eax"
                     );
                 break;
@@ -631,12 +639,14 @@ void Cpu::Exec()
                 opt2_8bit = CalculateReg8(mod_byte);
                 __asm__
                     (
+                     "PUSHW %3;\n\t"
+                     "POPFW;\n\t"
                      "ORB %2,%0;\n\t"
                      "PUSHF;\n\t"
                      "POP %%EAX;\n\t"
                      "MOVW %%AX,%1;\n\t"
                      :"+r"(*opt1_8bit), "=r"(control_reg_flag) /* output */
-                     :"r"(*opt2_8bit)       /* input */
+                     :"r"(*opt2_8bit)       , "r"(control_reg_flag) /* input */
                      :"eax"
                     );
                 break;
@@ -649,12 +659,14 @@ void Cpu::Exec()
                 opt2_16bit = CalculateReg16(mod_byte);
                 __asm__
                     (
+                     "PUSHW %3;\n\t"
+                     "POPFW;\n\t"
                      "ORW %2,%0;\n\t"
                      "PUSHF;\n\t"
                      "POP %%EAX;\n\t"
                      "MOVW %%AX,%1;\n\t"
                      :"+r"(*opt1_16bit), "=r"(control_reg_flag) /* output */
-                     :"r"(*opt2_16bit)       /* input */
+                     :"r"(*opt2_16bit)       , "r"(control_reg_flag) /* input */
                      :"eax"
                     );
                 break;
@@ -667,12 +679,14 @@ void Cpu::Exec()
                 opt2_8bit = CalculateRM(mod_byte, opcode);
                 __asm__
                     (
+                     "PUSHW %3;\n\t"
+                     "POPFW;\n\t"
                      "ORB %2,%0;\n\t"
                      "PUSHF;\n\t"
                      "POP %%EAX;\n\t"
                      "MOVW %%AX,%1;\n\t"
                      :"+r"(*opt1_8bit), "=r"(control_reg_flag) /* output */
-                     :"r"(*opt2_8bit)       /* input */
+                     :"r"(*opt2_8bit)       , "r"(control_reg_flag) /* input */
                      :"eax"
                     );
                 break;
@@ -685,12 +699,14 @@ void Cpu::Exec()
                 opt2_16bit = reinterpret_cast<uint16_t  *>(CalculateRM(mod_byte, opcode));
                 __asm__
                     (
+                     "PUSHW %3;\n\t"
+                     "POPFW;\n\t"
                      "ORW %2,%0;\n\t"
                      "PUSHF;\n\t"
                      "POP %%EAX;\n\t"
                      "MOVW %%AX,%1;\n\t"
                      :"+r"(*opt1_16bit), "=r"(control_reg_flag) /* output */
-                     :"r"(*opt2_16bit)       /* input */
+                     :"r"(*opt2_16bit)       , "r"(control_reg_flag) /* input */
                      :"eax"
                     );
                 break;
@@ -701,12 +717,14 @@ void Cpu::Exec()
                 opt1_8bit = universal_reg_al;
                 __asm__
                     (
+                     "PUSHW %3;\n\t"
+                     "POPFW;\n\t"
                      "ORB %2,%0;\n\t"
                      "PUSHF;\n\t"
                      "POP %%EAX;\n\t"
                      "MOVW %%AX,%1;\n\t"
                      :"+r"(*opt1_8bit), "=r"(control_reg_flag) /* output */
-                     :"r"(ReadData8InExe())       /* input */
+                     :"r"(ReadData8InExe())       , "r"(control_reg_flag) /* input */
                      :"eax"
                     );
                 break;
@@ -716,12 +734,14 @@ void Cpu::Exec()
             {
                 __asm__
                     (
+                     "PUSHW %3;\n\t"
+                     "POPFW;\n\t"
                      "ORW %2,%0;\n\t"
                      "PUSHF;\n\t"
                      "POP %%EAX;\n\t"
                      "MOVW %%AX,%1;\n\t"
                      :"+r"(universal_reg_ax), "=r"(control_reg_flag) /* output */
-                     :"r"(ReadData16InExe())       /* input */
+                     :"r"(ReadData16InExe())       , "r"(control_reg_flag) /* input */
                      :"eax"
                     );
                 break;
@@ -744,18 +764,16 @@ void Cpu::Exec()
                 mod_byte = ReadData8InExe();
                 opt1_8bit = CalculateRM(mod_byte, opcode);
                 opt2_8bit = CalculateReg8(mod_byte);
-                //uint8_t cf = control_reg_flag & 0x1;
-                //*opt2_8bit = *opt2_8bit + cf;
                 __asm__
                     (
-                     "PUSHW %1;\n\t"
+                     "PUSHW %3;\n\t"
                      "POPFW;\n\t"
                      "ADCB %2,%0;\n\t"
                      "PUSHF;\n\t"
                      "POP %%EAX;\n\t"
                      "MOVW %%AX,%1;\n\t"
-                     :"+r"(*opt1_8bit), "+r"(control_reg_flag) /* output */
-                     :"r"(*opt2_8bit)       /* input */
+                     :"+r"(*opt1_8bit), "=r"(control_reg_flag) /* output */
+                     :"r"(*opt2_8bit)       , "r"(control_reg_flag) /* input */
                      :"eax"
                     );
                 break;
@@ -766,18 +784,16 @@ void Cpu::Exec()
                 mod_byte = ReadData8InExe();
                 opt1_16bit = reinterpret_cast<uint16_t  *>(CalculateRM(mod_byte, opcode));
                 opt2_16bit = CalculateReg16(mod_byte);
-               // uint8_t cf = control_reg_flag & 0x1;
-               // *opt2_16bit = *opt2_16bit + cf;
                 __asm__
                     (
-                     "PUSHW %1;\n\t"
+                     "PUSHW %3;\n\t"
                      "POPFW;\n\t"
                      "ADCW %2,%0;\n\t"
                      "PUSHF;\n\t"
                      "POP %%EAX;\n\t"
                      "MOVW %%AX,%1;\n\t"
-                     :"+r"(*opt1_16bit), "+r"(control_reg_flag) /* output */
-                     :"r"(*opt2_16bit)       /* input */
+                     :"+r"(*opt1_16bit), "=r"(control_reg_flag) /* output */
+                     :"r"(*opt2_16bit)       , "r"(control_reg_flag) /* input */
                      :"eax"
                     );
                 break;
@@ -788,18 +804,16 @@ void Cpu::Exec()
                 mod_byte = ReadData8InExe();
                 opt1_8bit = CalculateReg8(mod_byte);
                 opt2_8bit = CalculateRM(mod_byte, opcode);
-               // uint8_t cf = control_reg_flag & 0x1;
-               // *opt2_8bit = *opt2_8bit + cf;
                 __asm__
                     (
-                     "PUSHW %1;\n\t"
+                     "PUSHW %3;\n\t"
                      "POPFW;\n\t"
                      "ADCB %2,%0;\n\t"
                      "PUSHF;\n\t"
                      "POP %%EAX;\n\t"
                      "MOVW %%AX,%1;\n\t"
-                     :"+r"(*opt1_8bit), "+r"(control_reg_flag) /* output */
-                     :"r"(*opt2_8bit)       /* input */
+                     :"+r"(*opt1_8bit), "=r"(control_reg_flag) /* output */
+                     :"r"(*opt2_8bit)       , "r"(control_reg_flag) /* input */
                      :"eax"
                     );
                 break;
@@ -810,18 +824,16 @@ void Cpu::Exec()
                 mod_byte = ReadData8InExe();
                 opt1_16bit = CalculateReg16(mod_byte);
                 opt2_16bit = reinterpret_cast<uint16_t  *>(CalculateRM(mod_byte, opcode));
-                //uint8_t cf = control_reg_flag & 0x1;
-                //*opt2_16bit = *opt2_16bit + cf;
                 __asm__
                     (
-                     "PUSHW %1;\n\t"
+                     "PUSHW %3;\n\t"
                      "POPFW;\n\t"
                      "ADCW %2,%0;\n\t"
                      "PUSHF;\n\t"
                      "POP %%EAX;\n\t"
                      "MOVW %%AX,%1;\n\t"
-                     :"+r"(*opt1_16bit), "+r"(control_reg_flag) /* output */
-                     :"r"(*opt2_16bit)       /* input */
+                     :"+r"(*opt1_16bit), "=r"(control_reg_flag) /* output */
+                     :"r"(*opt2_16bit)       , "r"(control_reg_flag) /* input */
                      :"eax"
                     );
                 break;
@@ -830,18 +842,16 @@ void Cpu::Exec()
         case(0x14)://ADC AL Ib
             {
                 opt1_8bit = universal_reg_al;
-                //uint8_t cf = control_reg_flag & 0x1;
-                //*opt1_8bit = *opt1_8bit + cf;
                 __asm__
                     (
-                     "PUSHW %1;\n\t"
+                     "PUSHW %3;\n\t"
                      "POPFW;\n\t"
                      "ADCB %2,%0;\n\t"
                      "PUSHF;\n\t"
                      "POP %%EAX;\n\t"
                      "MOVW %%AX,%1;\n\t"
-                     :"+r"(*opt1_8bit), "+r"(control_reg_flag) /* output */
-                     :"r"(ReadData8InExe())       /* input */
+                     :"+r"(*opt1_8bit), "=r"(control_reg_flag) /* output */
+                     :"r"(ReadData8InExe())       , "r"(control_reg_flag) /* input */
                      :"eax"
                     );
                 break;
@@ -849,18 +859,16 @@ void Cpu::Exec()
 
         case(0x15)://ADC AX Iv
             {
-                //uint8_t cf = control_reg_flag & 0x1;
-                //universal_reg_ax = universal_reg_ax + cf;
                 __asm__
                     (
-                     "PUSHW %1;\n\t"
+                     "PUSHW %3;\n\t"
                      "POPFW;\n\t"
                      "ADCW %2,%0;\n\t"
                      "PUSHF;\n\t"
                      "POP %%EAX;\n\t"
                      "MOVW %%AX,%1;\n\t"
-                     :"+r"(universal_reg_ax), "+r"(control_reg_flag) /* output */
-                     :"r"(ReadData16InExe())       /* input */
+                     :"+r"(universal_reg_ax), "=r"(control_reg_flag) /* output */
+                     :"r"(ReadData16InExe())       , "r"(control_reg_flag) /* input */
                      :"eax"
                     );
                 break;
@@ -882,18 +890,16 @@ void Cpu::Exec()
                 mod_byte = ReadData8InExe();
                 opt1_8bit = CalculateRM(mod_byte, opcode);
                 opt2_8bit = CalculateReg8(mod_byte);
-                //uint8_t cf = control_reg_flag & 0x1;
-                //*opt2_8bit = *opt2_8bit + cf;
                 __asm__
                     (
-                     "PUSHW %1;\n\t"
+                     "PUSHW %3;\n\t"
                      "POPFW;\n\t"
                      "SUBB %2,%0;\n\t"
                      "PUSHF;\n\t"
                      "POP %%EAX;\n\t"
                      "MOVW %%AX,%1;\n\t"
-                     :"+r"(*opt1_8bit), "+r"(control_reg_flag) /* output */
-                     :"r"(*opt2_8bit)       /* input */
+                     :"+r"(*opt1_8bit), "=r"(control_reg_flag) /* output */
+                     :"r"(*opt2_8bit)       , "r"(control_reg_flag) /* input */
                      :"eax"
                     );
                 break;
@@ -904,18 +910,16 @@ void Cpu::Exec()
                 mod_byte = ReadData8InExe();
                 opt1_16bit = reinterpret_cast<uint16_t  *>(CalculateRM(mod_byte, opcode));
                 opt2_16bit = CalculateReg16(mod_byte);
-                //uint8_t cf = control_reg_flag & 0x1;
-                //*opt2_16bit = *opt2_16bit + cf;
                 __asm__
                     (
-                     "PUSHW %1;\n\t"
+                     "PUSHW %3;\n\t"
                      "POPFW;\n\t"
                      "SUBW %2,%0;\n\t"
                      "PUSHF;\n\t"
                      "POP %%EAX;\n\t"
                      "MOVW %%AX,%1;\n\t"
-                     :"+r"(*opt1_16bit), "+r"(control_reg_flag) /* output */
-                     :"r"(*opt2_16bit)       /* input */
+                     :"+r"(*opt1_16bit), "=r"(control_reg_flag) /* output */
+                     :"r"(*opt2_16bit)       , "r"(control_reg_flag) /* input */
                      :"eax"
                     );
                 break;
@@ -926,18 +930,16 @@ void Cpu::Exec()
                 mod_byte = ReadData8InExe();
                 opt1_8bit = CalculateReg8(mod_byte);
                 opt2_8bit = CalculateRM(mod_byte, opcode);
-                //uint8_t cf = control_reg_flag & 0x1;
-                //*opt2_8bit = *opt2_8bit + cf;
                 __asm__
                     (
-                     "PUSHW %1;\n\t"
+                     "PUSHW %3;\n\t"
                      "POPFW;\n\t"
                      "SUBB %2,%0;\n\t"
                      "PUSHF;\n\t"
                      "POP %%EAX;\n\t"
                      "MOVW %%AX,%1;\n\t"
-                     :"+r"(*opt1_8bit), "+r"(control_reg_flag) /* output */
-                     :"r"(*opt2_8bit)       /* input */
+                     :"+r"(*opt1_8bit), "=r"(control_reg_flag) /* output */
+                     :"r"(*opt2_8bit)       , "r"(control_reg_flag) /* input */
                      :"eax"
                     );
                 break;
@@ -948,18 +950,16 @@ void Cpu::Exec()
                 mod_byte = ReadData8InExe();
                 opt1_16bit = CalculateReg16(mod_byte);
                 opt2_16bit = reinterpret_cast<uint16_t  *>(CalculateRM(mod_byte, opcode));
-                //uint8_t cf = control_reg_flag & 0x1;
-                //*opt2_16bit = *opt2_16bit + cf;
                 __asm__
                     (
-                     "PUSHW %1;\n\t"
+                     "PUSHW %3;\n\t"
                      "POPFW;\n\t"
                      "SBBW %2,%0;\n\t"
                      "PUSHF;\n\t"
                      "POP %%EAX;\n\t"
                      "MOVW %%AX,%1;\n\t"
-                     :"+r"(*opt1_16bit), "+r"(control_reg_flag) /* output */
-                     :"r"(*opt2_16bit)       /* input */
+                     :"+r"(*opt1_16bit), "=r"(control_reg_flag) /* output */
+                     :"r"(*opt2_16bit)       , "r"(control_reg_flag) /* input */
                      :"eax"
                     );
                 break;
@@ -968,18 +968,16 @@ void Cpu::Exec()
         case(0x1C)://SBB AL Ib
             {
                 opt1_8bit = universal_reg_al;
-                //uint8_t cf = control_reg_flag & 0x1;
-                //*opt1_8bit = *opt1_8bit - cf;
                 __asm__
                     (
-                     "PUSHW %1;\n\t"
+                     "PUSHW %3;\n\t"
                      "POPFW;\n\t"
                      "SBBB %2,%0;\n\t"
                      "PUSHF;\n\t"
                      "POP %%EAX;\n\t"
                      "MOVW %%AX,%1;\n\t"
-                     :"+r"(*opt1_8bit), "+r"(control_reg_flag) /* output */
-                     :"r"(ReadData8InExe())       /* input */
+                     :"+r"(*opt1_8bit), "=r"(control_reg_flag) /* output */
+                     :"r"(ReadData8InExe())       , "r"(control_reg_flag) /* input */
                      :"eax"
                     );
                 break;
@@ -987,18 +985,16 @@ void Cpu::Exec()
 
         case(0x1D)://SBB AX Iv
             {
-                //uint8_t cf = control_reg_flag & 0x1;
-                //universal_reg_ax = universal_reg_ax - cf;
                 __asm__
                     (
-                     "PUSHW %1;\n\t"
+                     "PUSHW %3;\n\t"
                      "POPFW;\n\t"
                      "SBBW %2,%0;\n\t"
                      "PUSHF;\n\t"
                      "POP %%EAX;\n\t"
                      "MOVW %%AX,%1;\n\t"
-                     :"+r"(universal_reg_ax),"+r"(control_reg_flag) /* output */
-                     :"r"(ReadData16InExe())       /* input */
+                     :"+r"(universal_reg_ax), "=r"(control_reg_flag) /* output */
+                     :"r"(ReadData16InExe())       , "r"(control_reg_flag) /* input */
                      :"eax"
                     );
                 break;
@@ -1023,12 +1019,14 @@ void Cpu::Exec()
                 opt2_8bit = CalculateReg8(mod_byte);
                 __asm__
                     (
+                     "PUSHW %3;\n\t"
+                     "POPFW;\n\t"
                      "ANDB %2,%0;\n\t"
                      "PUSHF;\n\t"
                      "POP %%EAX;\n\t"
                      "MOVW %%AX,%1;\n\t"
                      :"+r"(*opt1_8bit), "=r"(control_reg_flag) /* output */
-                     :"r"(*opt2_8bit)       /* input */
+                     :"r"(*opt2_8bit)       , "r"(control_reg_flag) /* input */
                      :"eax"
                     );
                 break;
@@ -1041,12 +1039,14 @@ void Cpu::Exec()
                 opt2_16bit = CalculateReg16(mod_byte);
                 __asm__
                     (
+                     "PUSHW %3;\n\t"
+                     "POPFW;\n\t"
                      "ANDW %2,%0;\n\t"
                      "PUSHF;\n\t"
                      "POP %%EAX;\n\t"
                      "MOVW %%AX,%1;\n\t"
                      :"+r"(*opt1_16bit), "=r"(control_reg_flag) /* output */
-                     :"r"(*opt2_16bit)       /* input */
+                     :"r"(*opt2_16bit)       , "r"(control_reg_flag) /* input */
                      :"eax"
                     );
                 break;
@@ -1059,12 +1059,14 @@ void Cpu::Exec()
                 opt2_8bit = CalculateRM(mod_byte, opcode);
                 __asm__
                     (
+                     "PUSHW %3;\n\t"
+                     "POPFW;\n\t"
                      "ANDB %2,%0;\n\t"
                      "PUSHF;\n\t"
                      "POP %%EAX;\n\t"
                      "MOVW %%AX,%1;\n\t"
                      :"+r"(*opt1_8bit), "=r"(control_reg_flag) /* output */
-                     :"r"(*opt2_8bit)       /* input */
+                     :"r"(*opt2_8bit)       , "r"(control_reg_flag) /* input */
                      :"eax"
                     );
                 break;
@@ -1077,12 +1079,14 @@ void Cpu::Exec()
                 opt2_16bit = reinterpret_cast<uint16_t  *>(CalculateRM(mod_byte, opcode));
                 __asm__
                     (
+                     "PUSHW %3;\n\t"
+                     "POPFW;\n\t"
                      "ANDW %2,%0;\n\t"
                      "PUSHF;\n\t"
                      "POP %%EAX;\n\t"
                      "MOVW %%AX,%1;\n\t"
                      :"+r"(*opt1_16bit), "=r"(control_reg_flag) /* output */
-                     :"r"(*opt2_16bit)       /* input */
+                     :"r"(*opt2_16bit)       , "r"(control_reg_flag) /* input */
                      :"eax"
                     );
                 break;
@@ -1093,12 +1097,14 @@ void Cpu::Exec()
                 opt1_8bit = universal_reg_al;
                 __asm__
                     (
+                     "PUSHW %3;\n\t"
+                     "POPFW;\n\t"
                      "ANDB %2,%0;\n\t"
                      "PUSHF;\n\t"
                      "POP %%EAX;\n\t"
                      "MOVW %%AX,%1;\n\t"
                      :"+r"(*opt1_8bit), "=r"(control_reg_flag) /* output */
-                     :"r"(ReadData8InExe())       /* input */
+                     :"r"(ReadData8InExe())       , "r"(control_reg_flag) /* input */
                      :"eax"
                     );
                 break;
@@ -1108,12 +1114,14 @@ void Cpu::Exec()
             {
                 __asm__
                     (
+                     "PUSHW %3;\n\t"
+                     "POPFW;\n\t"
                      "ANDW %2,%0;\n\t"
                      "PUSHF;\n\t"
                      "POP %%EAX;\n\t"
                      "MOVW %%AX,%1;\n\t"
                      :"+r"(universal_reg_ax), "=r"(control_reg_flag) /* output */
-                     :"r"(ReadData16InExe())       /* input */
+                     :"r"(ReadData16InExe())       , "r"(control_reg_flag) /* input */
                      :"eax"
                     );
                 break;
@@ -1125,7 +1133,7 @@ void Cpu::Exec()
             {
                 __asm__
                     (
-                     "PUSHW %1;\n\t"
+                     "PUSHW %2;\n\t"
                      "POPFW;\n\t"
                      "MOVB %0,%%AL;\n\t"
                      "DAA;\n\t"
@@ -1133,8 +1141,8 @@ void Cpu::Exec()
                      "PUSHF;\n\t"
                      "POP %%EAX;\n\t"
                      "MOVW %%AX,%1;\n\t"
-                     :"+r"(*universal_reg_al), "+r"(control_reg_flag) /* output */
-                     :
+                     :"+r"(*universal_reg_al), "=r"(control_reg_flag) /* output */
+                     :"r"(control_reg_flag) /*input*/
                      :"eax"
                     );
                 break;
@@ -1145,15 +1153,16 @@ void Cpu::Exec()
                 mod_byte = ReadData8InExe();
                 opt1_8bit = CalculateRM(mod_byte, opcode);
                 opt2_8bit = CalculateReg8(mod_byte);
-                // *opt1_8bit = *opt1_8bit + *opt2_8bit;
                 __asm__
                     (
+                     "PUSHW %3;\n\t"
+                     "POPFW;\n\t"
                      "SUBB %2,%0;\n\t"
                      "PUSHF;\n\t"
                      "POP %%EAX;\n\t"
                      "MOVW %%AX,%1;\n\t"
                      :"+r"(*opt1_8bit), "=r"(control_reg_flag) /* output */
-                     :"r"(*opt2_8bit)       /* input */
+                     :"r"(*opt2_8bit)       , "r"(control_reg_flag) /* input */
                      :"eax"
                     );
                 break;
@@ -1164,15 +1173,16 @@ void Cpu::Exec()
                 mod_byte = ReadData8InExe();
                 opt1_16bit = reinterpret_cast<uint16_t  *>(CalculateRM(mod_byte, opcode));
                 opt2_16bit = CalculateReg16(mod_byte);
-                //*opt1_16bit = *opt1_16bit + *opt2_16bit;
                 __asm__
                     (
+                     "PUSHW %3;\n\t"
+                     "POPFW;\n\t"
                      "SUBW %2,%0;\n\t"
                      "PUSHF;\n\t"
                      "POP %%EAX;\n\t"
                      "MOVW %%AX,%1;\n\t"
                      :"+r"(*opt1_16bit), "=r"(control_reg_flag) /* output */
-                     :"r"(*opt2_16bit)       /* input */
+                     :"r"(*opt2_16bit)       , "r"(control_reg_flag) /* input */
                      :"eax"
                     );
                 break;
@@ -1183,15 +1193,16 @@ void Cpu::Exec()
                 mod_byte = ReadData8InExe();
                 opt1_8bit = CalculateReg8(mod_byte);
                 opt2_8bit = CalculateRM(mod_byte, opcode);
-                //*opt1_8bit = *opt1_8bit + *opt2_8bit;
                 __asm__
                     (
+                     "PUSHW %3;\n\t"
+                     "POPFW;\n\t"
                      "SUBB %2,%0;\n\t"
                      "PUSHF;\n\t"
                      "POP %%EAX;\n\t"
                      "MOVW %%AX,%1;\n\t"
                      :"+r"(*opt1_8bit), "=r"(control_reg_flag) /* output */
-                     :"r"(*opt2_8bit)       /* input */
+                     :"r"(*opt2_8bit)       , "r"(control_reg_flag) /* input */
                      :"eax"
                     );
                 break;
@@ -1202,15 +1213,16 @@ void Cpu::Exec()
                 mod_byte = ReadData8InExe();
                 opt1_16bit = CalculateReg16(mod_byte);
                 opt2_16bit = reinterpret_cast<uint16_t  *>(CalculateRM(mod_byte, opcode));
-                //*opt1_16bit = *opt1_16bit + *opt2_16bit;
                 __asm__
                     (
+                     "PUSHW %3;\n\t"
+                     "POPFW;\n\t"
                      "SUBW %2,%0;\n\t"
                      "PUSHF;\n\t"
                      "POP %%EAX;\n\t"
                      "MOVW %%AX,%1;\n\t"
                      :"+r"(*opt1_16bit), "=r"(control_reg_flag) /* output */
-                     :"r"(*opt2_16bit)       /* input */
+                     :"r"(*opt2_16bit)       , "r"(control_reg_flag) /* input */
                      :"eax"
                     );
                 break;
@@ -1221,12 +1233,14 @@ void Cpu::Exec()
                 opt1_8bit = universal_reg_al;
                 __asm__
                     (
+                     "PUSHW %3;\n\t"
+                     "POPFW;\n\t"
                      "SUBB %2,%0;\n\t"
                      "PUSHF;\n\t"
                      "POP %%EAX;\n\t"
                      "MOVW %%AX,%1;\n\t"
                      :"+r"(*opt1_8bit), "=r"(control_reg_flag) /* output */
-                     :"r"(ReadData8InExe())       /* input */
+                     :"r"(ReadData8InExe())       , "r"(control_reg_flag) /* input */
                      :"eax"
                     );
                 break;
@@ -1236,12 +1250,14 @@ void Cpu::Exec()
             {
                 __asm__
                     (
+                     "PUSHW %3;\n\t"
+                     "POPFW;\n\t"
                      "SUBW %2,%0;\n\t"
                      "PUSHF;\n\t"
                      "POP %%EAX;\n\t"
                      "MOVW %%AX,%1;\n\t"
                      :"+r"(universal_reg_ax), "=r"(control_reg_flag) /* output */
-                     :"r"(ReadData16InExe())       /* input */
+                     :"r"(ReadData16InExe())       , "r"(control_reg_flag) /* input */
                      :"eax"
                     );
                 break;
@@ -1253,7 +1269,7 @@ void Cpu::Exec()
             {
                 __asm__
                     (
-                     "PUSHW %1;\n\t"
+                     "PUSHW %2;\n\t"
                      "POPFW;\n\t"
                      "MOVB %0,%%AL;\n\t"
                      "DAS;\n\t"
@@ -1261,8 +1277,8 @@ void Cpu::Exec()
                      "PUSHF;\n\t"
                      "POP %%EAX;\n\t"
                      "MOVW %%AX,%1;\n\t"
-                     :"+r"(*universal_reg_al), "+r"(control_reg_flag) /* output */
-                     :
+                     :"+r"(*universal_reg_al), "=r"(control_reg_flag) /* output */
+                     :"r"(control_reg_flag) /* input */
                      :"eax"
                     );
                 break;
@@ -1275,12 +1291,14 @@ void Cpu::Exec()
                 opt2_8bit = CalculateReg8(mod_byte);
                 __asm__
                     (
+                     "PUSHW %3;\n\t"
+                     "POPFW;\n\t"
                      "XORB %2,%0;\n\t"
                      "PUSHF;\n\t"
                      "POP %%EAX;\n\t"
                      "MOVW %%AX,%1;\n\t"
                      :"+r"(*opt1_8bit), "=r"(control_reg_flag) /* output */
-                     :"r"(*opt2_8bit)       /* input */
+                     :"r"(*opt2_8bit)       , "r"(control_reg_flag) /* input */
                      :"eax"
                     );
                 break;
@@ -1293,12 +1311,14 @@ void Cpu::Exec()
                 opt2_16bit = CalculateReg16(mod_byte);
                 __asm__
                     (
+                     "PUSHW %3;\n\t"
+                     "POPFW;\n\t"
                      "XORW %2,%0;\n\t"
                      "PUSHF;\n\t"
                      "POP %%EAX;\n\t"
                      "MOVW %%AX,%1;\n\t"
                      :"+r"(*opt1_16bit), "=r"(control_reg_flag) /* output */
-                     :"r"(*opt2_16bit)       /* input */
+                     :"r"(*opt2_16bit)       , "r"(control_reg_flag) /* input */
                      :"eax"
                     );
                 break;
@@ -1311,12 +1331,14 @@ void Cpu::Exec()
                 opt2_8bit = CalculateRM(mod_byte, opcode);
                 __asm__
                     (
+                     "PUSHW %3;\n\t"
+                     "POPFW;\n\t"
                      "XORB %2,%0;\n\t"
                      "PUSHF;\n\t"
                      "POP %%EAX;\n\t"
                      "MOVW %%AX,%1;\n\t"
                      :"+r"(*opt1_8bit), "=r"(control_reg_flag) /* output */
-                     :"r"(*opt2_8bit)       /* input */
+                     :"r"(*opt2_8bit)       , "r"(control_reg_flag) /* input */
                      :"eax"
                     );
                 break;
@@ -1329,12 +1351,14 @@ void Cpu::Exec()
                 opt2_16bit = reinterpret_cast<uint16_t  *>(CalculateRM(mod_byte, opcode));
                 __asm__
                     (
+                     "PUSHW %3;\n\t"
+                     "POPFW;\n\t"
                      "XORW %2,%0;\n\t"
                      "PUSHF;\n\t"
                      "POP %%EAX;\n\t"
                      "MOVW %%AX,%1;\n\t"
                      :"+r"(*opt1_16bit), "=r"(control_reg_flag) /* output */
-                     :"r"(*opt2_16bit)       /* input */
+                     :"r"(*opt2_16bit)       , "r"(control_reg_flag) /* input */
                      :"eax"
                     );
                 break;
@@ -1345,12 +1369,14 @@ void Cpu::Exec()
                 opt1_8bit = universal_reg_al;
                 __asm__
                     (
+                     "PUSHW %3;\n\t"
+                     "POPFW;\n\t"
                      "XORB %2,%0;\n\t"
                      "PUSHF;\n\t"
                      "POP %%EAX;\n\t"
                      "MOVW %%AX,%1;\n\t"
                      :"+r"(*opt1_8bit), "=r"(control_reg_flag) /* output */
-                     :"r"(ReadData8InExe())       /* input */
+                     :"r"(ReadData8InExe())       , "r"(control_reg_flag) /* input */
                      :"eax"
                     );
                 break;
@@ -1360,12 +1386,14 @@ void Cpu::Exec()
             {
                 __asm__
                     (
+                     "PUSHW %3;\n\t"
+                     "POPFW;\n\t"
                      "XORW %2,%0;\n\t"
                      "PUSHF;\n\t"
                      "POP %%EAX;\n\t"
                      "MOVW %%AX,%1;\n\t"
                      :"+r"(universal_reg_ax), "=r"(control_reg_flag) /* output */
-                     :"r"(ReadData16InExe())       /* input */
+                     :"r"(ReadData16InExe())       , "r"(control_reg_flag) /* input */
                      :"eax"
                     );
                 break;
@@ -1377,7 +1405,7 @@ void Cpu::Exec()
             {
                 __asm__
                     (
-                     "PUSHW %2;\n\t"
+                     "PUSHW %3;\n\t"
                      "POPFW;\n\t"
                      "MOVB %0,%%AL;\n\t"
                      "MOVB %1,%%AH;\n\t"
@@ -1387,8 +1415,8 @@ void Cpu::Exec()
                      "PUSHF;\n\t"
                      "POP %%EAX;\n\t"
                      "MOVW %%AX,%2;\n\t"
-                     :"+r"(*universal_reg_al), "+r"(*universal_reg_ah), "+r"(control_reg_flag) /* output */
-                     :
+                     :"+r"(*universal_reg_al), "+r"(*universal_reg_ah), "=r"(control_reg_flag) /* output */
+                     :"r"(control_reg_flag) /* input */
                      :"eax"
                     );
                 break;
@@ -1399,15 +1427,16 @@ void Cpu::Exec()
                 mod_byte = ReadData8InExe();
                 opt1_8bit = CalculateRM(mod_byte, opcode);
                 opt2_8bit = CalculateReg8(mod_byte);
-                // *opt1_8bit = *opt1_8bit + *opt2_8bit;
                 __asm__
                     (
+                     "PUSHW %3;\n\t"
+                     "POPFW;\n\t"
                      "CMPB %2,%1;\n\t"
                      "PUSHF;\n\t"
                      "POP %%EAX;\n\t"
                      "MOVW %%AX,%0;\n\t"
                      :"=r"(control_reg_flag) /* output */
-                     :"r"(*opt1_8bit), "r"(*opt2_8bit)      /* input */
+                     :"r"(*opt1_8bit), "r"(*opt2_8bit)      , "r"(control_reg_flag) /* input */
                      :"eax"
                     );
                 break;
@@ -1418,15 +1447,16 @@ void Cpu::Exec()
                 mod_byte = ReadData8InExe();
                 opt1_16bit = reinterpret_cast<uint16_t  *>(CalculateRM(mod_byte, opcode));
                 opt2_16bit = CalculateReg16(mod_byte);
-                //*opt1_16bit = *opt1_16bit + *opt2_16bit;
                 __asm__
                     (
+                     "PUSHW %3;\n\t"
+                     "POPFW;\n\t"
                      "CMPW %2,%1;\n\t"
                      "PUSHF;\n\t"
                      "POP %%EAX;\n\t"
                      "MOVW %%AX,%0;\n\t"
                      :"=r"(control_reg_flag) /* output */
-                     :"r"(*opt1_16bit), "r"(*opt2_16bit)      /* input */
+                     :"r"(*opt1_16bit), "r"(*opt2_16bit)      , "r"(control_reg_flag) /* input */
                      :"eax"
                     );
                 break;
@@ -1437,15 +1467,16 @@ void Cpu::Exec()
                 mod_byte = ReadData8InExe();
                 opt1_8bit = CalculateReg8(mod_byte);
                 opt2_8bit = CalculateRM(mod_byte, opcode);
-                //*opt1_8bit = *opt1_8bit + *opt2_8bit;
                 __asm__
                     (
+                     "PUSHW %3;\n\t"
+                     "POPFW;\n\t"
                      "CMPB %2,%1;\n\t"
                      "PUSHF;\n\t"
                      "POP %%EAX;\n\t"
                      "MOVW %%AX,%0;\n\t"
                      :"=r"(control_reg_flag) /* output */
-                     :"r"(*opt1_8bit), "r"(*opt2_8bit)      /* input */
+                     :"r"(*opt1_8bit), "r"(*opt2_8bit)      , "r"(control_reg_flag) /* input */
                      :"eax"
                     );
                 break;
@@ -1459,12 +1490,14 @@ void Cpu::Exec()
                 //*opt1_16bit = *opt1_16bit + *opt2_16bit;
                 __asm__
                     (
+                     "PUSHW %3;\n\t"
+                     "POPFW;\n\t"
                      "CMPW %2,%1;\n\t"
                      "PUSHF;\n\t"
                      "POP %%EAX;\n\t"
                      "MOVW %%AX,%0;\n\t"
                      :"=r"(control_reg_flag) /* output */
-                     :"r"(*opt1_16bit), "r"(*opt2_16bit)      /* input */
+                     :"r"(*opt1_16bit), "r"(*opt2_16bit)      , "r"(control_reg_flag) /* input */
                      :"eax"
                     );
                 break;
@@ -1475,12 +1508,14 @@ void Cpu::Exec()
                 opt1_8bit = universal_reg_al;
                 __asm__
                     (
+                     "PUSHW %3;\n\t"
+                     "POPFW;\n\t"
                      "SUBB %2,%1;\n\t"
                      "PUSHF;\n\t"
                      "POP %%EAX;\n\t"
                      "MOVW %%AX,%0;\n\t"
                      :"=r"(control_reg_flag) /* output */
-                     :"r"(*opt1_8bit), "r"(ReadData8InExe())      /* input */
+                     :"r"(*opt1_8bit), "r"(ReadData8InExe())      , "r"(control_reg_flag) /* input */
                      :"eax"
                     );
                 break;
@@ -1490,12 +1525,14 @@ void Cpu::Exec()
             {
                 __asm__
                     (
+                     "PUSHW %3;\n\t"
+                     "POPFW;\n\t"
                      "SUBW %2,%1;\n\t"
                      "PUSHF;\n\t"
                      "POP %%EAX;\n\t"
                      "MOVW %%AX,%0;\n\t"
                      :"=r"(control_reg_flag) /* output */
-                     :"r"(universal_reg_ax), "r"(ReadData16InExe())      /* input */
+                     :"r"(universal_reg_ax), "r"(ReadData16InExe())      , "r"(control_reg_flag) /* input */
                      :"eax"
                     );
                 break;
@@ -1507,7 +1544,7 @@ void Cpu::Exec()
             {
                 __asm__
                     (
-                     "PUSHW %2;\n\t"
+                     "PUSHW %3;\n\t"
                      "POPFW;\n\t"
                      "MOVB %0,%%AL;\n\t"
                      "MOVB %1,%%AH;\n\t"
@@ -1517,17 +1554,19 @@ void Cpu::Exec()
                      "PUSHF;\n\t"
                      "POP %%EAX;\n\t"
                      "MOVW %%AX,%2;\n\t"
-                     :"+r"(*universal_reg_al), "+r"(*universal_reg_ah), "+r"(control_reg_flag) /* output */
-                     :
+                     :"+r"(*universal_reg_al), "+r"(*universal_reg_ah), "=r"(control_reg_flag) /* output */
+                     :"r"(control_reg_flag) /* input */
                      :"eax"
                     );
                 break;
             }
 
-        case(0x40)://INC eAX  不影响CF位
+        case(0x40)://INC eAX
             {
                 __asm__
                     (
+                     "PUSHW %2;\n\t"
+                     "POPFW;\n\t"
                      "MOVW %0,%%AX;\n\t"
                      "INCW %%AX;\n\t"
                      "MOVW %%AX,%0;\n\t"
@@ -1535,7 +1574,7 @@ void Cpu::Exec()
                      "POP %%EAX;\n\t"
                      "MOVW %%AX,%1;\n\t"
                      :"+r"(universal_reg_ax), "=r"(control_reg_flag) /* output */
-                     :
+                     :"r"(control_reg_flag) /* input */
                      :"eax"
                     );
                 break;
@@ -1544,6 +1583,8 @@ void Cpu::Exec()
             {
                 __asm__
                     (
+                     "PUSHW %2;\n\t"
+                     "POPFW;\n\t"
                      "MOVW %0,%%AX;\n\t"
                      "INCW %%AX;\n\t"
                      "MOVW %%AX,%0;\n\t"
@@ -1551,7 +1592,7 @@ void Cpu::Exec()
                      "POP %%EAX;\n\t"
                      "MOVW %%AX,%1;\n\t"
                      :"+r"(universal_reg_cx), "=r"(control_reg_flag) /* output */
-                     :
+                     :"r"(control_reg_flag) /* input */
                      :"eax"
                     );
                 break;
@@ -1560,6 +1601,8 @@ void Cpu::Exec()
             {
                 __asm__
                     (
+                     "PUSHW %2;\n\t"
+                     "POPFW;\n\t"
                      "MOVW %0,%%AX;\n\t"
                      "INCW %%AX;\n\t"
                      "MOVW %%AX,%0;\n\t"
@@ -1567,7 +1610,7 @@ void Cpu::Exec()
                      "POP %%EAX;\n\t"
                      "MOVW %%AX,%1;\n\t"
                      :"+r"(universal_reg_dx), "=r"(control_reg_flag) /* output */
-                     :
+                     :"r"(control_reg_flag) /* input */
                      :"eax"
                     );
                 break;
@@ -1576,6 +1619,8 @@ void Cpu::Exec()
             {
                 __asm__
                     (
+                     "PUSHW %2;\n\t"
+                     "POPFW;\n\t"
                      "MOVW %0,%%AX;\n\t"
                      "INCW %%AX;\n\t"
                      "MOVW %%AX,%0;\n\t"
@@ -1583,7 +1628,7 @@ void Cpu::Exec()
                      "POP %%EAX;\n\t"
                      "MOVW %%AX,%1;\n\t"
                      :"+r"(universal_reg_bx), "=r"(control_reg_flag) /* output */
-                     :
+                     :"r"(control_reg_flag) /* input */
                      :"eax"
                     );
                 break;
@@ -1593,6 +1638,8 @@ void Cpu::Exec()
             {
                 __asm__
                     (
+                     "PUSHW %2;\n\t"
+                     "POPFW;\n\t"
                      "MOVW %0,%%AX;\n\t"
                      "INCW %%AX;\n\t"
                      "MOVW %%AX,%0;\n\t"
@@ -1600,7 +1647,7 @@ void Cpu::Exec()
                      "POP %%EAX;\n\t"
                      "MOVW %%AX,%1;\n\t"
                      :"+r"(universal_reg_sp), "=r"(control_reg_flag) /* output */
-                     :
+                     :"r"(control_reg_flag) /*input */
                      :"eax"
                     );
                 break;
@@ -1610,6 +1657,8 @@ void Cpu::Exec()
             {
                 __asm__
                     (
+                     "PUSHW %2;\n\t"
+                     "POPFW;\n\t"
                      "MOVW %0,%%AX;\n\t"
                      "INCW %%AX;\n\t"
                      "MOVW %%AX,%0;\n\t"
@@ -1617,7 +1666,7 @@ void Cpu::Exec()
                      "POP %%EAX;\n\t"
                      "MOVW %%AX,%1;\n\t"
                      :"+r"(universal_reg_bp), "=r"(control_reg_flag) /* output */
-                     :
+                     :"r"(control_reg_flag) /* input */
                      :"eax"
                     );
                 break;
@@ -1627,6 +1676,8 @@ void Cpu::Exec()
             {
                 __asm__
                     (
+                     "PUSHW %2;\n\t"
+                     "POPFW;\n\t"
                      "MOVW %0,%%AX;\n\t"
                      "INCW %%AX;\n\t"
                      "MOVW %%AX,%0;\n\t"
@@ -1634,7 +1685,7 @@ void Cpu::Exec()
                      "POP %%EAX;\n\t"
                      "MOVW %%AX,%1;\n\t"
                      :"+r"(universal_reg_si), "=r"(control_reg_flag) /* output */
-                     :
+                     :"r"(control_reg_flag) /* input */
                      :"eax"
                     );
                 break;
@@ -1644,6 +1695,8 @@ void Cpu::Exec()
             {
                 __asm__
                     (
+                     "PUSHW %2;\n\t"
+                     "POPFW;\n\t"
                      "MOVW %0,%%AX;\n\t"
                      "INCW %%AX;\n\t"
                      "MOVW %%AX,%0;\n\t"
@@ -1651,16 +1704,18 @@ void Cpu::Exec()
                      "POP %%EAX;\n\t"
                      "MOVW %%AX,%1;\n\t"
                      :"+r"(universal_reg_di), "=r"(control_reg_flag) /* output */
-                     :
+                     :"r"(control_reg_flag) /* input */
                      :"eax"
                     );
                 break;
             }
 
-        case(0x48)://DEC eAX  不影响CF位
+        case(0x48)://DEC eAX
             {
                 __asm__
                     (
+                     "PUSHW %2;\n\t"
+                     "POPFW;\n\t"
                      "MOVW %0,%%AX;\n\t"
                      "DECW %%AX;\n\t"
                      "MOVW %%AX,%0;\n\t"
@@ -1668,7 +1723,7 @@ void Cpu::Exec()
                      "POP %%EAX;\n\t"
                      "MOVW %%AX,%1;\n\t"
                      :"+r"(universal_reg_ax), "=r"(control_reg_flag) /* output */
-                     :
+                     :"r"(control_reg_flag) /* input */
                      :"eax"
                     );
                 break;
@@ -1677,6 +1732,8 @@ void Cpu::Exec()
             {
                 __asm__
                     (
+                     "PUSHW %2;\n\t"
+                     "POPFW;\n\t"
                      "MOVW %0,%%AX;\n\t"
                      "DECW %%AX;\n\t"
                      "MOVW %%AX,%0;\n\t"
@@ -1684,7 +1741,7 @@ void Cpu::Exec()
                      "POP %%EAX;\n\t"
                      "MOVW %%AX,%1;\n\t"
                      :"+r"(universal_reg_cx), "=r"(control_reg_flag) /* output */
-                     :
+                     :"r"(control_reg_flag) /* input */
                      :"eax"
                     );
                 break;
@@ -1693,6 +1750,8 @@ void Cpu::Exec()
             {
                 __asm__
                     (
+                     "PUSHW %2;\n\t"
+                     "POPFW;\n\t"
                      "MOVW %0,%%AX;\n\t"
                      "DECW %%AX;\n\t"
                      "MOVW %%AX,%0;\n\t"
@@ -1700,7 +1759,7 @@ void Cpu::Exec()
                      "POP %%EAX;\n\t"
                      "MOVW %%AX,%1;\n\t"
                      :"+r"(universal_reg_dx), "=r"(control_reg_flag) /* output */
-                     :
+                     :"r"(control_reg_flag) /* input */
                      :"eax"
                     );
                 break;
@@ -1709,6 +1768,8 @@ void Cpu::Exec()
             {
                 __asm__
                     (
+                     "PUSHW %2;\n\t"
+                     "POPFW;\n\t"
                      "MOVW %0,%%AX;\n\t"
                      "DECW %%AX;\n\t"
                      "MOVW %%AX,%0;\n\t"
@@ -1716,7 +1777,7 @@ void Cpu::Exec()
                      "POP %%EAX;\n\t"
                      "MOVW %%AX,%1;\n\t"
                      :"+r"(universal_reg_bx), "=r"(control_reg_flag) /* output */
-                     :
+                     :"r"(control_reg_flag) /* input */
                      :"eax"
                     );
                 break;
@@ -1726,6 +1787,8 @@ void Cpu::Exec()
             {
                 __asm__
                     (
+                     "PUSHW %2;\n\t"
+                     "POPFW;\n\t"
                      "MOVW %0,%%AX;\n\t"
                      "DECW %%AX;\n\t"
                      "MOVW %%AX,%0;\n\t"
@@ -1733,7 +1796,7 @@ void Cpu::Exec()
                      "POP %%EAX;\n\t"
                      "MOVW %%AX,%1;\n\t"
                      :"+r"(universal_reg_sp), "=r"(control_reg_flag) /* output */
-                     :
+                     :"r"(control_reg_flag) /* input */
                      :"eax"
                     );
                 break;
@@ -1743,6 +1806,8 @@ void Cpu::Exec()
             {
                 __asm__
                     (
+                     "PUSHW %2;\n\t"
+                     "POPFW;\n\t"
                      "MOVW %0,%%AX;\n\t"
                      "DECW %%AX;\n\t"
                      "MOVW %%AX,%0;\n\t"
@@ -1750,7 +1815,7 @@ void Cpu::Exec()
                      "POP %%EAX;\n\t"
                      "MOVW %%AX,%1;\n\t"
                      :"+r"(universal_reg_bp), "=r"(control_reg_flag) /* output */
-                     :
+                     :"r"(control_reg_flag) /* input */
                      :"eax"
                     );
                 break;
@@ -1760,6 +1825,8 @@ void Cpu::Exec()
             {
                 __asm__
                     (
+                     "PUSHW %2;\n\t"
+                     "POPFW;\n\t"
                      "MOVW %0,%%AX;\n\t"
                      "DECW %%AX;\n\t"
                      "MOVW %%AX,%0;\n\t"
@@ -1767,7 +1834,7 @@ void Cpu::Exec()
                      "POP %%EAX;\n\t"
                      "MOVW %%AX,%1;\n\t"
                      :"+r"(universal_reg_si), "=r"(control_reg_flag) /* output */
-                     :
+                     :"r"(control_reg_flag) /* input */
                      :"eax"
                     );
                 break;
@@ -1777,6 +1844,8 @@ void Cpu::Exec()
             {
                 __asm__
                     (
+                     "PUSHW %2;\n\t"
+                     "POPFW;\n\t"
                      "MOVW %0,%%AX;\n\t"
                      "DECW %%AX;\n\t"
                      "MOVW %%AX,%0;\n\t"
@@ -1784,7 +1853,7 @@ void Cpu::Exec()
                      "POP %%EAX;\n\t"
                      "MOVW %%AX,%1;\n\t"
                      :"+r"(universal_reg_di), "=r"(control_reg_flag) /* output */
-                     :
+                     :"r"(control_reg_flag) /* input */
                      :"eax"
                     );
                 break;
@@ -1895,28 +1964,26 @@ void Cpu::Exec()
 
         case(0x61)://POPA (80186)
             {
-                uint16_t sp_tmp;
                 universal_reg_di = Pop();
                 universal_reg_si = Pop();
                 universal_reg_bp = Pop();
-                sp_tmp = Pop();
+                Pop();
                 universal_reg_bx = Pop();
                 universal_reg_dx = Pop();
                 universal_reg_cx = Pop();
                 universal_reg_ax = Pop();
-                universal_reg_sp = sp_tmp;
                 break;
             }
 
-        case(0x62)://BOUND Gv Ma (80186)
+        case(0x62)://BOUND Gv Ma (80186) remain to fix
             {
                 mod_byte = ReadData8InExe();
                 opt1_16bit = CalculateReg16(mod_byte);
                 opt2_16bit = reinterpret_cast<uint16_t  *>(CalculateRM(mod_byte, opcode));
                 if(static_cast<uint32_t>(*opt1_16bit) < static_cast<uint32_t>(*opt2_16bit))
-                    ;//Int(5); int 5;
+                    ;//Intcall(5); int 5;
                 if(static_cast<uint32_t>(*opt1_16bit) > static_cast<uint32_t>(*(opt2_16bit + 1)));
-                ;//Int(5); int 5;
+                ;//Intcall(5); int 5;
                 break;
             }
 
@@ -1939,6 +2006,8 @@ void Cpu::Exec()
                 opt2_16bit = reinterpret_cast<uint16_t  *>(CalculateRM(mod_byte, opcode));
                 __asm__
                     (
+                     "PUSHW %4;\n\t"
+                     "POPFW;\n\t"
                      "MOVW %3,%%AX;\n\t"
                      "IMULW %2,%%AX;\n\t"
                      "MOVW %%AX,%0;\n\t"
@@ -1946,7 +2015,7 @@ void Cpu::Exec()
                      "POP %%EAX;\n\t"
                      "MOVW %%AX,%1;\n\t"
                      :"=r"(*opt1_16bit), "=r"(control_reg_flag) /* output */
-                     :"r"(*opt2_16bit), "r"(ReadData16InExe())   /* input */
+                     :"r"(*opt2_16bit), "r"(ReadData16InExe())   , "r"(control_reg_flag) /* input */
                      :"eax"
                     );
                 break;
@@ -1965,6 +2034,8 @@ void Cpu::Exec()
                 opt2_16bit = reinterpret_cast<uint16_t  *>(CalculateRM(mod_byte, opcode));
                 __asm__
                     (
+                     "PUSHW %4;\n\t"
+                     "POPFW;\n\t"
                      "MOVW %3,%%AX;\n\t"
                      "IMULW %2,%%AX;\n\t"
                      "MOVW %%AX,%0;\n\t"
@@ -1972,7 +2043,7 @@ void Cpu::Exec()
                      "POP %%EAX;\n\t"
                      "MOVW %%AX,%1;\n\t"
                      :"=r"(*opt1_16bit), "=r"(control_reg_flag) /* output */
-                     :"r"(*opt2_16bit), "r"(static_cast<uint16_t>(ReadData8InExe()))   /* input */
+                     :"r"(*opt2_16bit), "r"(static_cast<uint16_t>(ReadData8InExe()))   , "r"(control_reg_flag) /* input */
                      :"eax"
                     );
                 break;
@@ -2112,7 +2183,7 @@ void Cpu::Exec()
 #endif
         case(0x70)://JO Jb
             {
-                uint16_t tmp_data = static_cast<uint16_t>(ReadData8InExe());
+                int16_t tmp_data = static_cast<int16_t>(ReadData8InExe());
                 uint8_t flag_of = (control_reg_flag >> 11) & 0x1;
                 if(flag_of)
                     control_reg_ip = control_reg_ip + tmp_data;
@@ -2121,7 +2192,7 @@ void Cpu::Exec()
 
         case(0x71)://JNO Jb
             {
-                uint16_t tmp_data = static_cast<uint16_t>(ReadData8InExe());
+                int16_t tmp_data = static_cast<int16_t>(ReadData8InExe());
                 uint8_t flag_of = (control_reg_flag >> 11) & 0x1;
                 if(!flag_of)
                     control_reg_ip = control_reg_ip + tmp_data;
@@ -2130,7 +2201,7 @@ void Cpu::Exec()
 
         case(0x72)://JB Jb
             {
-                uint16_t tmp_data = static_cast<uint16_t>(ReadData8InExe());
+                int16_t tmp_data = static_cast<int16_t>(ReadData8InExe());
                 uint8_t flag_cf = control_reg_flag & 0x1;
                 if(flag_cf)
                     control_reg_ip = control_reg_ip + tmp_data;
@@ -2139,7 +2210,7 @@ void Cpu::Exec()
 
         case(0x73)://JNB Jb
             {
-                uint16_t tmp_data = static_cast<uint16_t>(ReadData8InExe());
+                int16_t tmp_data = static_cast<int16_t>(ReadData8InExe());
                 uint8_t flag_cf = control_reg_flag & 0x1;
                 if(!flag_cf)
                     control_reg_ip = control_reg_ip + tmp_data;
@@ -2148,7 +2219,7 @@ void Cpu::Exec()
 
         case(0x74)://JZ Jb
             {
-                uint16_t tmp_data = static_cast<uint16_t>(ReadData8InExe());
+                int16_t tmp_data = static_cast<int16_t>(ReadData8InExe());
                 uint8_t flag_zf = (control_reg_flag >> 6) & 0x1;
                 if(flag_zf)
                     control_reg_ip = control_reg_ip + tmp_data;
@@ -2157,7 +2228,7 @@ void Cpu::Exec()
 
         case(0x75)://JNZ Jb
             {
-                uint16_t tmp_data = static_cast<uint16_t>(ReadData8InExe());
+                int16_t tmp_data = static_cast<int16_t>(ReadData8InExe());
                 uint8_t flag_zf = (control_reg_flag >> 6) & 0x1;
                 if(!flag_zf)
                     control_reg_ip = control_reg_ip + tmp_data;
@@ -2174,19 +2245,19 @@ void Cpu::Exec()
                 break;
             }
 
-        case(0x77)://JNBE Jb
+        case(0x77)://JA Jb
             {
-                uint16_t tmp_data = static_cast<uint16_t>(ReadData8InExe());
+                int16_t tmp_data = static_cast<int16_t>(ReadData8InExe());
                 uint8_t flag_cf = control_reg_flag & 0x1;
                 uint8_t flag_zf = (control_reg_flag >> 6) & 0x1;
-                if(flag_zf == 0 || flag_cf == 0)
+                if(flag_zf == 0 && flag_cf == 0)
                     control_reg_ip = control_reg_ip + tmp_data;
                 break;
             }
 
         case(0x78)://JS Jb
             {
-                uint16_t tmp_data = static_cast<uint16_t>(ReadData8InExe());
+                int16_t tmp_data = static_cast<int16_t>(ReadData8InExe());
                 uint8_t flag_sf = (control_reg_flag >> 7) & 0x1;
                 if(flag_sf)
                     control_reg_ip = control_reg_ip + tmp_data;
@@ -2195,25 +2266,25 @@ void Cpu::Exec()
 
         case(0x79)://JNS Jb
             {
-                uint16_t tmp_data = static_cast<uint16_t>(ReadData8InExe());
+                int16_t tmp_data = static_cast<int16_t>(ReadData8InExe());
                 uint8_t flag_sf = (control_reg_flag >> 7) & 0x1;
                 if(!flag_sf)
                     control_reg_ip = control_reg_ip + tmp_data;
                 break;
             }
 
-        case(0x7A)://JP Jb
+        case(0x7A)://JPE Jb
             {
-                uint16_t tmp_data = static_cast<uint16_t>(ReadData8InExe());
+                int16_t tmp_data = static_cast<int16_t>(ReadData8InExe());
                 uint8_t flag_pf = (control_reg_flag >> 2) & 0x1;
                 if(flag_pf)
                     control_reg_ip = control_reg_ip + tmp_data;
                 break;
             }
 
-        case(0x7B)://JNP Jb
+        case(0x7B)://JPO Jb
             {
-                uint16_t tmp_data = static_cast<uint16_t>(ReadData8InExe());
+                int16_t tmp_data = static_cast<int16_t>(ReadData8InExe());
                 uint8_t flag_pf = (control_reg_flag >> 2) & 0x1;
                 if(!flag_pf)
                     control_reg_ip = control_reg_ip + tmp_data;
@@ -2222,7 +2293,7 @@ void Cpu::Exec()
 
         case(0x7C)://JL Jb
             {
-                uint16_t tmp_data = static_cast<uint16_t>(ReadData8InExe());
+                int16_t tmp_data = static_cast<int16_t>(ReadData8InExe());
                 uint8_t flag_sf = (control_reg_flag >> 7) & 0x1;
                 uint8_t flag_of = (control_reg_flag >> 11) & 0x1;
                 if(flag_sf != flag_of)
@@ -2232,7 +2303,7 @@ void Cpu::Exec()
 
         case(0x7D)://JNL Jb
             {
-                uint16_t tmp_data = static_cast<uint16_t>(ReadData8InExe());
+                int16_t tmp_data = static_cast<int16_t>(ReadData8InExe());
                 uint8_t flag_sf = (control_reg_flag >> 7) & 0x1;
                 uint8_t flag_of = (control_reg_flag >> 11) & 0x1;
                 if(flag_sf == flag_of)
@@ -2242,7 +2313,7 @@ void Cpu::Exec()
 
         case(0x7E)://JLE Jb
             {
-                uint16_t tmp_data = static_cast<uint16_t>(ReadData8InExe());
+                int16_t tmp_data = static_cast<int16_t>(ReadData8InExe());
                 uint8_t flag_zf = (control_reg_flag >> 6) & 0x1;
                 uint8_t flag_sf = (control_reg_flag >> 7) & 0x1;
                 uint8_t flag_of = (control_reg_flag >> 11) & 0x1;
@@ -2253,7 +2324,7 @@ void Cpu::Exec()
 
         case(0x7F)://JNLE Jb
             {
-                uint16_t tmp_data = static_cast<uint16_t>(ReadData8InExe());
+                int16_t tmp_data = static_cast<int16_t>(ReadData8InExe());
                 uint8_t flag_zf = (control_reg_flag >> 6) & 0x1;
                 uint8_t flag_sf = (control_reg_flag >> 7) & 0x1;
                 uint8_t flag_of = (control_reg_flag >> 11) & 0x1;
@@ -2274,12 +2345,14 @@ void Cpu::Exec()
                         {
                             __asm__
                                 (
+                                 "PUSHW %3;\n\t"
+                                 "POPFW;\n\t"
                                  "ADDB %2,%0;\n\t"
                                  "PUSHF;\n\t"
                                  "POP %%EAX;\n\t"
                                  "MOVW %%AX,%1;\n\t"
                                  :"+r"(*opt1_8bit), "=r"(control_reg_flag) /* output */
-                                 :"r"(ReadData8InExe())       /* input */
+                                 :"r"(ReadData8InExe())       , "r"(control_reg_flag) /* input */
                                  :"eax"
                                 );
                             break;
@@ -2289,12 +2362,14 @@ void Cpu::Exec()
                         {
                             __asm__
                                 (
+                                 "PUSHW %3;\n\t"
+                                 "POPFW;\n\t"
                                  "ORB %2,%0;\n\t"
                                  "PUSHF;\n\t"
                                  "POP %%EAX;\n\t"
                                  "MOVW %%AX,%1;\n\t"
                                  :"+r"(*opt1_8bit), "=r"(control_reg_flag) /* output */
-                                 :"r"(ReadData8InExe())       /* input */
+                                 :"r"(ReadData8InExe())       , "r"(control_reg_flag) /* input */
                                  :"eax"
                                 );
                             break;
@@ -2304,14 +2379,14 @@ void Cpu::Exec()
                         {
                             __asm__
                                 (
-                                 "PUSHW %1;\n\t"
+                                 "PUSHW %3;\n\t"
                                  "POPFW;\n\t"
                                  "ADCB %2,%0;\n\t"
                                  "PUSHF;\n\t"
                                  "POP %%EAX;\n\t"
                                  "MOVW %%AX,%1;\n\t"
-                                 :"+r"(*opt1_8bit), "+r"(control_reg_flag) /* output */
-                                 :"r"(ReadData8InExe())       /* input */
+                                 :"+r"(*opt1_8bit), "=r"(control_reg_flag) /* output */
+                                 :"r"(ReadData8InExe())       , "r"(control_reg_flag) /* input */
                                  :"eax"
                                 );
                             break;
@@ -2321,14 +2396,14 @@ void Cpu::Exec()
                         {
                             __asm__
                                 (
-                                 "PUSHW %1;\n\t"
+                                 "PUSHW %3;\n\t"
                                  "POPFW;\n\t"
                                  "SBBB %2,%0;\n\t"
                                  "PUSHF;\n\t"
                                  "POP %%EAX;\n\t"
                                  "MOVW %%AX,%1;\n\t"
-                                 :"+r"(*opt1_8bit), "+r"(control_reg_flag) /* output */
-                                 :"r"(ReadData8InExe())       /* input */
+                                 :"+r"(*opt1_8bit), "=r"(control_reg_flag) /* output */
+                                 :"r"(ReadData8InExe())       , "r"(control_reg_flag) /* input */
                                  :"eax"
                                 );
                             break;
@@ -2338,12 +2413,14 @@ void Cpu::Exec()
                         {
                             __asm__
                                 (
+                                 "PUSHW %3;\n\t"
+                                 "POPFW;\n\t"
                                  "ANDB %2,%0;\n\t"
                                  "PUSHF;\n\t"
                                  "POP %%EAX;\n\t"
                                  "MOVW %%AX,%1;\n\t"
                                  :"+r"(*opt1_8bit), "=r"(control_reg_flag) /* output */
-                                 :"r"(ReadData8InExe())       /* input */
+                                 :"r"(ReadData8InExe())       , "r"(control_reg_flag) /* input */
                                  :"eax"
                                 );
                             break;
@@ -2353,12 +2430,14 @@ void Cpu::Exec()
                         {
                             __asm__
                                 (
+                                 "PUSHW %3;\n\t"
+                                 "POPFW;\n\t"
                                  "SUBB %2,%0;\n\t"
                                  "PUSHF;\n\t"
                                  "POP %%EAX;\n\t"
                                  "MOVW %%AX,%1;\n\t"
                                  :"+r"(*opt1_8bit), "=r"(control_reg_flag) /* output */
-                                 :"r"(ReadData8InExe())       /* input */
+                                 :"r"(ReadData8InExe())       , "r"(control_reg_flag) /* input */
                                  :"eax"
                                 );
                             break;
@@ -2368,12 +2447,14 @@ void Cpu::Exec()
                         {
                             __asm__
                                 (
+                                 "PUSHW %3;\n\t"
+                                 "POPFW;\n\t"
                                  "XORB %2,%0;\n\t"
                                  "PUSHF;\n\t"
                                  "POP %%EAX;\n\t"
                                  "MOVW %%AX,%1;\n\t"
                                  :"+r"(*opt1_8bit), "=r"(control_reg_flag) /* output */
-                                 :"r"(ReadData8InExe())       /* input */
+                                 :"r"(ReadData8InExe())       , "r"(control_reg_flag) /* input */
                                  :"eax"
                                 );
                             break;
@@ -2383,12 +2464,14 @@ void Cpu::Exec()
                         {
                             __asm__
                                 (
+                                 "PUSHW %3;\n\t"
+                                 "POPFW;\n\t"
                                  "CMPB %2,%1;\n\t"
                                  "PUSHF;\n\t"
                                  "POP %%EAX;\n\t"
                                  "MOVW %%AX,%0;\n\t"
                                  :"=r"(control_reg_flag) /* output */
-                                 :"r"(*opt1_8bit), "r"(ReadData8InExe())      /* input */
+                                 :"r"(*opt1_8bit), "r"(ReadData8InExe())      , "r"(control_reg_flag) /* input */
                                  :"eax"
                                 );
                             break;
@@ -2408,12 +2491,14 @@ void Cpu::Exec()
                         {
                             __asm__
                                 (
+                                 "PUSHW %3;\n\t"
+                                 "POPFW;\n\t"
                                  "ADDW %2,%0;\n\t"
                                  "PUSHF;\n\t"
                                  "POP %%EAX;\n\t"
                                  "MOVW %%AX,%1;\n\t"
                                  :"+r"(*opt1_16bit), "=r"(control_reg_flag) /* output */
-                                 :"r"(ReadData16InExe())       /* input */
+                                 :"r"(ReadData16InExe())       , "r"(control_reg_flag) /* input */
                                  :"eax"
                                 );
                             break;
@@ -2423,12 +2508,14 @@ void Cpu::Exec()
                         {
                             __asm__
                                 (
+                                 "PUSHW %3;\n\t"
+                                 "POPFW;\n\t"
                                  "ORW %2,%0;\n\t"
                                  "PUSHF;\n\t"
                                  "POP %%EAX;\n\t"
                                  "MOVW %%AX,%1;\n\t"
                                  :"+r"(*opt1_16bit), "=r"(control_reg_flag) /* output */
-                                 :"r"(ReadData16InExe())       /* input */
+                                 :"r"(ReadData16InExe())       , "r"(control_reg_flag) /* input */
                                  :"eax"
                                 );
                             break;
@@ -2438,14 +2525,14 @@ void Cpu::Exec()
                         {
                             __asm__
                                 (
-                                 "PUSHW %1;\n\t"
+                                 "PUSHW %3;\n\t"
                                  "POPFW;\n\t"
                                  "ADCW %2,%0;\n\t"
                                  "PUSHF;\n\t"
                                  "POP %%EAX;\n\t"
                                  "MOVW %%AX,%1;\n\t"
-                                 :"+r"(*opt1_16bit), "+r"(control_reg_flag) /* output */
-                                 :"r"(ReadData16InExe())       /* input */
+                                 :"+r"(*opt1_16bit), "=r"(control_reg_flag) /* output */
+                                 :"r"(ReadData16InExe())       , "r"(control_reg_flag) /* input */
                                  :"eax"
                                 );
                             break;
@@ -2455,14 +2542,14 @@ void Cpu::Exec()
                         {
                             __asm__
                                 (
-                                 "PUSHW %1;\n\t"
+                                 "PUSHW %3;\n\t"
                                  "POPFW;\n\t"
                                  "SBBW %2,%0;\n\t"
                                  "PUSHF;\n\t"
                                  "POP %%EAX;\n\t"
                                  "MOVW %%AX,%1;\n\t"
-                                 :"+r"(*opt1_16bit), "+r"(control_reg_flag) /* output */
-                                 :"r"(ReadData16InExe())       /* input */
+                                 :"+r"(*opt1_16bit), "=r"(control_reg_flag) /* output */
+                                 :"r"(ReadData16InExe())       , "r"(control_reg_flag) /* input */
                                  :"eax"
                                 );
                             break;
@@ -2472,12 +2559,14 @@ void Cpu::Exec()
                         {
                             __asm__
                                 (
+                                 "PUSHW %3;\n\t"
+                                 "POPFW;\n\t"
                                  "ANDW %2,%0;\n\t"
                                  "PUSHF;\n\t"
                                  "POP %%EAX;\n\t"
                                  "MOVW %%AX,%1;\n\t"
                                  :"+r"(*opt1_16bit), "=r"(control_reg_flag) /* output */
-                                 :"r"(ReadData16InExe())       /* input */
+                                 :"r"(ReadData16InExe())       , "r"(control_reg_flag) /* input */
                                  :"eax"
                                 );
                             break;
@@ -2487,12 +2576,14 @@ void Cpu::Exec()
                         {
                             __asm__
                                 (
+                                 "PUSHW %3;\n\t"
+                                 "POPFW;\n\t"
                                  "SUBW %2,%0;\n\t"
                                  "PUSHF;\n\t"
                                  "POP %%EAX;\n\t"
                                  "MOVW %%AX,%1;\n\t"
                                  :"+r"(*opt1_16bit), "=r"(control_reg_flag) /* output */
-                                 :"r"(ReadData16InExe())       /* input */
+                                 :"r"(ReadData16InExe())       , "r"(control_reg_flag) /* input */
                                  :"eax"
                                 );
                             break;
@@ -2502,12 +2593,14 @@ void Cpu::Exec()
                         {
                             __asm__
                                 (
+                                 "PUSHW %3;\n\t"
+                                 "POPFW;\n\t"
                                  "XORW %2,%0;\n\t"
                                  "PUSHF;\n\t"
                                  "POP %%EAX;\n\t"
                                  "MOVW %%AX,%1;\n\t"
                                  :"+r"(*opt1_16bit), "=r"(control_reg_flag) /* output */
-                                 :"r"(ReadData16InExe())       /* input */
+                                 :"r"(ReadData16InExe())       , "r"(control_reg_flag) /* input */
                                  :"eax"
                                 );
                             break;
@@ -2517,12 +2610,14 @@ void Cpu::Exec()
                         {
                             __asm__
                                 (
+                                 "PUSHW %3;\n\t"
+                                 "POPFW;\n\t"
                                  "CMPW %2,%1;\n\t"
                                  "PUSHF;\n\t"
                                  "POP %%EAX;\n\t"
                                  "MOVW %%AX,%0;\n\t"
                                  :"=r"(control_reg_flag) /* output */
-                                 :"r"(*opt1_16bit), "r"(ReadData16InExe())      /* input */
+                                 :"r"(*opt1_16bit), "r"(ReadData16InExe())      , "r"(control_reg_flag) /* input */
                                  :"eax"
                                 );
                             break;
@@ -2542,12 +2637,14 @@ void Cpu::Exec()
                         {
                             __asm__
                                 (
+                                 "PUSHW %3;\n\t"
+                                 "POPFW;\n\t"
                                  "ADDW %2,%0;\n\t"
                                  "PUSHF;\n\t"
                                  "POP %%EAX;\n\t"
                                  "MOVW %%AX,%1;\n\t"
                                  :"+r"(*opt1_16bit), "=r"(control_reg_flag) /* output */
-                                 :"r"(static_cast<uint16_t>(ReadData8InExe()))       /* input */
+                                 :"r"(static_cast<int16_t>(ReadData8InExe()))       , "r"(control_reg_flag) /* input */
                                  :"eax"
                                 );
                             break;
@@ -2557,12 +2654,14 @@ void Cpu::Exec()
                         {
                             __asm__
                                 (
+                                 "PUSHW %3;\n\t"
+                                 "POPFW;\n\t"
                                  "ORW %2,%0;\n\t"
                                  "PUSHF;\n\t"
                                  "POP %%EAX;\n\t"
                                  "MOVW %%AX,%1;\n\t"
                                  :"+r"(*opt1_16bit), "=r"(control_reg_flag) /* output */
-                                 :"r"(static_cast<uint16_t>(ReadData8InExe()))       /* input */
+                                 :"r"(static_cast<int16_t>(ReadData8InExe()))       , "r"(control_reg_flag) /* input */
                                  :"eax"
                                 );
                             break;
@@ -2572,14 +2671,14 @@ void Cpu::Exec()
                         {
                             __asm__
                                 (
-                                 "PUSHW %1;\n\t"
+                                 "PUSHW %3;\n\t"
                                  "POPFW;\n\t"
                                  "ADCW %2,%0;\n\t"
                                  "PUSHF;\n\t"
                                  "POP %%EAX;\n\t"
                                  "MOVW %%AX,%1;\n\t"
-                                 :"+r"(*opt1_16bit), "+r"(control_reg_flag) /* output */
-                                 :"r"(static_cast<uint16_t>(ReadData8InExe()))       /* input */
+                                 :"+r"(*opt1_16bit), "=r"(control_reg_flag) /* output */
+                                 :"r"(static_cast<int16_t>(ReadData8InExe()))       , "r"(control_reg_flag) /* input */
                                  :"eax"
                                 );
                             break;
@@ -2589,14 +2688,14 @@ void Cpu::Exec()
                         {
                             __asm__
                                 (
-                                 "PUSHW %1;\n\t"
+                                 "PUSHW %3;\n\t"
                                  "POPFW;\n\t"
                                  "SBBW %2,%0;\n\t"
                                  "PUSHF;\n\t"
                                  "POP %%EAX;\n\t"
                                  "MOVW %%AX,%1;\n\t"
-                                 :"+r"(*opt1_16bit), "+r"(control_reg_flag) /* output */
-                                 :"r"(static_cast<uint16_t>(ReadData8InExe()))       /* input */
+                                 :"+r"(*opt1_16bit), "=r"(control_reg_flag) /* output */
+                                 :"r"(static_cast<int16_t>(ReadData8InExe()))       , "r"(control_reg_flag) /* input */
                                  :"eax"
                                 );
                             break;
@@ -2606,12 +2705,14 @@ void Cpu::Exec()
                         {
                             __asm__
                                 (
+                                 "PUSHW %3;\n\t"
+                                 "POPFW;\n\t"
                                  "ANDW %2,%0;\n\t"
                                  "PUSHF;\n\t"
                                  "POP %%EAX;\n\t"
                                  "MOVW %%AX,%1;\n\t"
                                  :"+r"(*opt1_16bit), "=r"(control_reg_flag) /* output */
-                                 :"r"(static_cast<uint16_t>(ReadData8InExe()))       /* input */
+                                 :"r"(static_cast<int16_t>(ReadData8InExe()))       , "r"(control_reg_flag) /* input */
                                  :"eax"
                                 );
                             break;
@@ -2621,12 +2722,14 @@ void Cpu::Exec()
                         {
                             __asm__
                                 (
+                                 "PUSHW %3;\n\t"
+                                 "POPFW;\n\t"
                                  "SUBW %2,%0;\n\t"
                                  "PUSHF;\n\t"
                                  "POP %%EAX;\n\t"
                                  "MOVW %%AX,%1;\n\t"
                                  :"+r"(*opt1_16bit), "=r"(control_reg_flag) /* output */
-                                 :"r"(static_cast<uint16_t>(ReadData8InExe()))       /* input */
+                                 :"r"(static_cast<int16_t>(ReadData8InExe()))       , "r"(control_reg_flag) /* input */
                                  :"eax"
                                 );
                             break;
@@ -2636,12 +2739,14 @@ void Cpu::Exec()
                         {
                             __asm__
                                 (
+                                 "PUSHW %3;\n\t"
+                                 "POPFW;\n\t"
                                  "XORW %2,%0;\n\t"
                                  "PUSHF;\n\t"
                                  "POP %%EAX;\n\t"
                                  "MOVW %%AX,%1;\n\t"
                                  :"+r"(*opt1_16bit), "=r"(control_reg_flag) /* output */
-                                 :"r"(static_cast<uint16_t>(ReadData8InExe()))       /* input */
+                                 :"r"(static_cast<int16_t>(ReadData8InExe()))       , "r"(control_reg_flag) /* input */
                                  :"eax"
                                 );
                             break;
@@ -2651,12 +2756,14 @@ void Cpu::Exec()
                         {
                             __asm__
                                 (
+                                 "PUSHW %3;\n\t"
+                                 "POPFW;\n\t"
                                  "CMPW %2,%1;\n\t"
                                  "PUSHF;\n\t"
                                  "POP %%EAX;\n\t"
                                  "MOVW %%AX,%0;\n\t"
                                  :"=r"(control_reg_flag) /* output */
-                                 :"r"(*opt1_16bit), "r"(static_cast<uint16_t>(ReadData8InExe()))      /* input */
+                                 :"r"(*opt1_16bit), "r"(static_cast<uint16_t>(ReadData8InExe()))      , "r"(control_reg_flag) /* input */
                                  :"eax"
                                 );
                             break;
@@ -2672,12 +2779,14 @@ void Cpu::Exec()
                 opt2_8bit = CalculateReg8(mod_byte);
                 __asm__
                     (
+                     "PUSHW %3;\n\t"
+                     "POPFW;\n\t"
                      "TESTB %2,%1;\n\t"
                      "PUSHF;\n\t"
                      "POP %%EAX;\n\t"
                      "MOVW %%AX,%0;\n\t"
                      :"=r"(control_reg_flag) /* output */
-                     :"r"(*opt1_8bit), "r"(*opt2_8bit)      /* input */
+                     :"r"(*opt1_8bit), "r"(*opt2_8bit)      , "r"(control_reg_flag) /* input */
                      :"eax"
                     );
                 break;
@@ -2690,12 +2799,14 @@ void Cpu::Exec()
                 opt2_16bit = CalculateReg16(mod_byte);
                 __asm__
                     (
+                     "PUSHW %3;\n\t"
+                     "POPFW;\n\t"
                      "TESTW %2,%1;\n\t"
                      "PUSHF;\n\t"
                      "POP %%EAX;\n\t"
                      "MOVW %%AX,%0;\n\t"
                      :"=r"(control_reg_flag) /* output */
-                     :"r"(*opt1_16bit), "r"(*opt2_16bit)      /* input */
+                     :"r"(*opt1_16bit), "r"(*opt2_16bit)      , "r"(control_reg_flag) /* input */
                      :"eax"
                     );
                 break;
@@ -3038,12 +3149,14 @@ void Cpu::Exec()
                 opt1_8bit = universal_reg_al;
                 __asm__
                     (
+                     "PUSHW %3;\n\t"
+                     "POPFW;\n\t"
                      "TESTB %2,%1;\n\t"
                      "PUSHF;\n\t"
                      "POP %%EAX;\n\t"
                      "MOVW %%AX,%0;\n\t"
                      :"=r"(control_reg_flag) /* output */
-                     :"r"(*opt1_8bit), "r"(ReadData8InExe())      /* input */
+                     :"r"(*opt1_8bit), "r"(ReadData8InExe())      , "r"(control_reg_flag) /* input */
                      :"eax"
                     );
                 break;
@@ -3054,12 +3167,14 @@ void Cpu::Exec()
                 opt1_16bit = &universal_reg_ax;
                 __asm__
                     (
+                     "PUSHW %3;\n\t"
+                     "POPFW;\n\t"
                      "TESTW %2,%1;\n\t"
                      "PUSHF;\n\t"
                      "POP %%EAX;\n\t"
                      "MOVW %%AX,%0;\n\t"
                      :"=r"(control_reg_flag) /* output */
-                     :"r"(*opt1_16bit), "r"(ReadData16InExe())      /* input */
+                     :"r"(*opt1_16bit), "r"(ReadData16InExe())      , "r"(control_reg_flag) /* input */
                      :"eax"
                     );
                 break;
@@ -3200,12 +3315,14 @@ void Cpu::Exec()
                         {
                             __asm__
                                 (
+                                 "PUSHW %3;\n\t"
+                                 "POPFW;\n\t"
                                  "ROLB %2,%0;\n\t"
                                  "PUSHF;\n\t"
                                  "POP %%EAX;\n\t"
                                  "MOVW %%AX,%1;\n\t"
                                  :"+r"(*opt1_8bit), "=r"(control_reg_flag) /* output */
-                                 :"r"(ReadData8InExe())       /* input */
+                                 :"r"(ReadData8InExe())       , "r"(control_reg_flag) /* input */
                                  :"eax"
                                 );
                             break;
@@ -3215,12 +3332,14 @@ void Cpu::Exec()
                         {
                             __asm__
                                 (
+                                 "PUSHW %3;\n\t"
+                                 "POPFW;\n\t"
                                  "RORB %2,%0;\n\t"
                                  "PUSHF;\n\t"
                                  "POP %%EAX;\n\t"
                                  "MOVW %%AX,%1;\n\t"
                                  :"+r"(*opt1_8bit), "=r"(control_reg_flag) /* output */
-                                 :"r"(ReadData8InExe())       /* input */
+                                 :"r"(ReadData8InExe())       , "r"(control_reg_flag) /* input */
                                  :"eax"
                                 );
                             break;
@@ -3237,7 +3356,7 @@ void Cpu::Exec()
                                  "POP %%EAX;\n\t"
                                  "MOVW %%AX,%1;\n\t"
                                  :"+r"(*opt1_8bit), "=r"(control_reg_flag) /* output */
-                                 :"r"(ReadData8InExe()),"r"(control_reg_flag)       /* input */
+                                 :"r"(ReadData8InExe()), "r"(control_reg_flag)  /* input */
                                  :"eax"
                                 );
                             break;
@@ -3254,7 +3373,7 @@ void Cpu::Exec()
                                  "POP %%EAX;\n\t"
                                  "MOVW %%AX,%1;\n\t"
                                  :"+r"(*opt1_8bit), "=r"(control_reg_flag) /* output */
-                                 :"r"(ReadData8InExe()),"r"(control_reg_flag)        /* input */
+                                 :"r"(ReadData8InExe()), "r"(control_reg_flag)  /* input */
                                  :"eax"
                                 );
                             break;
@@ -3264,12 +3383,14 @@ void Cpu::Exec()
                         {
                             __asm__
                                 (
+                                 "PUSHW %3;\n\t"
+                                 "POPFW;\n\t"
                                  "SHLB %2,%0;\n\t"
                                  "PUSHF;\n\t"
                                  "POP %%EAX;\n\t"
                                  "MOVW %%AX,%1;\n\t"
                                  :"+r"(*opt1_8bit), "=r"(control_reg_flag) /* output */
-                                 :"r"(ReadData8InExe())       /* input */
+                                 :"r"(ReadData8InExe())       , "r"(control_reg_flag) /* input */
                                  :"eax"
                                 );
                             break;
@@ -3279,12 +3400,14 @@ void Cpu::Exec()
                         {
                             __asm__
                                 (
+                                 "PUSHW %3;\n\t"
+                                 "POPFW;\n\t"
                                  "SHRB %2,%0;\n\t"
                                  "PUSHF;\n\t"
                                  "POP %%EAX;\n\t"
                                  "MOVW %%AX,%1;\n\t"
                                  :"+r"(*opt1_8bit), "=r"(control_reg_flag) /* output */
-                                 :"r"(ReadData8InExe())       /* input */
+                                 :"r"(ReadData8InExe())       , "r"(control_reg_flag) /* input */
                                  :"eax"
                                 );
                             break;
@@ -3294,12 +3417,14 @@ void Cpu::Exec()
                         {
                             __asm__
                                 (
+                                 "PUSHW %3;\n\t"
+                                 "POPFW;\n\t"
                                  "SALB %2,%0;\n\t"
                                  "PUSHF;\n\t"
                                  "POP %%EAX;\n\t"
                                  "MOVW %%AX,%1;\n\t"
                                  :"+r"(*opt1_8bit), "=r"(control_reg_flag) /* output */
-                                 :"r"(ReadData8InExe())       /* input */
+                                 :"r"(ReadData8InExe())       , "r"(control_reg_flag) /* input */
                                  :"eax"
                                 );
                             break;
@@ -3309,12 +3434,14 @@ void Cpu::Exec()
                         {
                             __asm__
                                 (
+                                 "PUSHW %3;\n\t"
+                                 "POPFW;\n\t"
                                  "SARB %2,%0;\n\t"
                                  "PUSHF;\n\t"
                                  "POP %%EAX;\n\t"
                                  "MOVW %%AX,%1;\n\t"
                                  :"+r"(*opt1_8bit), "=r"(control_reg_flag) /* output */
-                                 :"r"(ReadData8InExe())       /* input */
+                                 :"r"(ReadData8InExe())       , "r"(control_reg_flag) /* input */
                                  :"eax"
                                 );
                             break;
@@ -3334,12 +3461,14 @@ void Cpu::Exec()
                         {
                             __asm__
                                 (
+                                 "PUSHW %3;\n\t"
+                                 "POPFW;\n\t"
                                  "ROLW %2,%0;\n\t"
                                  "PUSHF;\n\t"
                                  "POP %%EAX;\n\t"
                                  "MOVW %%AX,%1;\n\t"
                                  :"+r"(*opt1_16bit), "=r"(control_reg_flag) /* output */
-                                 :"r"(ReadData8InExe())       /* input */
+                                 :"r"(ReadData8InExe())       , "r"(control_reg_flag) /* input */
                                  :"eax"
                                 );
                             break;
@@ -3349,12 +3478,14 @@ void Cpu::Exec()
                         {
                             __asm__
                                 (
+                                 "PUSHW %3;\n\t"
+                                 "POPFW;\n\t"
                                  "RORW %2,%0;\n\t"
                                  "PUSHF;\n\t"
                                  "POP %%EAX;\n\t"
                                  "MOVW %%AX,%1;\n\t"
                                  :"+r"(*opt1_16bit), "=r"(control_reg_flag) /* output */
-                                 :"r"(ReadData8InExe())       /* input */
+                                 :"r"(ReadData8InExe())       , "r"(control_reg_flag) /* input */
                                  :"eax"
                                 );
                             break;
@@ -3371,7 +3502,7 @@ void Cpu::Exec()
                                  "POP %%EAX;\n\t"
                                  "MOVW %%AX,%1;\n\t"
                                  :"+r"(*opt1_16bit), "=r"(control_reg_flag) /* output */
-                                 :"r"(ReadData8InExe()),"r"(control_reg_flag)      /* input */
+                                 :"r"(ReadData8InExe()), "r"(control_reg_flag)     /* input */
                                  :"eax"
                                 );
                             break;
@@ -3388,7 +3519,7 @@ void Cpu::Exec()
                                  "POP %%EAX;\n\t"
                                  "MOVW %%AX,%1;\n\t"
                                  :"+r"(*opt1_16bit), "=r"(control_reg_flag) /* output */
-                                 :"r"(ReadData8InExe()),"r"(control_reg_flag)       /* input */
+                                 :"r"(ReadData8InExe()), "r"(control_reg_flag)      /* input */
                                  :"eax"
                                 );
                             break;
@@ -3398,12 +3529,14 @@ void Cpu::Exec()
                         {
                             __asm__
                                 (
+                                 "PUSHW %3;\n\t"
+                                 "POPFW;\n\t"
                                  "SHLW %2,%0;\n\t"
                                  "PUSHF;\n\t"
                                  "POP %%EAX;\n\t"
                                  "MOVW %%AX,%1;\n\t"
                                  :"+r"(*opt1_16bit), "=r"(control_reg_flag) /* output */
-                                 :"r"(ReadData8InExe())       /* input */
+                                 :"r"(ReadData8InExe())       , "r"(control_reg_flag) /* input */
                                  :"eax"
                                 );
                             break;
@@ -3413,12 +3546,14 @@ void Cpu::Exec()
                         {
                             __asm__
                                 (
+                                 "PUSHW %3;\n\t"
+                                 "POPFW;\n\t"
                                  "SHRW %2,%0;\n\t"
                                  "PUSHF;\n\t"
                                  "POP %%EAX;\n\t"
                                  "MOVW %%AX,%1;\n\t"
                                  :"+r"(*opt1_16bit), "=r"(control_reg_flag) /* output */
-                                 :"r"(ReadData8InExe())       /* input */
+                                 :"r"(ReadData8InExe())       , "r"(control_reg_flag) /* input */
                                  :"eax"
                                 );
                             break;
@@ -3428,12 +3563,14 @@ void Cpu::Exec()
                         {
                             __asm__
                                 (
+                                 "PUSHW %3;\n\t"
+                                 "POPFW;\n\t"
                                  "SALW %2,%0;\n\t"
                                  "PUSHF;\n\t"
                                  "POP %%EAX;\n\t"
                                  "MOVW %%AX,%1;\n\t"
                                  :"+r"(*opt1_16bit), "=r"(control_reg_flag) /* output */
-                                 :"r"(ReadData8InExe())       /* input */
+                                 :"r"(ReadData8InExe())       , "r"(control_reg_flag) /* input */
                                  :"eax"
                                 );
                             break;
@@ -3443,12 +3580,14 @@ void Cpu::Exec()
                         {
                             __asm__
                                 (
+                                 "PUSHW %3;\n\t"
+                                 "POPFW;\n\t"
                                  "SARW %2,%0;\n\t"
                                  "PUSHF;\n\t"
                                  "POP %%EAX;\n\t"
                                  "MOVW %%AX,%1;\n\t"
                                  :"+r"(*opt1_16bit), "=r"(control_reg_flag) /* output */
-                                 :"r"(ReadData8InExe())       /* input */
+                                 :"r"(ReadData8InExe())       , "r"(control_reg_flag) /* input */
                                  :"eax"
                                 );
                             break;
@@ -3592,12 +3731,14 @@ void Cpu::Exec()
                         {
                             __asm__
                                 (
+                                 "PUSHW %3;\n\t"
+                                 "POPFW;\n\t"
                                  "ROLB %2,%0;\n\t"
                                  "PUSHF;\n\t"
                                  "POP %%EAX;\n\t"
                                  "MOVW %%AX,%1;\n\t"
                                  :"+r"(*opt1_8bit), "=r"(control_reg_flag) /* output */
-                                 :"i"(1)       /* input */
+                                 :"i"(1)       , "r"(control_reg_flag) /* input */
                                  :"eax"
                                 );
                             break;
@@ -3607,12 +3748,14 @@ void Cpu::Exec()
                         {
                             __asm__
                                 (
+                                 "PUSHW %3;\n\t"
+                                 "POPFW;\n\t"
                                  "RORB %2,%0;\n\t"
                                  "PUSHF;\n\t"
                                  "POP %%EAX;\n\t"
                                  "MOVW %%AX,%1;\n\t"
                                  :"+r"(*opt1_8bit), "=r"(control_reg_flag) /* output */
-                                 :"i"(1)       /* input */
+                                 :"i"(1)       , "r"(control_reg_flag) /* input */
                                  :"eax"
                                 );
                             break;
@@ -3623,14 +3766,14 @@ void Cpu::Exec()
                             printf("hdsafad\n");
                             __asm__
                                 (
-                                 "PUSHW %1;\n\t"
+                                 "PUSHW %3;\n\t"
                                  "POPFW;\n\t"
                                  "RCLB %2,%0;\n\t"
                                  "PUSHF;\n\t"
                                  "POP %%EAX;\n\t"
                                  "MOVW %%AX,%1;\n\t"
-                                 :"+r"(*opt1_8bit), "+r"(control_reg_flag) /* output */
-                                 :"i"(1)       /* input */
+                                 :"+r"(*opt1_8bit), "=r"(control_reg_flag) /* output */
+                                 :"i"(1)       , "r"(control_reg_flag) /* input */
                                  :"eax"
                                 );
                             break;
@@ -3640,14 +3783,14 @@ void Cpu::Exec()
                         {
                             __asm__
                                 (
-                                 "PUSHW %1;\n\t"
+                                 "PUSHW %3;\n\t"
                                  "POPFW;\n\t"
                                  "RCRB %2,%0;\n\t"
                                  "PUSHF;\n\t"
                                  "POP %%EAX;\n\t"
                                  "MOVW %%AX,%1;\n\t"
-                                 :"+r"(*opt1_8bit), "+r"(control_reg_flag) /* output */
-                                 :"i"(1)       /* input */
+                                 :"+r"(*opt1_8bit), "=r"(control_reg_flag) /* output */
+                                 :"i"(1)       , "r"(control_reg_flag) /* input */
                                  :"eax"
                                 );
                             break;
@@ -3657,12 +3800,14 @@ void Cpu::Exec()
                         {
                             __asm__
                                 (
+                                 "PUSHW %3;\n\t"
+                                 "POPFW;\n\t"
                                  "SHLB %2,%0;\n\t"
                                  "PUSHF;\n\t"
                                  "POP %%EAX;\n\t"
                                  "MOVW %%AX,%1;\n\t"
                                  :"+r"(*opt1_8bit), "=r"(control_reg_flag) /* output */
-                                 :"i"(1)       /* input */
+                                 :"i"(1)       , "r"(control_reg_flag) /* input */
                                  :"eax"
                                 );
                             break;
@@ -3672,12 +3817,14 @@ void Cpu::Exec()
                         {
                             __asm__
                                 (
+                                 "PUSHW %3;\n\t"
+                                 "POPFW;\n\t"
                                  "SHRB %2,%0;\n\t"
                                  "PUSHF;\n\t"
                                  "POP %%EAX;\n\t"
                                  "MOVW %%AX,%1;\n\t"
                                  :"+r"(*opt1_8bit), "=r"(control_reg_flag) /* output */
-                                 :"i"(1)       /* input */
+                                 :"i"(1)       , "r"(control_reg_flag) /* input */
                                  :"eax"
                                 );
                             break;
@@ -3687,12 +3834,14 @@ void Cpu::Exec()
                         {
                             __asm__
                                 (
+                                 "PUSHW %3;\n\t"
+                                 "POPFW;\n\t"
                                  "SALB %2,%0;\n\t"
                                  "PUSHF;\n\t"
                                  "POP %%EAX;\n\t"
                                  "MOVW %%AX,%1;\n\t"
                                  :"+r"(*opt1_8bit), "=r"(control_reg_flag) /* output */
-                                 :"i"(1)       /* input */
+                                 :"i"(1)       , "r"(control_reg_flag) /* input */
                                  :"eax"
                                 );
                             break;
@@ -3702,12 +3851,14 @@ void Cpu::Exec()
                         {
                             __asm__
                                 (
+                                 "PUSHW %3;\n\t"
+                                 "POPFW;\n\t"
                                  "SARB %2,%0;\n\t"
                                  "PUSHF;\n\t"
                                  "POP %%EAX;\n\t"
                                  "MOVW %%AX,%1;\n\t"
                                  :"+r"(*opt1_8bit), "=r"(control_reg_flag) /* output */
-                                 :"i"(1)       /* input */
+                                 :"i"(1)       , "r"(control_reg_flag) /* input */
                                  :"eax"
                                 );
                             break;
@@ -3727,12 +3878,14 @@ void Cpu::Exec()
                         {
                             __asm__
                                 (
+                                 "PUSHW %3;\n\t"
+                                 "POPFW;\n\t"
                                  "ROLW %2,%0;\n\t"
                                  "PUSHF;\n\t"
                                  "POP %%EAX;\n\t"
                                  "MOVW %%AX,%1;\n\t"
                                  :"+r"(*opt1_16bit), "=r"(control_reg_flag) /* output */
-                                 :"i"(1)       /* input */
+                                 :"i"(1)       , "r"(control_reg_flag) /* input */
                                  :"eax"
                                 );
                             break;
@@ -3742,12 +3895,14 @@ void Cpu::Exec()
                         {
                             __asm__
                                 (
+                                 "PUSHW %3;\n\t"
+                                 "POPFW;\n\t"
                                  "RORW %2,%0;\n\t"
                                  "PUSHF;\n\t"
                                  "POP %%EAX;\n\t"
                                  "MOVW %%AX,%1;\n\t"
                                  :"+r"(*opt1_16bit), "=r"(control_reg_flag) /* output */
-                                 :"i"(1)       /* input */
+                                 :"i"(1)       , "r"(control_reg_flag) /* input */
                                  :"eax"
                                 );
                             break;
@@ -3757,14 +3912,14 @@ void Cpu::Exec()
                         {
                             __asm__
                                 (
-                                 "PUSHW %1;\n\t"
+                                 "PUSHW %3;\n\t"
                                  "POPFW;\n\t"
                                  "RCLW %2,%0;\n\t"
                                  "PUSHF;\n\t"
                                  "POP %%EAX;\n\t"
                                  "MOVW %%AX,%1;\n\t"
-                                 :"+r"(*opt1_16bit), "+r"(control_reg_flag) /* output */
-                                 :"i"(1)       /* input */
+                                 :"+r"(*opt1_16bit), "=r"(control_reg_flag) /* output */
+                                 :"i"(1)       , "r"(control_reg_flag) /* input */
                                  :"eax"
                                 );
                             break;
@@ -3774,14 +3929,14 @@ void Cpu::Exec()
                         {
                             __asm__
                                 (
-                                 "PUSHW %1;\n\t"
+                                 "PUSHW %3;\n\t"
                                  "POPFW;\n\t"
                                  "RCRW %2,%0;\n\t"
                                  "PUSHF;\n\t"
                                  "POP %%EAX;\n\t"
                                  "MOVW %%AX,%1;\n\t"
-                                 :"+r"(*opt1_16bit), "+r"(control_reg_flag) /* output */
-                                 :"i"(1)       /* input */
+                                 :"+r"(*opt1_16bit), "=r"(control_reg_flag) /* output */
+                                 :"i"(1) , "r"(control_reg_flag) /* input */
                                  :"eax"
                                 );
                             break;
@@ -3791,12 +3946,14 @@ void Cpu::Exec()
                         {
                             __asm__
                                 (
+                                 "PUSHW %3;\n\t"
+                                 "POPFW;\n\t"
                                  "SHLW %2,%0;\n\t"
                                  "PUSHF;\n\t"
                                  "POP %%EAX;\n\t"
                                  "MOVW %%AX,%1;\n\t"
                                  :"+r"(*opt1_16bit), "=r"(control_reg_flag) /* output */
-                                 :"i"(1)       /* input */
+                                 :"i"(1)       , "r"(control_reg_flag) /* input */
                                  :"eax"
                                 );
                             break;
@@ -3806,12 +3963,14 @@ void Cpu::Exec()
                         {
                             __asm__
                                 (
+                                 "PUSHW %3;\n\t"
+                                 "POPFW;\n\t"
                                  "SHRW %2,%0;\n\t"
                                  "PUSHF;\n\t"
                                  "POP %%EAX;\n\t"
                                  "MOVW %%AX,%1;\n\t"
                                  :"+r"(*opt1_16bit), "=r"(control_reg_flag) /* output */
-                                 :"i"(1)       /* input */
+                                 :"i"(1)       , "r"(control_reg_flag) /* input */
                                  :"eax"
                                 );
                             break;
@@ -3821,12 +3980,14 @@ void Cpu::Exec()
                         {
                             __asm__
                                 (
+                                 "PUSHW %3;\n\t"
+                                 "POPFW;\n\t"
                                  "SALW %2,%0;\n\t"
                                  "PUSHF;\n\t"
                                  "POP %%EAX;\n\t"
                                  "MOVW %%AX,%1;\n\t"
                                  :"+r"(*opt1_16bit), "=r"(control_reg_flag) /* output */
-                                 :"i"(1)       /* input */
+                                 :"i"(1)       , "r"(control_reg_flag) /* input */
                                  :"eax"
                                 );
                             break;
@@ -3836,12 +3997,14 @@ void Cpu::Exec()
                         {
                             __asm__
                                 (
+                                 "PUSHW %3;\n\t"
+                                 "POPFW;\n\t"
                                  "SARW %2,%0;\n\t"
                                  "PUSHF;\n\t"
                                  "POP %%EAX;\n\t"
                                  "MOVW %%AX,%1;\n\t"
                                  :"+r"(*opt1_16bit), "=r"(control_reg_flag) /* output */
-                                 :"i"(1)       /* input */
+                                 :"i"(1)       , "r"(control_reg_flag) /* input */
                                  :"eax"
                                 );
                             break;
@@ -3861,12 +4024,14 @@ void Cpu::Exec()
                         {
                             __asm__
                                 (
+                                 "PUSHW %3;\n\t"
+                                 "POPFW;\n\t"
                                  "ROLB %2,%0;\n\t"
                                  "PUSHF;\n\t"
                                  "POP %%EAX;\n\t"
                                  "MOVW %%AX,%1;\n\t"
                                  :"+r"(*opt1_8bit), "=r"(control_reg_flag) /* output */
-                                 :"r"(*universal_reg_cl)       /* input */
+                                 :"r"(*universal_reg_cl)       , "r"(control_reg_flag) /* input */
                                  :"eax"
                                 );
                             break;
@@ -3876,12 +4041,14 @@ void Cpu::Exec()
                         {
                             __asm__
                                 (
+                                 "PUSHW %3;\n\t"
+                                 "POPFW;\n\t"
                                  "RORB %2,%0;\n\t"
                                  "PUSHF;\n\t"
                                  "POP %%EAX;\n\t"
                                  "MOVW %%AX,%1;\n\t"
                                  :"+r"(*opt1_8bit), "=r"(control_reg_flag) /* output */
-                                 :"r"(*universal_reg_cl)       /* input */
+                                 :"r"(*universal_reg_cl)       , "r"(control_reg_flag) /* input */
                                  :"eax"
                                 );
                             break;
@@ -3898,7 +4065,7 @@ void Cpu::Exec()
                                  "POP %%EAX;\n\t"
                                  "MOVW %%AX,%1;\n\t"
                                  :"+r"(*opt1_8bit), "=r"(control_reg_flag) /* output */
-                                 :"r"(*universal_reg_cl),"r"(control_reg_flag)      /* input */
+                                 :"r"(*universal_reg_cl), "r"(control_reg_flag)   /* input */
                                  :"eax"
                                 );
                             break;
@@ -3915,7 +4082,7 @@ void Cpu::Exec()
                                  "POP %%EAX;\n\t"
                                  "MOVW %%AX,%1;\n\t"
                                  :"+r"(*opt1_8bit), "=r"(control_reg_flag) /* output */
-                                 :"r"(*universal_reg_cl),"r"(control_reg_flag)      /* input */
+                                 :"r"(*universal_reg_cl), "r"(control_reg_flag)     /* input */
                                  :"eax"
                                 );
                             break;
@@ -3925,12 +4092,14 @@ void Cpu::Exec()
                         {
                             __asm__
                                 (
+                                 "PUSHW %3;\n\t"
+                                 "POPFW;\n\t"
                                  "SHLB %2,%0;\n\t"
                                  "PUSHF;\n\t"
                                  "POP %%EAX;\n\t"
                                  "MOVW %%AX,%1;\n\t"
                                  :"+r"(*opt1_8bit), "=r"(control_reg_flag) /* output */
-                                 :"r"(*universal_reg_cl)       /* input */
+                                 :"r"(*universal_reg_cl)       , "r"(control_reg_flag) /* input */
                                  :"eax"
                                 );
                             break;
@@ -3940,12 +4109,14 @@ void Cpu::Exec()
                         {
                             __asm__
                                 (
+                                 "PUSHW %3;\n\t"
+                                 "POPFW;\n\t"
                                  "SHRB %2,%0;\n\t"
                                  "PUSHF;\n\t"
                                  "POP %%EAX;\n\t"
                                  "MOVW %%AX,%1;\n\t"
                                  :"+r"(*opt1_8bit), "=r"(control_reg_flag) /* output */
-                                 :"r"(*universal_reg_cl)       /* input */
+                                 :"r"(*universal_reg_cl)       , "r"(control_reg_flag) /* input */
                                  :"eax"
                                 );
                             break;
@@ -3955,12 +4126,14 @@ void Cpu::Exec()
                         {
                             __asm__
                                 (
+                                 "PUSHW %3;\n\t"
+                                 "POPFW;\n\t"
                                  "SALB %2,%0;\n\t"
                                  "PUSHF;\n\t"
                                  "POP %%EAX;\n\t"
                                  "MOVW %%AX,%1;\n\t"
                                  :"+r"(*opt1_8bit), "=r"(control_reg_flag) /* output */
-                                 :"r"(*universal_reg_cl)       /* input */
+                                 :"r"(*universal_reg_cl)       , "r"(control_reg_flag) /* input */
                                  :"eax"
                                 );
                             break;
@@ -3970,12 +4143,14 @@ void Cpu::Exec()
                         {
                             __asm__
                                 (
+                                 "PUSHW %3;\n\t"
+                                 "POPFW;\n\t"
                                  "SARB %2,%0;\n\t"
                                  "PUSHF;\n\t"
                                  "POP %%EAX;\n\t"
                                  "MOVW %%AX,%1;\n\t"
                                  :"+r"(*opt1_8bit), "=r"(control_reg_flag) /* output */
-                                 :"r"(*universal_reg_cl)       /* input */
+                                 :"r"(*universal_reg_cl)       , "r"(control_reg_flag) /* input */
                                  :"eax"
                                 );
                             break;
@@ -3995,12 +4170,14 @@ void Cpu::Exec()
                         {
                             __asm__
                                 (
+                                 "PUSHW %3;\n\t"
+                                 "POPFW;\n\t"
                                  "ROLW %2,%0;\n\t"
                                  "PUSHF;\n\t"
                                  "POP %%EAX;\n\t"
                                  "MOVW %%AX,%1;\n\t"
                                  :"+r"(*opt1_16bit), "=r"(control_reg_flag) /* output */
-                                 :"r"(*universal_reg_cl)       /* input */
+                                 :"r"(*universal_reg_cl)       , "r"(control_reg_flag) /* input */
                                  :"eax"
                                 );
                             break;
@@ -4010,12 +4187,14 @@ void Cpu::Exec()
                         {
                             __asm__
                                 (
+                                 "PUSHW %3;\n\t"
+                                 "POPFW;\n\t"
                                  "RORW %2,%0;\n\t"
                                  "PUSHF;\n\t"
                                  "POP %%EAX;\n\t"
                                  "MOVW %%AX,%1;\n\t"
                                  :"+r"(*opt1_16bit), "=r"(control_reg_flag) /* output */
-                                 :"r"(*universal_reg_cl)       /* input */
+                                 :"r"(*universal_reg_cl)       , "r"(control_reg_flag) /* input */
                                  :"eax"
                                 );
                             break;
@@ -4032,7 +4211,7 @@ void Cpu::Exec()
                                  "POP %%EAX;\n\t"
                                  "MOVW %%AX,%1;\n\t"
                                  :"+r"(*opt1_16bit), "=r"(control_reg_flag) /* output */
-                                 :"r"(*universal_reg_cl),"r"(control_reg_flag)       /* input */
+                                 :"r"(*universal_reg_cl), "r"(control_reg_flag)      /* input */
                                  :"eax"
                                 );
                             break;
@@ -4049,7 +4228,7 @@ void Cpu::Exec()
                                  "POP %%EAX;\n\t"
                                  "MOVW %%AX,%1;\n\t"
                                  :"+r"(*opt1_16bit), "=r"(control_reg_flag) /* output */
-                                 :"r"(*universal_reg_cl),"r"(control_reg_flag)      /* input */
+                                 :"r"(*universal_reg_cl), "r"(control_reg_flag)     /* input */
                                  :"eax"
                                 );
                             break;
@@ -4059,12 +4238,14 @@ void Cpu::Exec()
                         {
                             __asm__
                                 (
+                                 "PUSHW %3;\n\t"
+                                 "POPFW;\n\t"
                                  "SHLW %2,%0;\n\t"
                                  "PUSHF;\n\t"
                                  "POP %%EAX;\n\t"
                                  "MOVW %%AX,%1;\n\t"
                                  :"+r"(*opt1_16bit), "=r"(control_reg_flag) /* output */
-                                 :"r"(*universal_reg_cl)       /* input */
+                                 :"r"(*universal_reg_cl)       , "r"(control_reg_flag) /* input */
                                  :"eax"
                                 );
                             break;
@@ -4074,12 +4255,14 @@ void Cpu::Exec()
                         {
                             __asm__
                                 (
+                                 "PUSHW %3;\n\t"
+                                 "POPFW;\n\t"
                                  "SHRW %2,%0;\n\t"
                                  "PUSHF;\n\t"
                                  "POP %%EAX;\n\t"
                                  "MOVW %%AX,%1;\n\t"
                                  :"+r"(*opt1_16bit), "=r"(control_reg_flag) /* output */
-                                 :"r"(*universal_reg_cl)       /* input */
+                                 :"r"(*universal_reg_cl)       , "r"(control_reg_flag) /* input */
                                  :"eax"
                                 );
                             break;
@@ -4089,12 +4272,14 @@ void Cpu::Exec()
                         {
                             __asm__
                                 (
+                                 "PUSHW %3;\n\t"
+                                 "POPFW;\n\t"
                                  "SALW %2,%0;\n\t"
                                  "PUSHF;\n\t"
                                  "POP %%EAX;\n\t"
                                  "MOVW %%AX,%1;\n\t"
                                  :"+r"(*opt1_16bit), "=r"(control_reg_flag) /* output */
-                                 :"r"(*universal_reg_cl)       /* input */
+                                 :"r"(*universal_reg_cl)       , "r"(control_reg_flag) /* input */
                                  :"eax"
                                 );
                             break;
@@ -4104,12 +4289,14 @@ void Cpu::Exec()
                         {
                             __asm__
                                 (
+                                 "PUSHW %3;\n\t"
+                                 "POPFW;\n\t"
                                  "SARW %2,%0;\n\t"
                                  "PUSHF;\n\t"
                                  "POP %%EAX;\n\t"
                                  "MOVW %%AX,%1;\n\t"
                                  :"+r"(*opt1_16bit), "=r"(control_reg_flag) /* output */
-                                 :"r"(*universal_reg_cl)       /* input */
+                                 :"r"(*universal_reg_cl)       , "r"(control_reg_flag) /* input */
                                  :"eax"
                                 );
                             break;
@@ -4130,13 +4317,15 @@ void Cpu::Exec()
                 *universal_reg_al = *universal_reg_al % divisor;
                 __asm__
                     (
+                     "PUSHW %3;\n\t"
+                     "POPFW;\n\t"
                      "MOVW %1,%%AX;\n\t"
                      "TESTW %2,%%AX;\n\t"
                      "PUSHF;\n\t"
                      "POP %%EAX;\n\t"
                      "MOVW %%AX,%0;\n\t"
                      :"=r"(control_reg_flag) /* output */
-                     :"r"(universal_reg_ax), "i"(0xFFFF) /* input */
+                     :"r"(universal_reg_ax), "i"(0xFFFF) , "r"(control_reg_flag) /* input */
                      :"eax"
                     );
                 break;
@@ -4149,13 +4338,15 @@ void Cpu::Exec()
                 *universal_reg_ah = 0x0;
                 __asm__
                     (
+                     "PUSHW %3;\n\t"
+                     "POPFW;\n\t"
                      "MOVW %1,%%AX;\n\t"
                      "TESTW %2,%%AX;\n\t"
                      "PUSHF;\n\t"
                      "POP %%EAX;\n\t"
                      "MOVW %%AX,%0;\n\t"
                      :"=r"(control_reg_flag) /* output */
-                     :"r"(universal_reg_ax), "i"(0xFFFF) /* input */
+                     :"r"(universal_reg_ax), "i"(0xFFFF) , "r"(control_reg_flag) /* input */
                      :"eax"
                     );
                 break;
@@ -4195,9 +4386,10 @@ void Cpu::Exec()
             {
                 uint8_t zf = (control_reg_flag >> 6) & 0x1;
                 universal_reg_cx = universal_reg_cx - 1;
+                uint8_t tmp_data = ReadData8InExe();
                 if(universal_reg_cx && !zf)
                 {
-                    control_reg_ip = control_reg_ip + ReadData8InExe();
+                    control_reg_ip = control_reg_ip + tmp_data;
                 }
                 break;
             }
@@ -4206,9 +4398,10 @@ void Cpu::Exec()
             {
                 uint8_t zf = (control_reg_flag >> 6) & 0x1;
                 universal_reg_cx = universal_reg_cx - 1;
+                uint8_t tmp_data = ReadData8InExe();
                 if(universal_reg_cx && zf)
                 {
-                    control_reg_ip = control_reg_ip + ReadData8InExe();
+                    control_reg_ip = control_reg_ip + tmp_data;
                 }
                 break;
             }
@@ -4216,18 +4409,20 @@ void Cpu::Exec()
         case(0xE2)://LOOP rel8 IP have error remain fix
             {
                 universal_reg_cx = universal_reg_cx - 1;
+                uint8_t tmp_data = ReadData8InExe();
                 if(universal_reg_cx)
                 {
-                    control_reg_ip = control_reg_ip + ReadData8InExe();
+                    control_reg_ip = control_reg_ip + tmp_data;
                 }
                 break;
             }
 
         case(0xE3)://JCXZ rel8
             {
+                uint8_t tmp_data = ReadData8InExe();
                 if(!universal_reg_cx)
                 {
-                    control_reg_ip = control_reg_ip + ReadData8InExe();
+                    control_reg_ip = control_reg_ip + tmp_data;
                 }
                 break;
             }
@@ -4350,12 +4545,14 @@ void Cpu::Exec()
                         {
                             __asm__
                                 (
+                                 "PUSHW %3;\n\t"
+                                 "POPFW;\n\t"
                                  "TESTB %2,%0;\n\t"
                                  "PUSHF;\n\t"
                                  "POP %%EAX;\n\t"
                                  "MOVW %%AX,%1;\n\t"
                                  :"+r"(*opt1_8bit), "=r"(control_reg_flag) /* output */
-                                 :"r"(ReadData8InExe())       /* input */
+                                 :"r"(ReadData8InExe())       , "r"(control_reg_flag) /* input */
                                  :"eax"
                                 );
                             break;
@@ -4365,12 +4562,14 @@ void Cpu::Exec()
                         {
                             __asm__
                                 (
+                                 "PUSHW %3;\n\t"
+                                 "POPFW;\n\t"
                                  "TESTB %2,%0;\n\t"
                                  "PUSHF;\n\t"
                                  "POP %%EAX;\n\t"
                                  "MOVW %%AX,%1;\n\t"
                                  :"+r"(*opt1_8bit), "=r"(control_reg_flag) /* output */
-                                 :"r"(ReadData8InExe())       /* input */
+                                 :"r"(ReadData8InExe())       , "r"(control_reg_flag) /* input */
                                  :"eax"
                                 );
                             break;
@@ -4386,12 +4585,14 @@ void Cpu::Exec()
                         {
                             __asm__
                                 (
+                                 "PUSHW %2;\n\t"
+                                 "POPFW;\n\t"
                                  "NEGB %0;\n\t"
                                  "PUSHF;\n\t"
                                  "POP %%EAX;\n\t"
                                  "MOVW %%AX,%1;\n\t"
                                  :"+r"(*opt1_8bit), "=r"(control_reg_flag) /* output */
-                                 :      /* input */
+                                 : "r"(control_reg_flag) /* input */
                                  :"eax"
                                 );
                             break;
@@ -4401,6 +4602,8 @@ void Cpu::Exec()
                         {
                             __asm__
                                 (
+                                 "PUSHW %3;\n\t"
+                                 "POPFW;\n\t"
                                  "MOVW %0,%%AX;\n\t"
                                  "MULB %2;\n\t"
                                  "MOVW %%AX,%0;\n\t"
@@ -4408,7 +4611,7 @@ void Cpu::Exec()
                                  "POP %%EAX;\n\t"
                                  "MOVW %%AX,%1;\n\t"
                                  :"+r"(universal_reg_ax), "=r"(control_reg_flag) /* output */
-                                 :"r"(*opt1_8bit)     /* input */
+                                 :"r"(*opt1_8bit)     , "r"(control_reg_flag) /* input */
                                  :"eax"
                                 );
                             break;
@@ -4418,6 +4621,8 @@ void Cpu::Exec()
                         {
                             __asm__
                                 (
+                                 "PUSHW %3;\n\t"
+                                 "POPFW;\n\t"
                                  "MOVW %0,%%AX;\n\t"
                                  "IMULB %2;\n\t"
                                  "MOVW %%AX,%0;\n\t"
@@ -4425,7 +4630,7 @@ void Cpu::Exec()
                                  "POP %%EAX;\n\t"
                                  "MOVW %%AX,%1;\n\t"
                                  :"+r"(universal_reg_ax), "=r"(control_reg_flag) /* output */
-                                 :"r"(*opt1_8bit)     /* input */
+                                 :"r"(*opt1_8bit)     , "r"(control_reg_flag) /* input */
                                  :"eax"
                                 );
                             break;
@@ -4440,6 +4645,8 @@ void Cpu::Exec()
                             }
                             __asm__
                                 (
+                                 "PUSHW %3;\n\t"
+                                 "POPFW;\n\t"
                                  "MOVW %0,%%AX;\n\t"
                                  "DIVB %2;\n\t"
                                  "MOVW %%AX,%0;\n\t"
@@ -4447,7 +4654,7 @@ void Cpu::Exec()
                                  "POP %%EAX;\n\t"
                                  "MOVW %%AX,%1;\n\t"
                                  :"+r"(universal_reg_ax), "=r"(control_reg_flag) /* output */
-                                 :"r"(*opt1_8bit)     /* input */
+                                 :"r"(*opt1_8bit)     , "r"(control_reg_flag) /* input */
                                  :"eax"
                                 );
                             break;
@@ -4462,6 +4669,8 @@ void Cpu::Exec()
                             }
                             __asm__
                                 (
+                                 "PUSHW %3;\n\t"
+                                 "POPFW;\n\t"
                                  "MOVW %0,%%AX;\n\t"
                                  "IDIVB %2;\n\t"
                                  "MOVW %%AX,%0;\n\t"
@@ -4469,7 +4678,7 @@ void Cpu::Exec()
                                  "POP %%EAX;\n\t"
                                  "MOVW %%AX,%1;\n\t"
                                  :"+r"(universal_reg_ax), "=r"(control_reg_flag) /* output */
-                                 :"r"(*opt1_8bit)     /* input */
+                                 :"r"(*opt1_8bit)     , "r"(control_reg_flag) /* input */
                                  :"eax"
                                 );
                             break;
@@ -4489,12 +4698,14 @@ void Cpu::Exec()
                         {
                             __asm__
                                 (
+                                 "PUSHW %3;\n\t"
+                                 "POPFW;\n\t"
                                  "TESTW %2,%0;\n\t"
                                  "PUSHF;\n\t"
                                  "POP %%EAX;\n\t"
                                  "MOVW %%AX,%1;\n\t"
                                  :"+r"(*opt1_16bit), "=r"(control_reg_flag) /* output */
-                                 :"r"(ReadData16InExe())       /* input */
+                                 :"r"(ReadData16InExe())       , "r"(control_reg_flag) /* input */
                                  :"eax"
                                 );
                             break;
@@ -4504,12 +4715,14 @@ void Cpu::Exec()
                         {
                             __asm__
                                 (
+                                 "PUSHW %3;\n\t"
+                                 "POPFW;\n\t"
                                  "TESTW %2,%0;\n\t"
                                  "PUSHF;\n\t"
                                  "POP %%EAX;\n\t"
                                  "MOVW %%AX,%1;\n\t"
                                  :"+r"(*opt1_16bit), "=r"(control_reg_flag) /* output */
-                                 :"r"(ReadData16InExe())       /* input */
+                                 :"r"(ReadData16InExe())       , "r"(control_reg_flag) /* input */
                                  :"eax"
                                 );
                             break;
@@ -4525,12 +4738,14 @@ void Cpu::Exec()
                         {
                             __asm__
                                 (
+                                 "PUSHW %2;\n\t"
+                                 "POPFW;\n\t"
                                  "NEGW %0;\n\t"
                                  "PUSHF;\n\t"
                                  "POP %%EAX;\n\t"
                                  "MOVW %%AX,%1;\n\t"
                                  :"+r"(*opt1_16bit), "=r"(control_reg_flag) /* output */
-                                 :      /* input */
+                                 :    "r"(control_reg_flag) /* input */
                                  :"eax"
                                 );
                             break;
@@ -4540,6 +4755,8 @@ void Cpu::Exec()
                         {
                             __asm__
                                 (
+                                 "PUSHW %4;\n\t"
+                                 "POPFW;\n\t"
                                  "MOVW %0,%%AX;\n\t"
                                  "MULW %3;\n\t"
                                  "MOVW %%AX,%0;\n\t"
@@ -4548,7 +4765,7 @@ void Cpu::Exec()
                                  "POP %%EAX;\n\t"
                                  "MOVW %%AX,%1;\n\t"
                                  :"+r"(universal_reg_ax), "=r"(control_reg_flag), "=r"(universal_reg_dx) /* output */
-                                 :"r"(*opt1_16bit)     /* input */
+                                 :"r"(*opt1_16bit)     , "r"(control_reg_flag) /* input */
                                  :"eax", "edx"
                                 );
                             break;
@@ -4558,6 +4775,8 @@ void Cpu::Exec()
                         {
                             __asm__
                                 (
+                                 "PUSHW %4;\n\t"
+                                 "POPFW;\n\t"
                                  "MOVW %0,%%AX;\n\t"
                                  "IMULW %3;\n\t"
                                  "MOVW %%AX,%0;\n\t"
@@ -4566,7 +4785,7 @@ void Cpu::Exec()
                                  "POP %%EAX;\n\t"
                                  "MOVW %%AX,%1;\n\t"
                                  :"+r"(universal_reg_ax), "=r"(control_reg_flag), "=r"(universal_reg_dx) /* output */
-                                 :"r"(*opt1_16bit)     /* input */
+                                 :"r"(*opt1_16bit)     , "r"(control_reg_flag) /* input */
                                  :"eax", "edx"
                                 );
                             break;
@@ -4581,6 +4800,8 @@ void Cpu::Exec()
                             }
                             __asm__
                                 (
+                                 "PUSHW %4;\n\t"
+                                 "POPFW;\n\t"
                                  "MOVW %0,%%AX;\n\t"
                                  "DIVW %3;\n\t"
                                  "MOVW %%AX,%0;\n\t"
@@ -4589,7 +4810,7 @@ void Cpu::Exec()
                                  "POP %%EAX;\n\t"
                                  "MOVW %%AX,%1;\n\t"
                                  :"+r"(universal_reg_ax), "=r"(control_reg_flag), "=r"(universal_reg_dx) /* output */
-                                 :"r"(*opt1_16bit)     /* input */
+                                 :"r"(*opt1_16bit)     , "r"(control_reg_flag) /* input */
                                  :"eax", "edx"
                                 );
                             break;
@@ -4605,6 +4826,8 @@ void Cpu::Exec()
                             }
                             __asm__
                                 (
+                                 "PUSHW %4;\n\t"
+                                 "POPFW;\n\t"
                                  "MOVW %0,%%AX;\n\t"
                                  "IDIVW %3;\n\t"
                                  "MOVW %%AX,%0;\n\t"
@@ -4613,7 +4836,7 @@ void Cpu::Exec()
                                  "POP %%EAX;\n\t"
                                  "MOVW %%AX,%1;\n\t"
                                  :"+r"(universal_reg_ax), "=r"(control_reg_flag), "=r"(universal_reg_dx) /* output */
-                                 :"r"(*opt1_16bit)     /* input */
+                                 :"r"(*opt1_16bit)     , "r"(control_reg_flag) /* input */
                                  :"eax", "edx"
                                 );
                             break;
@@ -4669,12 +4892,14 @@ void Cpu::Exec()
                         {
                             __asm__
                                 (
+                                 "PUSHW %2;\n\t"
+                                 "POPFW;\n\t"
                                  "INCB %0;\n\t"
                                  "PUSHF;\n\t"
                                  "POP %%EAX;\n\t"
                                  "MOVW %%AX,%1;\n\t"
                                  :"+r"(*opt1_8bit), "=r"(control_reg_flag) /* output */
-                                 :       /* input */
+                                 :      "r"(control_reg_flag) /* input */
                                  :"eax"
                                 );
                             break;
@@ -4684,12 +4909,14 @@ void Cpu::Exec()
                         {
                             __asm__
                                 (
+                                 "PUSHW %2;\n\t"
+                                 "POPFW;\n\t"
                                  "DECB %0;\n\t"
                                  "PUSHF;\n\t"
                                  "POP %%EAX;\n\t"
                                  "MOVW %%AX,%1;\n\t"
                                  :"+r"(*opt1_8bit), "=r"(control_reg_flag) /* output */
-                                 :       /* input */
+                                 :      "r"(control_reg_flag) /* input */
                                  :"eax"
                                 );
                             break;
@@ -4712,12 +4939,14 @@ void Cpu::Exec()
                         {
                             __asm__
                                 (
+                                 "PUSHW %2;\n\t"
+                                 "POPFW;\n\t"
                                  "INCW %0;\n\t"
                                  "PUSHF;\n\t"
                                  "POP %%EAX;\n\t"
                                  "MOVW %%AX,%1;\n\t"
                                  :"+r"(*opt1_16bit), "=r"(control_reg_flag) /* output */
-                                 :       /* input */
+                                 :       "r"(control_reg_flag) /* input */
                                  :"eax"
                                 );
                             break;
@@ -4727,12 +4956,14 @@ void Cpu::Exec()
                         {
                             __asm__
                                 (
+                                 "PUSHW %2;\n\t"
+                                 "POPFW;\n\t"
                                  "DECW %0;\n\t"
                                  "PUSHF;\n\t"
                                  "POP %%EAX;\n\t"
                                  "MOVW %%AX,%1;\n\t"
                                  :"+r"(*opt1_16bit), "=r"(control_reg_flag) /* output */
-                                 :       /* input */
+                                 :       "r"(control_reg_flag) /* input */
                                  :"eax"
                                 );
                             break;
