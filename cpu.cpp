@@ -1,6 +1,7 @@
 #include "cpu.h"
 
 #include <stdio.h>
+#include <string.h>
 
 Cpu::Cpu()
 {
@@ -470,7 +471,10 @@ inline uint16_t Cpu::Pop()
 int Cpu::Init(unsigned int ram_size)
 {
     ram = new uint8_t[ram_size];
+    memset(ram, 0x0, ram_size);
+    memset(ram + 0x8000, ' ', 80 * 25);
     Reset();
+    halt = 0;
     return 0;
 }
 
@@ -494,6 +498,7 @@ void Cpu::Exec()
     seg_reg_replace_ds = &seg_reg_ds;
     seg_reg_replace_ss = &seg_reg_ss;
     opcode = ReadData8InExe();
+    //printf("opcode :%x\n", opcode);
     switch(opcode)
     {
         /*seg prefix
@@ -914,7 +919,7 @@ void Cpu::Exec()
                     (
                      "PUSHW %3;\n\t"
                      "POPFW;\n\t"
-                     "SUBW %2,%0;\n\t"
+                     "SBBW %2,%0;\n\t"
                      "PUSHF;\n\t"
                      "POP %%EAX;\n\t"
                      "MOVW %%AX,%1;\n\t"
@@ -934,7 +939,7 @@ void Cpu::Exec()
                     (
                      "PUSHW %3;\n\t"
                      "POPFW;\n\t"
-                     "SUBB %2,%0;\n\t"
+                     "SBBB %2,%0;\n\t"
                      "PUSHF;\n\t"
                      "POP %%EAX;\n\t"
                      "MOVW %%AX,%1;\n\t"
@@ -1510,7 +1515,7 @@ void Cpu::Exec()
                     (
                      "PUSHW %3;\n\t"
                      "POPFW;\n\t"
-                     "SUBB %2,%1;\n\t"
+                     "CMPB %2,%1;\n\t"
                      "PUSHF;\n\t"
                      "POP %%EAX;\n\t"
                      "MOVW %%AX,%0;\n\t"
@@ -2183,7 +2188,7 @@ void Cpu::Exec()
 #endif
         case(0x70)://JO Jb
             {
-                int16_t tmp_data = static_cast<int16_t>(ReadData8InExe());
+                int16_t tmp_data = static_cast<int16_t>(static_cast<int8_t>(ReadData8InExe()));
                 uint8_t flag_of = (control_reg_flag >> 11) & 0x1;
                 if(flag_of)
                     control_reg_ip = control_reg_ip + tmp_data;
@@ -2192,7 +2197,7 @@ void Cpu::Exec()
 
         case(0x71)://JNO Jb
             {
-                int16_t tmp_data = static_cast<int16_t>(ReadData8InExe());
+                int16_t tmp_data = static_cast<int16_t>(static_cast<int8_t>(ReadData8InExe()));
                 uint8_t flag_of = (control_reg_flag >> 11) & 0x1;
                 if(!flag_of)
                     control_reg_ip = control_reg_ip + tmp_data;
@@ -2201,7 +2206,7 @@ void Cpu::Exec()
 
         case(0x72)://JB Jb
             {
-                int16_t tmp_data = static_cast<int16_t>(ReadData8InExe());
+                int16_t tmp_data = static_cast<int16_t>(static_cast<int8_t>(ReadData8InExe()));
                 uint8_t flag_cf = control_reg_flag & 0x1;
                 if(flag_cf)
                     control_reg_ip = control_reg_ip + tmp_data;
@@ -2210,7 +2215,7 @@ void Cpu::Exec()
 
         case(0x73)://JNB Jb
             {
-                int16_t tmp_data = static_cast<int16_t>(ReadData8InExe());
+                int16_t tmp_data = static_cast<int16_t>(static_cast<int8_t>(ReadData8InExe()));
                 uint8_t flag_cf = control_reg_flag & 0x1;
                 if(!flag_cf)
                     control_reg_ip = control_reg_ip + tmp_data;
@@ -2219,7 +2224,7 @@ void Cpu::Exec()
 
         case(0x74)://JZ Jb
             {
-                int16_t tmp_data = static_cast<int16_t>(ReadData8InExe());
+                int16_t tmp_data = static_cast<int16_t>(static_cast<int8_t>(ReadData8InExe()));
                 uint8_t flag_zf = (control_reg_flag >> 6) & 0x1;
                 if(flag_zf)
                     control_reg_ip = control_reg_ip + tmp_data;
@@ -2228,16 +2233,16 @@ void Cpu::Exec()
 
         case(0x75)://JNZ Jb
             {
-                int16_t tmp_data = static_cast<int16_t>(ReadData8InExe());
+                int16_t tmp_data = static_cast<int16_t>(static_cast<int8_t>(ReadData8InExe()));
                 uint8_t flag_zf = (control_reg_flag >> 6) & 0x1;
-                if(!flag_zf)
+                if(flag_zf == 0)
                     control_reg_ip = control_reg_ip + tmp_data;
                 break;
             }
 
         case(0x76)://JBE Jb
             {
-                uint16_t tmp_data = static_cast<uint16_t>(ReadData8InExe());
+                int16_t tmp_data = static_cast<int16_t>(static_cast<int8_t>(ReadData8InExe()));
                 uint8_t flag_cf = control_reg_flag & 0x1;
                 uint8_t flag_zf = (control_reg_flag >> 6) & 0x1;
                 if(flag_zf || flag_cf)
@@ -2247,7 +2252,7 @@ void Cpu::Exec()
 
         case(0x77)://JA Jb
             {
-                int16_t tmp_data = static_cast<int16_t>(ReadData8InExe());
+                int16_t tmp_data = static_cast<int16_t>(static_cast<int8_t>(ReadData8InExe()));
                 uint8_t flag_cf = control_reg_flag & 0x1;
                 uint8_t flag_zf = (control_reg_flag >> 6) & 0x1;
                 if(flag_zf == 0 && flag_cf == 0)
@@ -2257,7 +2262,7 @@ void Cpu::Exec()
 
         case(0x78)://JS Jb
             {
-                int16_t tmp_data = static_cast<int16_t>(ReadData8InExe());
+                int16_t tmp_data = static_cast<int16_t>(static_cast<int8_t>(ReadData8InExe()));
                 uint8_t flag_sf = (control_reg_flag >> 7) & 0x1;
                 if(flag_sf)
                     control_reg_ip = control_reg_ip + tmp_data;
@@ -2266,7 +2271,7 @@ void Cpu::Exec()
 
         case(0x79)://JNS Jb
             {
-                int16_t tmp_data = static_cast<int16_t>(ReadData8InExe());
+                int16_t tmp_data = static_cast<int16_t>(static_cast<int8_t>(ReadData8InExe()));
                 uint8_t flag_sf = (control_reg_flag >> 7) & 0x1;
                 if(!flag_sf)
                     control_reg_ip = control_reg_ip + tmp_data;
@@ -2275,7 +2280,7 @@ void Cpu::Exec()
 
         case(0x7A)://JPE Jb
             {
-                int16_t tmp_data = static_cast<int16_t>(ReadData8InExe());
+                int16_t tmp_data = static_cast<int16_t>(static_cast<int8_t>(ReadData8InExe()));
                 uint8_t flag_pf = (control_reg_flag >> 2) & 0x1;
                 if(flag_pf)
                     control_reg_ip = control_reg_ip + tmp_data;
@@ -2284,7 +2289,7 @@ void Cpu::Exec()
 
         case(0x7B)://JPO Jb
             {
-                int16_t tmp_data = static_cast<int16_t>(ReadData8InExe());
+                int16_t tmp_data = static_cast<int16_t>(static_cast<int8_t>(ReadData8InExe()));
                 uint8_t flag_pf = (control_reg_flag >> 2) & 0x1;
                 if(!flag_pf)
                     control_reg_ip = control_reg_ip + tmp_data;
@@ -2293,7 +2298,7 @@ void Cpu::Exec()
 
         case(0x7C)://JL Jb
             {
-                int16_t tmp_data = static_cast<int16_t>(ReadData8InExe());
+                int16_t tmp_data = static_cast<int16_t>(static_cast<int8_t>(ReadData8InExe()));
                 uint8_t flag_sf = (control_reg_flag >> 7) & 0x1;
                 uint8_t flag_of = (control_reg_flag >> 11) & 0x1;
                 if(flag_sf != flag_of)
@@ -2303,7 +2308,7 @@ void Cpu::Exec()
 
         case(0x7D)://JNL Jb
             {
-                int16_t tmp_data = static_cast<int16_t>(ReadData8InExe());
+                int16_t tmp_data = static_cast<int16_t>(static_cast<int8_t>(ReadData8InExe()));
                 uint8_t flag_sf = (control_reg_flag >> 7) & 0x1;
                 uint8_t flag_of = (control_reg_flag >> 11) & 0x1;
                 if(flag_sf == flag_of)
@@ -2313,7 +2318,7 @@ void Cpu::Exec()
 
         case(0x7E)://JLE Jb
             {
-                int16_t tmp_data = static_cast<int16_t>(ReadData8InExe());
+                int16_t tmp_data = static_cast<int16_t>(static_cast<int8_t>(ReadData8InExe()));
                 uint8_t flag_zf = (control_reg_flag >> 6) & 0x1;
                 uint8_t flag_sf = (control_reg_flag >> 7) & 0x1;
                 uint8_t flag_of = (control_reg_flag >> 11) & 0x1;
@@ -2324,7 +2329,7 @@ void Cpu::Exec()
 
         case(0x7F)://JNLE Jb
             {
-                int16_t tmp_data = static_cast<int16_t>(ReadData8InExe());
+                int16_t tmp_data = static_cast<int16_t>(static_cast<int8_t>(ReadData8InExe()));
                 uint8_t flag_zf = (control_reg_flag >> 6) & 0x1;
                 uint8_t flag_sf = (control_reg_flag >> 7) & 0x1;
                 uint8_t flag_of = (control_reg_flag >> 11) & 0x1;
@@ -2635,6 +2640,7 @@ void Cpu::Exec()
                 {
                     case(0x00)://ADD Ev Ib
                         {
+                            int16_t tmp_data = (int16_t)(int8_t)(ReadData8InExe());
                             __asm__
                                 (
                                  "PUSHW %3;\n\t"
@@ -2644,7 +2650,7 @@ void Cpu::Exec()
                                  "POP %%EAX;\n\t"
                                  "MOVW %%AX,%1;\n\t"
                                  :"+r"(*opt1_16bit), "=r"(control_reg_flag) /* output */
-                                 :"r"(static_cast<int16_t>(ReadData8InExe()))       , "r"(control_reg_flag) /* input */
+                                 :"r"(tmp_data)       , "r"(control_reg_flag) /* input */
                                  :"eax"
                                 );
                             break;
@@ -2652,6 +2658,7 @@ void Cpu::Exec()
 
                     case(0x01)://OR Ev Ib
                         {
+                            int16_t tmp_data = (int16_t)(int8_t)(ReadData8InExe());
                             __asm__
                                 (
                                  "PUSHW %3;\n\t"
@@ -2661,7 +2668,7 @@ void Cpu::Exec()
                                  "POP %%EAX;\n\t"
                                  "MOVW %%AX,%1;\n\t"
                                  :"+r"(*opt1_16bit), "=r"(control_reg_flag) /* output */
-                                 :"r"(static_cast<int16_t>(ReadData8InExe()))       , "r"(control_reg_flag) /* input */
+                                 :"r"(tmp_data)       , "r"(control_reg_flag) /* input */
                                  :"eax"
                                 );
                             break;
@@ -2669,6 +2676,7 @@ void Cpu::Exec()
 
                     case(0x02)://ADC Ev Ib
                         {
+                            int16_t tmp_data = (int16_t)(int8_t)(ReadData8InExe());
                             __asm__
                                 (
                                  "PUSHW %3;\n\t"
@@ -2678,7 +2686,7 @@ void Cpu::Exec()
                                  "POP %%EAX;\n\t"
                                  "MOVW %%AX,%1;\n\t"
                                  :"+r"(*opt1_16bit), "=r"(control_reg_flag) /* output */
-                                 :"r"(static_cast<int16_t>(ReadData8InExe()))       , "r"(control_reg_flag) /* input */
+                                 :"r"(tmp_data)       , "r"(control_reg_flag) /* input */
                                  :"eax"
                                 );
                             break;
@@ -2686,6 +2694,7 @@ void Cpu::Exec()
 
                     case(0x03)://SBB Ev Ib
                         {
+                            int16_t tmp_data = (int16_t)(int8_t)(ReadData8InExe());
                             __asm__
                                 (
                                  "PUSHW %3;\n\t"
@@ -2695,7 +2704,7 @@ void Cpu::Exec()
                                  "POP %%EAX;\n\t"
                                  "MOVW %%AX,%1;\n\t"
                                  :"+r"(*opt1_16bit), "=r"(control_reg_flag) /* output */
-                                 :"r"(static_cast<int16_t>(ReadData8InExe()))       , "r"(control_reg_flag) /* input */
+                                 :"r"(tmp_data)       , "r"(control_reg_flag) /* input */
                                  :"eax"
                                 );
                             break;
@@ -2703,6 +2712,7 @@ void Cpu::Exec()
 
                     case(0x04)://AND Ev Ib
                         {
+                            int16_t tmp_data = (int16_t)(int8_t)(ReadData8InExe());
                             __asm__
                                 (
                                  "PUSHW %3;\n\t"
@@ -2712,7 +2722,7 @@ void Cpu::Exec()
                                  "POP %%EAX;\n\t"
                                  "MOVW %%AX,%1;\n\t"
                                  :"+r"(*opt1_16bit), "=r"(control_reg_flag) /* output */
-                                 :"r"(static_cast<int16_t>(ReadData8InExe()))       , "r"(control_reg_flag) /* input */
+                                 :"r"(tmp_data)       , "r"(control_reg_flag) /* input */
                                  :"eax"
                                 );
                             break;
@@ -2720,6 +2730,7 @@ void Cpu::Exec()
 
                     case(0x05)://SUB Ev Ib
                         {
+                            int16_t tmp_data = (int16_t)(int8_t)(ReadData8InExe());
                             __asm__
                                 (
                                  "PUSHW %3;\n\t"
@@ -2729,7 +2740,7 @@ void Cpu::Exec()
                                  "POP %%EAX;\n\t"
                                  "MOVW %%AX,%1;\n\t"
                                  :"+r"(*opt1_16bit), "=r"(control_reg_flag) /* output */
-                                 :"r"(static_cast<int16_t>(ReadData8InExe()))       , "r"(control_reg_flag) /* input */
+                                 :"r"(tmp_data)       , "r"(control_reg_flag) /* input */
                                  :"eax"
                                 );
                             break;
@@ -2737,6 +2748,7 @@ void Cpu::Exec()
 
                     case(0x06)://XOR Ev Ib
                         {
+                            int16_t tmp_data = (int16_t)(int8_t)(ReadData8InExe());
                             __asm__
                                 (
                                  "PUSHW %3;\n\t"
@@ -2746,7 +2758,7 @@ void Cpu::Exec()
                                  "POP %%EAX;\n\t"
                                  "MOVW %%AX,%1;\n\t"
                                  :"+r"(*opt1_16bit), "=r"(control_reg_flag) /* output */
-                                 :"r"(static_cast<int16_t>(ReadData8InExe()))       , "r"(control_reg_flag) /* input */
+                                 :"r"(tmp_data)       , "r"(control_reg_flag) /* input */
                                  :"eax"
                                 );
                             break;
@@ -2754,6 +2766,7 @@ void Cpu::Exec()
 
                     case(0x07)://CMP Ev Ib
                         {
+                            int16_t tmp_data = (int16_t)(int8_t)(ReadData8InExe());
                             __asm__
                                 (
                                  "PUSHW %3;\n\t"
@@ -2763,7 +2776,7 @@ void Cpu::Exec()
                                  "POP %%EAX;\n\t"
                                  "MOVW %%AX,%0;\n\t"
                                  :"=r"(control_reg_flag) /* output */
-                                 :"r"(*opt1_16bit), "r"(static_cast<uint16_t>(ReadData8InExe()))      , "r"(control_reg_flag) /* input */
+                                 :"r"(*opt1_16bit), "r"(tmp_data)      , "r"(control_reg_flag) /* input */
                                  :"eax"
                                 );
                             break;
@@ -3605,6 +3618,7 @@ void Cpu::Exec()
 
         case(0xC3)://RETN
             {
+
                 control_reg_ip = Pop();
                 break;
             }
@@ -3763,7 +3777,6 @@ void Cpu::Exec()
 
                     case(0x02)://RCL Eb 1
                         {
-                            printf("hdsafad\n");
                             __asm__
                                 (
                                  "PUSHW %3;\n\t"
@@ -4484,7 +4497,7 @@ void Cpu::Exec()
 
         case(0xEB)://JMP Jb
             {
-                uint8_t tmp_data = ReadData8InExe();
+                int16_t tmp_data = static_cast<int16_t>(static_cast<int8_t>(ReadData8InExe()));
                 control_reg_ip = control_reg_ip + tmp_data;
                 break;
             }
@@ -4521,7 +4534,7 @@ void Cpu::Exec()
 
         case(0xF4)://HLT
             {
-                //halt = 1;
+                halt = 1;
                 break;
             }
 

@@ -2,17 +2,53 @@
 
 #include "cpu.h"
 
-int main()
+void print_screen(Cpu  *cpu)
+{
+    int x, y;
+    // print out the screen
+    for(y = 0; y < 25; ++y)
+    {
+        for(x = 0; x < 80; ++x)
+            fprintf(stdout, "%c", cpu->ram[ 0x8000 + (y * 80) + x ]);
+        fprintf(stdout, "\n");
+    }
+}
+
+
+int main(int argc, char **argv)
 {
     Cpu cpu;
-    uint16_t disp16 = 0x1234;
-    uint8_t disp8 = 0x34;
-    cpu.Init(0x10000);
-    cpu.SetCS(0x10);
-    cpu.SetIP(0x20);
-    cpu.SetBP(0x21);
-    cpu.SetSI(0x777);
-    cpu.SetAX(0x00);
+    FILE* binFile = NULL;
+    const char* inputFilename = argv[1];
+    size_t fileSize = 0;
+    //fprintf(stdout, "input file = %s\n", inputFilename);
+
+    binFile = fopen(inputFilename, "rb");
+    if(binFile)
+    {
+        fseek(binFile, 0, SEEK_END);
+        fileSize = (size_t)ftell(binFile);
+        fseek(binFile, 0, SEEK_SET);
+        //fprintf(stdout, "filesize=%d\n", fileSize);
+        cpu.Init(0x10000);
+        fread(cpu.ram, 1, fileSize, binFile);
+    }
+    cpu.SetDS(0);
+    cpu.SetCS(0);
+    cpu.SetSS(0);
+    cpu.SetIP(0);
+    cpu.SetSP(0x100);
+    while(cpu.halt == 0)
+        cpu.Exec();
+    print_screen(&cpu);
+    /*uint16_t disp16 = 0x1234;
+      uint8_t disp8 = 0x34;
+      cpu.Init(0x10000);
+      cpu.SetCS(0x10);
+      cpu.SetIP(0x20);
+      cpu.SetBP(0x21);
+      cpu.SetSI(0x777);
+      cpu.SetAX(0x00);
     //cpu.SetBX(0x5);
     cpu.SetCX(0x7659);
     //cpu.SetDX(0xabcd);
@@ -37,7 +73,7 @@ int main()
     //cpu.WriteRam16(0x10 * 16 + 0x22, disp16);
     //cpu.WriteRam16(0x10 * 16 + 0x24, 0x4444);
     //printf("main read:%x\n",cpu.ReadRam16(0x10 * 16 + 0x22));
-//cpu.WriteRam8(0x10 * 16 + 0x22, 0x12);
+    //cpu.WriteRam8(0x10 * 16 + 0x22, 0x12);
     //cpu.WriteRam8(0x10*16+0x21,disp8);
     //cpu.WriteRam16(0x10 * 16 + 0x21, disp16);
     //cpu.SetSI(0x8);
@@ -64,7 +100,6 @@ int main()
     //printf("bp:%x\n", cpu.GetBP());
     //printf("bx:%x\n", cpu.GetBX());
     //printf("sp:%x\n", cpu.GetSP());
-    cpu.Exec();
     //printf("[sp]=%x\n", cpu.ReadRam16(cpu.GetSS() * 16 + cpu.GetSP()));
     //cpu.SetAX(0x12de);
     //cpu.SetBX(0x12de);
@@ -87,7 +122,7 @@ int main()
     //printf("sp:%x\n", cpu.GetSP());
     //printf("sP:%x\n", cpu.GetSP());
     //aprintf("%x\n", cpu.ReadRam16(cpu.GetDS() * 16 + cpu.GetBX()+cpu.GetSI()));
-//printf("%x\n",cpu.ReadRam16(cpu.GetDS() * 16+0x1234));
+    //printf("%x\n",cpu.ReadRam16(cpu.GetDS() * 16+0x1234));
     //printf("%x\n", cpu.GetAL());
     //printf("%x\n", cpu.ReadRam16(cpu.GetDS() * 16 + disp16));
     //printf("%x\n", cpu.ReadRam16(cpu.GetDS() * 16 + disp16));
@@ -123,5 +158,6 @@ int main()
     // cpu.SetES(value2);
     // printf("%x\n", cpu.GetSS());
     // printf("%x\n", cpu.GetES());
-    return 0;
+    */
+        return 0;
 }

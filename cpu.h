@@ -93,6 +93,9 @@ public:
     int Reset();
     void Exec();
 
+    uint8_t *ram;
+    /*debug*/
+    int halt;
 private:
 
     uint8_t *CalculateReg8(uint8_t mod_byte);
@@ -100,7 +103,6 @@ private:
     uint16_t *CalculateSeg16(uint8_t mod_byte);
     uint8_t *CalculateRM(uint8_t mod_byte, uint8_t opcode);
 
-    uint8_t *ram;
 
     uint16_t universal_reg_ax, universal_reg_bx, universal_reg_cx, universal_reg_dx,
              universal_reg_sp, universal_reg_bp, universal_reg_si, universal_reg_di;

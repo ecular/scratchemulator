@@ -72,16 +72,54 @@ SetSP	./cpu.cpp	/^inline void Cpu::SetSP(uint16_t value)$/;"	f	class:Cpu
 SetSS	./cpu.cpp	/^inline void Cpu::SetSS(uint16_t value)$/;"	f	class:Cpu
 WriteRam16	./cpu.cpp	/^inline void Cpu::WriteRam16(unsigned int location, uint16_t value)$/;"	f	class:Cpu
 WriteRam8	./cpu.cpp	/^inline void Cpu::WriteRam8(unsigned int location, uint8_t value)$/;"	f	class:Cpu
+ascii_loop	./testasm/codegolf.asm	/^ascii_loop:$/;"	l
+boxloop	./testasm/codegolf.asm	/^boxloop:$/;"	l
+boxloop2	./testasm/codegolf.asm	/^boxloop2:$/;"	l
+calcsq	./testasm/codegolf.asm	/^calcsq:$/;"	l
+calcsqfinish	./testasm/codegolf.asm	/^calcsqfinish:$/;"	l
+calcsqloop	./testasm/codegolf.asm	/^calcsqloop:$/;"	l
+calltest	./testasm/codegolf.asm	/^calltest:$/;"	l
+cont	./testasm/codegolf.asm	/^cont:$/;"	l
+cont1	./testasm/codegolf.asm	/^cont1:$/;"	l
+cont2	./testasm/codegolf.asm	/^cont2:$/;"	l
 control_reg_flag	./cpu.h	/^    uint16_t control_reg_ip, control_reg_flag;$/;"	m	class:Cpu
 control_reg_ip	./cpu.h	/^    uint16_t control_reg_ip, control_reg_flag;$/;"	m	class:Cpu
-main	./main.cpp	/^int main()$/;"	f
+cursor	./testasm/codegolf.asm	/^cursor:$/;"	l
+fibloop	./testasm/codegolf.asm	/^fibloop:$/;"	l
+halt	./cpu.h	/^    int halt;$/;"	m	class:Cpu
+hello	./testasm/codegolf.asm	/^hello:$/;"	l
+hlt	./testasm/codegolf.asm	/^hlt:$/;"	l
+inc	./testasm/codegolf.asm	/^	inc di$/;"	d
+main	./main.cpp	/^int main(int argc, char **argv)$/;"	f
+memory	./testasm/codegolf.asm	/^memory:$/;"	l
+numcont_1digit	./testasm/codegolf.asm	/^numcont_1digit:$/;"	l
+numcont_2digit	./testasm/codegolf.asm	/^numcont_2digit:$/;"	l
+numloop_2digit	./testasm/codegolf.asm	/^numloop_2digit:$/;"	l
+numloop_3digit	./testasm/codegolf.asm	/^numloop_3digit:$/;"	l
+pop	./testasm/codegolf.asm	/^	pop di$/;"	d
+pop	./testasm/codegolf.asm	/^	pop dx$/;"	d
+primecont	./testasm/codegolf.asm	/^primecont:$/;"	l
+primeloop	./testasm/codegolf.asm	/^primeloop:$/;"	l
+primeloop_inner	./testasm/codegolf.asm	/^primeloop_inner:$/;"	l
+print	./testasm/codegolf.asm	/^print:$/;"	l
+print_screen	./main.cpp	/^void print_screen(Cpu  *cpu)$/;"	f
+printchr	./testasm/codegolf.asm	/^printchr:$/;"	l
+printloop	./testasm/codegolf.asm	/^printloop:$/;"	l
+printnl	./testasm/codegolf.asm	/^printnl:$/;"	l
+printnlloop	./testasm/codegolf.asm	/^printnlloop:$/;"	l
+printnum	./testasm/codegolf.asm	/^printnum:$/;"	l
+push	./testasm/codegolf.asm	/^	push di$/;"	d
+push	./testasm/codegolf.asm	/^	push dx$/;"	d
 ram	./cpu.h	/^    uint8_t *ram;$/;"	m	class:Cpu
+rettest	./testasm/codegolf.asm	/^rettest:$/;"	l
 seg_reg_cs	./cpu.h	/^    uint16_t seg_reg_cs, seg_reg_ds, seg_reg_ss, seg_reg_es;$/;"	m	class:Cpu
 seg_reg_ds	./cpu.h	/^    uint16_t seg_reg_cs, seg_reg_ds, seg_reg_ss, seg_reg_es;$/;"	m	class:Cpu
 seg_reg_es	./cpu.h	/^    uint16_t seg_reg_cs, seg_reg_ds, seg_reg_ss, seg_reg_es;$/;"	m	class:Cpu
 seg_reg_replace_ds	./cpu.h	/^    uint16_t *seg_reg_replace_ds, *seg_reg_replace_ss;$/;"	m	class:Cpu
 seg_reg_replace_ss	./cpu.h	/^    uint16_t *seg_reg_replace_ds, *seg_reg_replace_ss;$/;"	m	class:Cpu
 seg_reg_ss	./cpu.h	/^    uint16_t seg_reg_cs, seg_reg_ds, seg_reg_ss, seg_reg_es;$/;"	m	class:Cpu
+squareloop	./testasm/codegolf.asm	/^squareloop:$/;"	l
+start	./testasm/codegolf.asm	/^start:$/;"	l
 universal_reg_ah	./cpu.h	/^    uint8_t *universal_reg_ah, *universal_reg_al;$/;"	m	class:Cpu
 universal_reg_al	./cpu.h	/^    uint8_t *universal_reg_ah, *universal_reg_al;$/;"	m	class:Cpu
 universal_reg_ax	./cpu.h	/^    uint16_t universal_reg_ax, universal_reg_bx, universal_reg_cx, universal_reg_dx,$/;"	m	class:Cpu
