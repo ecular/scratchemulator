@@ -499,18 +499,48 @@ void Cpu::Exec()
     seg_reg_replace_ss = &seg_reg_ss;
     opcode = ReadData8InExe();
     //printf("opcode :%x\n", opcode);
+
+    /*segment prefix check*/
     switch(opcode)
     {
-        /*seg prefix
-         * case(0x26):
-         seg_reg_replace = &seg_reg_es;//es prefix
-         case(0x2E):
-         seg_reg_replace = &seg_reg_cs;//cs prefix
-         case(0x36):
-         seg_reg_replace = &seg_reg_ss;//ss prefix
-         case(0x3E):
-         seg_reg_replace = &seg_reg_ds;//ds prefix
-         */
+        case(0x26)://es prefix
+            {
+                seg_reg_replace_ds = &seg_reg_es;
+                seg_reg_replace_ss = &seg_reg_es;
+                opcode = ReadData8InExe();
+                break;
+            }
+
+        case(0x2E)://cs prefix
+            {
+                seg_reg_replace_ds = &seg_reg_cs;
+                seg_reg_replace_ss = &seg_reg_cs;
+                opcode = ReadData8InExe();
+                break;
+            }
+
+        case(0x36)://ss prefix
+            {
+                seg_reg_replace_ds = &seg_reg_ss;
+                seg_reg_replace_ss = &seg_reg_ss;
+                opcode = ReadData8InExe();
+                break;
+            }
+
+        case(0x3E)://ds prefix
+            {
+                seg_reg_replace_ds = &seg_reg_ds;
+                seg_reg_replace_ss = &seg_reg_ds;
+                opcode = ReadData8InExe();
+                break;
+            }
+
+        default:
+            break;
+    }
+
+    switch(opcode)
+    {
         case(0x00)://ADD Eb Gb
             {
                 mod_byte = ReadData8InExe();
@@ -2640,7 +2670,7 @@ void Cpu::Exec()
                 {
                     case(0x00)://ADD Ev Ib
                         {
-                            int16_t tmp_data = (int16_t)(int8_t)(ReadData8InExe());
+                            int16_t tmp_data = static_cast<int16_t>(static_cast<int8_t>((ReadData8InExe())));
                             __asm__
                                 (
                                  "PUSHW %3;\n\t"
@@ -2658,7 +2688,7 @@ void Cpu::Exec()
 
                     case(0x01)://OR Ev Ib
                         {
-                            int16_t tmp_data = (int16_t)(int8_t)(ReadData8InExe());
+                            int16_t tmp_data = static_cast<int16_t>(static_cast<int8_t>((ReadData8InExe())));
                             __asm__
                                 (
                                  "PUSHW %3;\n\t"
@@ -2676,7 +2706,7 @@ void Cpu::Exec()
 
                     case(0x02)://ADC Ev Ib
                         {
-                            int16_t tmp_data = (int16_t)(int8_t)(ReadData8InExe());
+                            int16_t tmp_data = static_cast<int16_t>(static_cast<int8_t>((ReadData8InExe())));
                             __asm__
                                 (
                                  "PUSHW %3;\n\t"
@@ -2694,7 +2724,7 @@ void Cpu::Exec()
 
                     case(0x03)://SBB Ev Ib
                         {
-                            int16_t tmp_data = (int16_t)(int8_t)(ReadData8InExe());
+                            int16_t tmp_data = static_cast<int16_t>(static_cast<int8_t>((ReadData8InExe())));
                             __asm__
                                 (
                                  "PUSHW %3;\n\t"
@@ -2712,7 +2742,7 @@ void Cpu::Exec()
 
                     case(0x04)://AND Ev Ib
                         {
-                            int16_t tmp_data = (int16_t)(int8_t)(ReadData8InExe());
+                            int16_t tmp_data = static_cast<int16_t>(static_cast<int8_t>((ReadData8InExe())));
                             __asm__
                                 (
                                  "PUSHW %3;\n\t"
@@ -2730,7 +2760,7 @@ void Cpu::Exec()
 
                     case(0x05)://SUB Ev Ib
                         {
-                            int16_t tmp_data = (int16_t)(int8_t)(ReadData8InExe());
+                            int16_t tmp_data = static_cast<int16_t>(static_cast<int8_t>((ReadData8InExe())));
                             __asm__
                                 (
                                  "PUSHW %3;\n\t"
@@ -2748,7 +2778,7 @@ void Cpu::Exec()
 
                     case(0x06)://XOR Ev Ib
                         {
-                            int16_t tmp_data = (int16_t)(int8_t)(ReadData8InExe());
+                            int16_t tmp_data = static_cast<int16_t>(static_cast<int8_t>((ReadData8InExe())));
                             __asm__
                                 (
                                  "PUSHW %3;\n\t"
@@ -2766,7 +2796,7 @@ void Cpu::Exec()
 
                     case(0x07)://CMP Ev Ib
                         {
-                            int16_t tmp_data = (int16_t)(int8_t)(ReadData8InExe());
+                            int16_t tmp_data = static_cast<int16_t>(static_cast<int8_t>((ReadData8InExe())));
                             __asm__
                                 (
                                  "PUSHW %3;\n\t"
