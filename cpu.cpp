@@ -2041,9 +2041,9 @@ void Cpu::Exec()
                 mod_byte = ReadData8InExe();
                 opt1_16bit = CalculateReg16(mod_byte);
                 opt2_16bit = reinterpret_cast<uint16_t  *>(CalculateRM(mod_byte, opcode));
-                if(static_cast<uint32_t>(*opt1_16bit) < static_cast<uint32_t>(*opt2_16bit))
+                if(static_cast<int32_t>(static_cast<int16_t>(*opt1_16bit)) < static_cast<int32_t>(static_cast<int16_t>(*opt2_16bit)))
                     ;//Intcall(5); int 5;
-                if(static_cast<uint32_t>(*opt1_16bit) > static_cast<uint32_t>(*(opt2_16bit + 1)));
+                if(static_cast<int32_t>(static_cast<int16_t>(*opt1_16bit)) > static_cast<int32_t>(static_cast<int16_t>(*(opt2_16bit + 1))));
                 ;//Intcall(5); int 5;
                 break;
             }
