@@ -495,48 +495,74 @@ void Cpu::Exec()
     uint8_t mod_byte;
     uint8_t *opt1_8bit, *opt2_8bit;
     uint16_t *opt1_16bit, *opt2_16bit;
+    uint8_t continue_check = 1;
+
+#ifdef cpu_80186
+    uint8_t rep = 0;
+#endif
+
     seg_reg_replace_ds = &seg_reg_ds;
     seg_reg_replace_ss = &seg_reg_ss;
     opcode = ReadData8InExe();
     //printf("opcode :%x\n", opcode);
 
-    /*segment prefix check*/
-    switch(opcode)
+    while(continue_check)
     {
-        case(0x26)://es prefix
-            {
-                seg_reg_replace_ds = &seg_reg_es;
-                seg_reg_replace_ss = &seg_reg_es;
-                opcode = ReadData8InExe();
-                break;
-            }
+        /*segment prefix check*/
+        switch(opcode)
+        {
+            case(0x26)://es prefix
+                {
+                    seg_reg_replace_ds = &seg_reg_es;
+                    seg_reg_replace_ss = &seg_reg_es;
+                    opcode = ReadData8InExe();
+                    break;
+                }
 
-        case(0x2E)://cs prefix
-            {
-                seg_reg_replace_ds = &seg_reg_cs;
-                seg_reg_replace_ss = &seg_reg_cs;
-                opcode = ReadData8InExe();
-                break;
-            }
+            case(0x2E)://cs prefix
+                {
+                    seg_reg_replace_ds = &seg_reg_cs;
+                    seg_reg_replace_ss = &seg_reg_cs;
+                    opcode = ReadData8InExe();
+                    break;
+                }
 
-        case(0x36)://ss prefix
-            {
-                seg_reg_replace_ds = &seg_reg_ss;
-                seg_reg_replace_ss = &seg_reg_ss;
-                opcode = ReadData8InExe();
-                break;
-            }
+            case(0x36)://ss prefix
+                {
+                    seg_reg_replace_ds = &seg_reg_ss;
+                    seg_reg_replace_ss = &seg_reg_ss;
+                    opcode = ReadData8InExe();
+                    break;
+                }
 
-        case(0x3E)://ds prefix
-            {
-                seg_reg_replace_ds = &seg_reg_ds;
-                seg_reg_replace_ss = &seg_reg_ds;
-                opcode = ReadData8InExe();
-                break;
-            }
+            case(0x3E)://ds prefix
+                {
+                    seg_reg_replace_ds = &seg_reg_ds;
+                    seg_reg_replace_ss = &seg_reg_ds;
+                    opcode = ReadData8InExe();
+                    break;
+                }
 
-        default:
-            break;
+#ifdef cpu_80186
+                /*REP prefix*/
+            case(0xF3)://REP,REPE,REPZ
+                {
+                    rep = 1;
+                    break;
+                }
+            case(0xF2)://REPNE,REPNZ
+                {
+                    rep = 2;
+                    break;
+                }
+#endif
+
+            default:
+                {
+                    continue_check = 0;
+                    break;
+                }
+        }
     }
 
     switch(opcode)
@@ -2105,7 +2131,7 @@ void Cpu::Exec()
                     universal_reg_cx = universal_reg_cx - 1;
                 }
 
-                totalexec++;
+                totalexec++;//执行的指令个数
                 loopcount++;
 
                 if(!rep) {

@@ -17,42 +17,43 @@ void print_screen(Cpu  *cpu)
 
 int main(int argc, char **argv)
 {
-    /*  Cpu cpu;
-        FILE* binFile = NULL;
-        const char* inputFilename = argv[1];
-        size_t fileSize = 0;
 
-        binFile = fopen(inputFilename, "rb");
-        if(binFile)
-        {
+    Cpu cpu;
+    FILE* binFile = NULL;
+    const char* inputFilename = argv[1];
+    size_t fileSize = 0;
+
+    binFile = fopen(inputFilename, "rb");
+    if(binFile)
+    {
         fseek(binFile, 0, SEEK_END);
         fileSize = (size_t)ftell(binFile);
         fseek(binFile, 0, SEEK_SET);
         cpu.Init(0x10000);
         fread(cpu.ram, 1, fileSize, binFile);
-        }
-        cpu.SetDS(0);
-        cpu.SetCS(0);
-        cpu.SetSS(0);
-        cpu.SetIP(0);
-        cpu.SetSP(0x100);
-        while(cpu.halt == 0)
+    }
+    cpu.SetDS(0);
+    cpu.SetCS(0);
+    cpu.SetSS(0);
+    cpu.SetIP(0);
+    cpu.SetSP(0x100);
+    while(cpu.halt == 0)
         cpu.Exec();
-        print_screen(&cpu);
-        */
+    print_screen(&cpu);
 
 
 
-    Cpu cpu;
+    /*
+       Cpu cpu;
 
-    uint16_t disp16 = 0x1234;
-    uint8_t disp8 = 0x34;
-    cpu.Init(0x10000);
-    cpu.SetCS(0x10);
-    cpu.SetIP(0x20);
-    cpu.SetBP(0x21);
-    cpu.SetSI(0x777);
-    cpu.SetAX(0x00);
+       uint16_t disp16 = 0x1234;
+       uint8_t disp8 = 0x34;
+       cpu.Init(0x10000);
+       cpu.SetCS(0x10);
+       cpu.SetIP(0x20);
+       cpu.SetBP(0x21);
+       cpu.SetSI(0x777);
+       cpu.SetAX(0x00);
     //cpu.SetBX(0x5);
     cpu.SetCX(0x7659);
     //cpu.SetDX(0xabcd);
@@ -177,5 +178,6 @@ int main(int argc, char **argv)
     // cpu.SetES(value2);
     // printf("%x\n", cpu.GetSS());
     // printf("%x\n", cpu.GetES());
-    return 0;
+    */
+        return 0;
 }
