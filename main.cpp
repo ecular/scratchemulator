@@ -17,7 +17,6 @@ void print_screen(Cpu  *cpu)
 
 int main(int argc, char **argv)
 {
-
     Cpu cpu;
     FILE* binFile = NULL;
     const char* inputFilename = argv[1];
@@ -41,8 +40,6 @@ int main(int argc, char **argv)
         cpu.Exec();
     print_screen(&cpu);
 
-
-
     /*
        Cpu cpu;
 
@@ -51,46 +48,28 @@ int main(int argc, char **argv)
        cpu.Init(0x10000);
        cpu.SetCS(0x10);
        cpu.SetIP(0x20);
-       cpu.SetBP(0x21);
-       cpu.SetSI(0x777);
-       cpu.SetAX(0x00);
-    //cpu.SetBX(0x5);
-    cpu.SetCX(0x7659);
-    //cpu.SetDX(0xabcd);
-    cpu.SetFlag(0xFFFF);
+       cpu.SetDS(0x200);
+       cpu.SetAL(0xcc);
+       cpu.SetCL(0x33);
 
-
-    cpu.SetAX(0x00);
-    cpu.SetBX(0x20);
-    cpu.SetCX(0x0003);
-    cpu.SetDX(0x1234);
-
-    cpu.SetSP(0x1);
-    cpu.SetBP(0x3);
-    cpu.SetSI(0x1234);
-    cpu.SetDI(0x1234);
-    cpu.SetSS(0x12);
-    cpu.SetDS(0x200);
-
-    cpu.WriteRam8(0x10 * 16 + 0x20, 0x3e);
-    cpu.WriteRam8(0x10 * 16 + 0x21, 0xc7);
-    cpu.WriteRam8(0x10 * 16 + 0x22, 0x46);
-    cpu.WriteRam8(0x10 * 16 + 0x23, 0x00);
-    cpu.WriteRam8(0x10 * 16 + 0x24, 0x99);
-    cpu.WriteRam8(0x10 * 16 + 0x25, 0x33);
+       cpu.WriteRam8(0x10 * 16 + 0x20, 0xf6);
+       cpu.WriteRam8(0x10 * 16 + 0x21, 0xe1);
+    //cpu.WriteRam8(0x10 * 16 + 0x22, 0x46);
+    //cpu.WriteRam8(0x10 * 16 + 0x23, 0x00);
+    //cpu.WriteRam8(0x10 * 16 + 0x24, 0x99);
+    //cpu.WriteRam8(0x10 * 16 + 0x25, 0x33);
 
 
     cpu.Exec();
 
-    cpu.WriteRam8(0x10 * 16 + 0x26, 0xc7);
-    cpu.WriteRam8(0x10 * 16 + 0x27, 0x46);
-    cpu.WriteRam8(0x10 * 16 + 0x28, 0x00);
-    cpu.WriteRam8(0x10 * 16 + 0x29, 0x78);
-    cpu.WriteRam8(0x10 * 16 + 0x2A, 0x56);
+    //cpu.WriteRam8(0x10 * 16 + 0x26, 0xc7);
+    //cpu.WriteRam8(0x10 * 16 + 0x27, 0x46);
+    //cpu.WriteRam8(0x10 * 16 + 0x28, 0x00);
+    //cpu.WriteRam8(0x10 * 16 + 0x29, 0x78);
+    //cpu.WriteRam8(0x10 * 16 + 0x2A, 0x56);
 
-    cpu.Exec();
-    printf("result1:%x\n", cpu.ReadRam16(0x200 * 16 + 0x3));
-    printf("result2:%x\n", cpu.ReadRam16(0x12 * 16 + 0x3));
+    //    cpu.Exec();
+    printf("AX:%x\n",cpu.GetAX());
     //cpu.WriteRam16(0x10 * 16 + 0x22, disp16);
     //cpu.WriteRam16(0x10 * 16 + 0x24, 0x4444);
     //printf("main read:%x\n",cpu.ReadRam16(0x10 * 16 + 0x22));
@@ -107,10 +86,8 @@ int main(int argc, char **argv)
     //cpu.SetES(0);
     //cpu.WriteRam16(cpu.GetDS() * 16 + 0x1234, 0x7788);
     //cpu.SetCL(0x1);
-    cpu.SetFlag(0x0);
     //cpu.WriteRam16(cpu.GetDS() * 16 + 0x1234, 0x3333);
     //cpu.SetBX(0x1200);
-    cpu.SetAX(0x1234);
 
     //printf("ax:%x\n", cpu.GetAX());
     //printf("bx:%x\n", cpu.GetBX());
@@ -146,9 +123,7 @@ int main(int argc, char **argv)
     //printf("%x\n", cpu.GetAL());
     //printf("%x\n", cpu.ReadRam16(cpu.GetDS() * 16 + disp16));
     //printf("%x\n", cpu.ReadRam16(cpu.GetDS() * 16 + disp16));
-    printf("%x\n", cpu.GetAX());
     //printf("%x\n", cpu.GetDX());
-    printf("%x\n", cpu.GetFlag());
     //    cpu.Init(0x100);
     //    cpu.WriteRam8(20, value1);
     //    cpu.WriteRam8(21, value2);

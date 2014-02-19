@@ -2104,7 +2104,7 @@ void Cpu::Exec()
                      "POP %%EAX;\n\t"
                      "MOVW %%AX,%1;\n\t"
                      :"=r"(*opt1_16bit), "=r"(control_reg_flag) /* output */
-                     :"r"(*opt2_16bit), "r"(static_cast<uint16_t>(ReadData8InExe()))   , "r"(control_reg_flag) /* input */
+                     :"r"(*opt2_16bit), "r"(static_cast<uint16_t>(eadData8InExe())), "r"(control_reg_flag) /* input */
                      :"eax"
                     );
                 break;
@@ -4455,7 +4455,7 @@ void Cpu::Exec()
             {
                 uint8_t zf = (control_reg_flag >> 6) & 0x1;
                 universal_reg_cx = universal_reg_cx - 1;
-                uint8_t tmp_data = ReadData8InExe();
+                int16_t tmp_data = static_cast<int16_t>(static_cast<int8_t>(ReadData8InExe()));
                 if(universal_reg_cx && !zf)
                 {
                     control_reg_ip = control_reg_ip + tmp_data;
@@ -4467,7 +4467,7 @@ void Cpu::Exec()
             {
                 uint8_t zf = (control_reg_flag >> 6) & 0x1;
                 universal_reg_cx = universal_reg_cx - 1;
-                uint8_t tmp_data = ReadData8InExe();
+                int16_t tmp_data = static_cast<int16_t>(static_cast<int8_t>(ReadData8InExe()));
                 if(universal_reg_cx && zf)
                 {
                     control_reg_ip = control_reg_ip + tmp_data;
@@ -4478,7 +4478,7 @@ void Cpu::Exec()
         case(0xE2)://LOOP rel8 IP have error remain fix
             {
                 universal_reg_cx = universal_reg_cx - 1;
-                uint8_t tmp_data = ReadData8InExe();
+                int16_t tmp_data = static_cast<int16_t>(static_cast<int8_t>(ReadData8InExe()));
                 if(universal_reg_cx)
                 {
                     control_reg_ip = control_reg_ip + tmp_data;
@@ -4488,7 +4488,7 @@ void Cpu::Exec()
 
         case(0xE3)://JCXZ rel8
             {
-                uint8_t tmp_data = ReadData8InExe();
+                int16_t tmp_data = static_cast<int16_t>(static_cast<int8_t>(ReadData8InExe()));
                 if(!universal_reg_cx)
                 {
                     control_reg_ip = control_reg_ip + tmp_data;
@@ -4496,7 +4496,7 @@ void Cpu::Exec()
                 break;
             }
 
-            /*port IO oprate remain to fix*/
+            /*port IO operate remain to fix*/
             /*
                case(0xE4)://IN AL ib
                {
@@ -4928,13 +4928,15 @@ void Cpu::Exec()
 
         case(0xFA)://CLI
             {
-                control_reg_flag = control_reg_flag & 0xFDFF;
+                if_flag = 0;
+                //control_reg_flag = control_reg_flag & 0xFDFF;
                 break;
             }
 
         case(0xFB)://STI
             {
-                control_reg_flag = control_reg_flag | 0x200;
+                if_flag = 1;
+                //control_reg_flag = control_reg_flag | 0x200;
                 break;
             }
 
