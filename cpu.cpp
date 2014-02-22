@@ -489,6 +489,23 @@ int Cpu::Reset()
     return 0;
 }
 
+void Cpu::Intcall(uint8_t int_num)
+{
+    ;//do some thing about video and others
+    if(if_flag == 1)
+        Push(control_reg_flag | 0x0200);
+    else
+        Push(control_reg_flag & 0xFDFF);
+
+    if_flag = 0;//set IF = 0
+    control_reg_flag = control_reg_flag & 0xFEFF;//set TF = 0
+
+    Push(seg_reg_cs);
+    Push(control_reg_ip);
+    seg_reg_cs = ReadRam16((0 << 4) + int_num * 4 + 2);
+    control_reg_ip = ReadRam16((0 << 4) + int_num * 4);
+}
+
 void Cpu::Exec()
 {
     uint8_t opcode;
@@ -2042,7 +2059,8 @@ void Cpu::Exec()
                 opt1_16bit = CalculateReg16(mod_byte);
                 opt2_16bit = reinterpret_cast<uint16_t  *>(CalculateRM(mod_byte, opcode));
                 if(static_cast<int32_t>(static_cast<int16_t>(*opt1_16bit)) < static_cast<int32_t>(static_cast<int16_t>(*opt2_16bit)))
-                    ;//Intcall(5); int 5;
+                    Intcall(5);
+                int 5;
                 if(static_cast<int32_t>(static_cast<int16_t>(*opt1_16bit)) > static_cast<int32_t>(static_cast<int16_t>(*(opt2_16bit + 1))));
                 ;//Intcall(5); int 5;
                 break;
@@ -3085,13 +3103,17 @@ void Cpu::Exec()
 
         case(0x9C)://PUSHF
             {
-                Push(control_reg_flag);
+                if(if_flag == 1)
+                    Push(control_reg_flag | 0x0200);
+                else
+                    Push(control_reg_flag & 0xFDFF);
                 break;
             }
 
         case(0x9D)://POPF
             {
                 control_reg_flag = Pop();
+                if_flag = (control_reg_flag >> 9) & 0x1;
                 break;
             }
 
@@ -3787,6 +3809,7 @@ void Cpu::Exec()
                 control_reg_ip = Pop();
                 seg_reg_cs = Pop();
                 control_reg_flag = Pop();
+                if_flag = (control_reg_flag >> 9) & 0x1;
                 break;
             }
 
