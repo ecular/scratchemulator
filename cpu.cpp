@@ -2062,7 +2062,7 @@ void Cpu::Exec()
                     Intcall(5);
                 int 5;
                 if(static_cast<int32_t>(static_cast<int16_t>(*opt1_16bit)) > static_cast<int32_t>(static_cast<int16_t>(*(opt2_16bit + 1))));
-                ;//Intcall(5); int 5;
+                Intcall(5);
                 break;
             }
 
@@ -4402,7 +4402,7 @@ void Cpu::Exec()
                 uint8_t divisor = ReadData8InExe();
                 if(!divisor)
                 {
-                    //callint(0);//divid by 0
+                    Intcall(0);//divid by 0
                     break;
                 }
                 *universal_reg_ah = *universal_reg_al / divisor;
@@ -4732,7 +4732,7 @@ void Cpu::Exec()
                         {
                             if(!*opt1_8bit)
                             {
-                                //callint(0);//divid by 0
+                                Intcall(0);//divid by 0
                                 break;
                             }
                             __asm__
@@ -4756,7 +4756,7 @@ void Cpu::Exec()
                         {
                             if(!*opt1_8bit)
                             {
-                                //callint(0);//divid by 0
+                                Intcall(0);//divid by 0
                                 break;
                             }
                             __asm__
@@ -4887,7 +4887,7 @@ void Cpu::Exec()
                         {
                             if(!*opt1_16bit)
                             {
-                                //callint(0);//divid by 0
+                                Intcall(0);//divid by 0
                                 break;
                             }
                             __asm__
@@ -4913,7 +4913,7 @@ void Cpu::Exec()
                         {
                             if(!*opt1_16bit)
                             {
-                                //callint(0);//divid by 0
+                                Intcall(0);//divid by 0
                                 break;
                             }
                             __asm__
