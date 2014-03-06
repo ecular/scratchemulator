@@ -3,6 +3,8 @@
 #include <stdio.h>
 #include <string.h>
 
+#include "8259a.h"
+
 Cpu::Cpu()
 {
     universal_reg_al = reinterpret_cast<uint8_t *>(&universal_reg_ax);
@@ -13,7 +15,6 @@ Cpu::Cpu()
     universal_reg_ch = universal_reg_cl + 1;
     universal_reg_dl = reinterpret_cast<uint8_t *>(&universal_reg_dx);
     universal_reg_dh = universal_reg_dl + 1;
-
 }
 
 /*set reg*/
@@ -486,13 +487,15 @@ int Cpu::Reset()
     seg_reg_ds = 0x0;
     seg_reg_ss = 0x0;
     seg_reg_es = 0x0;
+    if_flag = 1;
+    tf_flag = 0;
     return 0;
 }
 
 void Cpu::Intcall(uint8_t int_num)
 {
     ;//do some thing about video and others
-    if(if_flag == 1)
+    if(if_flag == 1)//PUSH Flash
         Push(control_reg_flag | 0x0200);
     else
         Push(control_reg_flag & 0xFDFF);
@@ -500,10 +503,10 @@ void Cpu::Intcall(uint8_t int_num)
     if_flag = 0;//set IF = 0
     control_reg_flag = control_reg_flag & 0xFEFF;//set TF = 0
 
-    Push(seg_reg_cs);
-    Push(control_reg_ip);
-    seg_reg_cs = ReadRam16((0 << 4) + int_num * 4 + 2);
-    control_reg_ip = ReadRam16((0 << 4) + int_num * 4);
+    Push(seg_reg_cs);//push cs
+    Push(control_reg_ip);//push ip
+    seg_reg_cs = ReadRam16((0 << 4) + int_num * 4 + 2);//read cs from Interrupt vector table
+    control_reg_ip = ReadRam16((0 << 4) + int_num * 4);//read ip from INterrupt vector table
 }
 
 void Cpu::Exec()
@@ -513,6 +516,7 @@ void Cpu::Exec()
     uint8_t *opt1_8bit, *opt2_8bit;
     uint16_t *opt1_16bit, *opt2_16bit;
     uint8_t continue_check = 1;
+    static uint8_t one_step_mode = 0;
 
 #ifdef cpu_80186
     uint8_t rep = 0;
@@ -520,12 +524,25 @@ void Cpu::Exec()
 
     seg_reg_replace_ds = &seg_reg_ds;
     seg_reg_replace_ss = &seg_reg_ss;
+
+    /*one step mode*/
+    if(one_step_mode)
+        Intcall(1);//one step interrupt
+    if(tf_flag)
+        one_step_mode = 1;
+    else
+        one_step_mode = 0;
+
+    /*get int_num from 8259a*/
+    if(if_flag && (i8259a.IRR & (~i8259a.IMR)))
+        Intcall(i8259a.send_int_cpu());
+
     opcode = ReadData8InExe();
     //printf("opcode :%x\n", opcode);
 
+    /*segment prefix check*/
     while(continue_check)
     {
-        /*segment prefix check*/
         switch(opcode)
         {
             case(0x26)://es prefix
@@ -3783,14 +3800,14 @@ void Cpu::Exec()
             /*remain to fix*/
         case(0xCC)://INT 3
             {
-                //callint(3);
+                Intcall(3);
                 break;
             }
 
             /*remain to fix*/
         case(0xCD)://INT Ib
             {
-                //callint(ReadData8InExe());
+                Intcall(ReadData8InExe());
                 break;
             }
 
@@ -3799,7 +3816,7 @@ void Cpu::Exec()
                 uint8_t of = (control_reg_flag >> 11) & 0x1;
                 if(of)
                 {
-                    //callint(4);
+                    Intcall(4);
                 }
                 break;
             }
@@ -5103,6 +5120,5 @@ void Cpu::Exec()
                 }
                 break;
             }
-
     }
 }
