@@ -4,6 +4,7 @@
 #include <string.h>
 
 #include "8259a.h"
+#include "8253.h"
 
 Cpu::Cpu()
 {
@@ -528,6 +529,8 @@ void Cpu::Exec()
     /*one step mode*/
     if(one_step_mode)
         Intcall(1);//one step interrupt
+
+    /*check tf,before execute one opcode*/
     if(tf_flag)
         one_step_mode = 1;
     else
@@ -537,9 +540,9 @@ void Cpu::Exec()
     if(if_flag && (i8259a.IRR & (~i8259a.IMR)))
         Intcall(i8259a.send_int_cpu());
 
+    /*read a opcode from Memory via CS:IP*/
     opcode = ReadData8InExe();
     //printf("opcode :%x\n", opcode);
-
     /*segment prefix check*/
     while(continue_check)
     {

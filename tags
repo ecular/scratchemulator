@@ -13,6 +13,7 @@ CalculateReg8	./cpu.cpp	/^uint8_t *Cpu::CalculateReg8(uint8_t mod_byte)$/;"	f	cl
 CalculateSeg16	./cpu.cpp	/^uint16_t *Cpu::CalculateSeg16(uint8_t mod_byte)$/;"	f	class:Cpu
 Cpu	./cpu.cpp	/^Cpu::Cpu()$/;"	f	class:Cpu
 Cpu	./cpu.h	/^class Cpu {$/;"	c
+EMU_8259A_H_	./8259a.h	2;"	d
 EMU_CPU_H_	./cpu.h	2;"	d
 Exec	./cpu.cpp	/^void Cpu::Exec()$/;"	f	class:Cpu
 GetAH	./cpu.cpp	/^inline uint8_t Cpu::GetAH()$/;"	f	class:Cpu
@@ -37,10 +38,18 @@ GetIP	./cpu.cpp	/^inline uint16_t Cpu::GetIP()$/;"	f	class:Cpu
 GetSI	./cpu.cpp	/^inline uint16_t Cpu::GetSI()$/;"	f	class:Cpu
 GetSP	./cpu.cpp	/^inline uint16_t Cpu::GetSP()$/;"	f	class:Cpu
 GetSS	./cpu.cpp	/^inline uint16_t Cpu::GetSS()$/;"	f	class:Cpu
+ICW	./8259a.h	/^    uint8_t ICW[5];$/;"	m	class:Interrupt_Controller_8259a
+IMR	./8259a.h	/^    uint8_t IMR;$/;"	m	class:Interrupt_Controller_8259a
 IPStep	./cpu.cpp	/^inline void Cpu::IPStep(unsigned int steps)$/;"	f	class:Cpu
+IRR	./8259a.h	/^    uint8_t IRR;$/;"	m	class:Interrupt_Controller_8259a
+ISR	./8259a.h	/^    uint8_t ISR;$/;"	m	class:Interrupt_Controller_8259a
 Init	./cpu.cpp	/^int Cpu::Init(unsigned int ram_size)$/;"	f	class:Cpu
+Intcall	./cpu.cpp	/^void Cpu::Intcall(uint8_t int_num)$/;"	f	class:Cpu
+Interrupt_Controller_8259a	./8259a.cpp	/^Interrupt_Controller_8259a::Interrupt_Controller_8259a()$/;"	f	class:Interrupt_Controller_8259a
+Interrupt_Controller_8259a	./8259a.h	/^class Interrupt_Controller_8259a {$/;"	c
 LDFLAG	./Makefile	/^LDFLAG = $/;"	m
 OBJ	./Makefile	/^OBJ = $(patsubst %.cpp,%.o,$(wildcard *.cpp)) $/;"	m
+OCW	./8259a.h	/^    uint8_t OCW[4];$/;"	m	class:Interrupt_Controller_8259a
 Pop	./cpu.cpp	/^inline uint16_t Cpu::Pop()$/;"	f	class:Cpu
 Push	./cpu.cpp	/^inline void Cpu::Push(uint16_t data)$/;"	f	class:Cpu
 ReadData16InExe	./cpu.cpp	/^inline uint16_t Cpu::ReadData16InExe()$/;"	f	class:Cpu
@@ -82,15 +91,20 @@ calltest	./testasm/codegolf.asm	/^calltest:$/;"	l
 cont	./testasm/codegolf.asm	/^cont:$/;"	l
 cont1	./testasm/codegolf.asm	/^cont1:$/;"	l
 cont2	./testasm/codegolf.asm	/^cont2:$/;"	l
-control_reg_flag	./cpu.h	/^    uint16_t control_reg_ip, control_reg_flag;$/;"	m	class:Cpu
-control_reg_ip	./cpu.h	/^    uint16_t control_reg_ip, control_reg_flag;$/;"	m	class:Cpu
+control_reg_flag	./cpu.h	/^        uint16_t control_reg_ip, control_reg_flag;$/;"	m	class:Cpu
+control_reg_ip	./cpu.h	/^        uint16_t control_reg_ip, control_reg_flag;$/;"	m	class:Cpu
 cursor	./testasm/codegolf.asm	/^cursor:$/;"	l
 fibloop	./testasm/codegolf.asm	/^fibloop:$/;"	l
-halt	./cpu.h	/^    int halt;$/;"	m	class:Cpu
+halt	./cpu.h	/^        int halt;$/;"	m	class:Cpu
 hello	./testasm/codegolf.asm	/^hello:$/;"	l
 hlt	./testasm/codegolf.asm	/^hlt:$/;"	l
+i8259a	./cpu.h	/^        Interrupt_Controller_8259a i8259a;$/;"	m	class:Cpu
+if_flag	./cpu.h	/^        uint8_t if_flag, tf_flag;$/;"	m	class:Cpu
 inc	./testasm/codegolf.asm	/^	inc di$/;"	d
+init_8259a	./8259a.cpp	/^void Interrupt_Controller_8259a::init_8259a()$/;"	f	class:Interrupt_Controller_8259a
+init_order	./8259a.h	/^    int8_t init_order;$/;"	m	class:Interrupt_Controller_8259a
 main	./main.cpp	/^int main(int argc, char **argv)$/;"	f
+master_base_vector	./8259a.h	/^    uint8_t master_base_vector;$/;"	m	class:Interrupt_Controller_8259a
 memory	./testasm/codegolf.asm	/^memory:$/;"	l
 numcont_1digit	./testasm/codegolf.asm	/^numcont_1digit:$/;"	l
 numcont_2digit	./testasm/codegolf.asm	/^numcont_2digit:$/;"	l
@@ -110,29 +124,34 @@ printnlloop	./testasm/codegolf.asm	/^printnlloop:$/;"	l
 printnum	./testasm/codegolf.asm	/^printnum:$/;"	l
 push	./testasm/codegolf.asm	/^	push di$/;"	d
 push	./testasm/codegolf.asm	/^	push dx$/;"	d
-ram	./cpu.h	/^    uint8_t *ram;$/;"	m	class:Cpu
+ram	./cpu.h	/^        uint8_t *ram;$/;"	m	class:Cpu
+read_8259a	./8259a.cpp	/^uint8_t Interrupt_Controller_8259a::read_8259a(uint8_t port_num)$/;"	f	class:Interrupt_Controller_8259a
 rettest	./testasm/codegolf.asm	/^rettest:$/;"	l
-seg_reg_cs	./cpu.h	/^    uint16_t seg_reg_cs, seg_reg_ds, seg_reg_ss, seg_reg_es;$/;"	m	class:Cpu
-seg_reg_ds	./cpu.h	/^    uint16_t seg_reg_cs, seg_reg_ds, seg_reg_ss, seg_reg_es;$/;"	m	class:Cpu
-seg_reg_es	./cpu.h	/^    uint16_t seg_reg_cs, seg_reg_ds, seg_reg_ss, seg_reg_es;$/;"	m	class:Cpu
-seg_reg_replace_ds	./cpu.h	/^    uint16_t *seg_reg_replace_ds, *seg_reg_replace_ss;$/;"	m	class:Cpu
-seg_reg_replace_ss	./cpu.h	/^    uint16_t *seg_reg_replace_ds, *seg_reg_replace_ss;$/;"	m	class:Cpu
-seg_reg_ss	./cpu.h	/^    uint16_t seg_reg_cs, seg_reg_ds, seg_reg_ss, seg_reg_es;$/;"	m	class:Cpu
+seg_reg_cs	./cpu.h	/^        uint16_t seg_reg_cs, seg_reg_ds, seg_reg_ss, seg_reg_es;$/;"	m	class:Cpu
+seg_reg_ds	./cpu.h	/^        uint16_t seg_reg_cs, seg_reg_ds, seg_reg_ss, seg_reg_es;$/;"	m	class:Cpu
+seg_reg_es	./cpu.h	/^        uint16_t seg_reg_cs, seg_reg_ds, seg_reg_ss, seg_reg_es;$/;"	m	class:Cpu
+seg_reg_replace_ds	./cpu.h	/^        uint16_t *seg_reg_replace_ds, *seg_reg_replace_ss;$/;"	m	class:Cpu
+seg_reg_replace_ss	./cpu.h	/^        uint16_t *seg_reg_replace_ds, *seg_reg_replace_ss;$/;"	m	class:Cpu
+seg_reg_ss	./cpu.h	/^        uint16_t seg_reg_cs, seg_reg_ds, seg_reg_ss, seg_reg_es;$/;"	m	class:Cpu
+send_int_cpu	./8259a.cpp	/^uint8_t Interrupt_Controller_8259a::send_int_cpu()$/;"	f	class:Interrupt_Controller_8259a
 squareloop	./testasm/codegolf.asm	/^squareloop:$/;"	l
 start	./testasm/codegolf.asm	/^start:$/;"	l
-universal_reg_ah	./cpu.h	/^    uint8_t *universal_reg_ah, *universal_reg_al;$/;"	m	class:Cpu
-universal_reg_al	./cpu.h	/^    uint8_t *universal_reg_ah, *universal_reg_al;$/;"	m	class:Cpu
-universal_reg_ax	./cpu.h	/^    uint16_t universal_reg_ax, universal_reg_bx, universal_reg_cx, universal_reg_dx,$/;"	m	class:Cpu
-universal_reg_bh	./cpu.h	/^    uint8_t *universal_reg_bh, *universal_reg_bl;$/;"	m	class:Cpu
-universal_reg_bl	./cpu.h	/^    uint8_t *universal_reg_bh, *universal_reg_bl;$/;"	m	class:Cpu
-universal_reg_bp	./cpu.h	/^             universal_reg_sp, universal_reg_bp, universal_reg_si, universal_reg_di;$/;"	m	class:Cpu
-universal_reg_bx	./cpu.h	/^    uint16_t universal_reg_ax, universal_reg_bx, universal_reg_cx, universal_reg_dx,$/;"	m	class:Cpu
-universal_reg_ch	./cpu.h	/^    uint8_t *universal_reg_ch, *universal_reg_cl;$/;"	m	class:Cpu
-universal_reg_cl	./cpu.h	/^    uint8_t *universal_reg_ch, *universal_reg_cl;$/;"	m	class:Cpu
-universal_reg_cx	./cpu.h	/^    uint16_t universal_reg_ax, universal_reg_bx, universal_reg_cx, universal_reg_dx,$/;"	m	class:Cpu
-universal_reg_dh	./cpu.h	/^    uint8_t *universal_reg_dh, *universal_reg_dl;$/;"	m	class:Cpu
-universal_reg_di	./cpu.h	/^             universal_reg_sp, universal_reg_bp, universal_reg_si, universal_reg_di;$/;"	m	class:Cpu
-universal_reg_dl	./cpu.h	/^    uint8_t *universal_reg_dh, *universal_reg_dl;$/;"	m	class:Cpu
-universal_reg_dx	./cpu.h	/^    uint16_t universal_reg_ax, universal_reg_bx, universal_reg_cx, universal_reg_dx,$/;"	m	class:Cpu
-universal_reg_si	./cpu.h	/^             universal_reg_sp, universal_reg_bp, universal_reg_si, universal_reg_di;$/;"	m	class:Cpu
-universal_reg_sp	./cpu.h	/^             universal_reg_sp, universal_reg_bp, universal_reg_si, universal_reg_di;$/;"	m	class:Cpu
+tf_flag	./cpu.h	/^        uint8_t if_flag, tf_flag;$/;"	m	class:Cpu
+trigger_int	./8259a.cpp	/^void Interrupt_Controller_8259a::trigger_int(uint8_t int_num)$/;"	f	class:Interrupt_Controller_8259a
+universal_reg_ah	./cpu.h	/^        uint8_t *universal_reg_ah, *universal_reg_al;$/;"	m	class:Cpu
+universal_reg_al	./cpu.h	/^        uint8_t *universal_reg_ah, *universal_reg_al;$/;"	m	class:Cpu
+universal_reg_ax	./cpu.h	/^        uint16_t universal_reg_ax, universal_reg_bx, universal_reg_cx, universal_reg_dx,$/;"	m	class:Cpu
+universal_reg_bh	./cpu.h	/^        uint8_t *universal_reg_bh, *universal_reg_bl;$/;"	m	class:Cpu
+universal_reg_bl	./cpu.h	/^        uint8_t *universal_reg_bh, *universal_reg_bl;$/;"	m	class:Cpu
+universal_reg_bp	./cpu.h	/^                 universal_reg_sp, universal_reg_bp, universal_reg_si, universal_reg_di;$/;"	m	class:Cpu
+universal_reg_bx	./cpu.h	/^        uint16_t universal_reg_ax, universal_reg_bx, universal_reg_cx, universal_reg_dx,$/;"	m	class:Cpu
+universal_reg_ch	./cpu.h	/^        uint8_t *universal_reg_ch, *universal_reg_cl;$/;"	m	class:Cpu
+universal_reg_cl	./cpu.h	/^        uint8_t *universal_reg_ch, *universal_reg_cl;$/;"	m	class:Cpu
+universal_reg_cx	./cpu.h	/^        uint16_t universal_reg_ax, universal_reg_bx, universal_reg_cx, universal_reg_dx,$/;"	m	class:Cpu
+universal_reg_dh	./cpu.h	/^        uint8_t *universal_reg_dh, *universal_reg_dl;$/;"	m	class:Cpu
+universal_reg_di	./cpu.h	/^                 universal_reg_sp, universal_reg_bp, universal_reg_si, universal_reg_di;$/;"	m	class:Cpu
+universal_reg_dl	./cpu.h	/^        uint8_t *universal_reg_dh, *universal_reg_dl;$/;"	m	class:Cpu
+universal_reg_dx	./cpu.h	/^        uint16_t universal_reg_ax, universal_reg_bx, universal_reg_cx, universal_reg_dx,$/;"	m	class:Cpu
+universal_reg_si	./cpu.h	/^                 universal_reg_sp, universal_reg_bp, universal_reg_si, universal_reg_di;$/;"	m	class:Cpu
+universal_reg_sp	./cpu.h	/^                 universal_reg_sp, universal_reg_bp, universal_reg_si, universal_reg_di;$/;"	m	class:Cpu
+write_8259a	./8259a.cpp	/^void Interrupt_Controller_8259a::write_8259a(uint8_t port_num, uint8_t value)$/;"	f	class:Interrupt_Controller_8259a
