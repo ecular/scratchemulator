@@ -3,7 +3,9 @@
 
 #include <stdint.h>
 
+#include "port_handle.h"
 #include "8259a.h"
+#include "8253.h"
 
 class Cpu {
     /* 声明次序
@@ -16,7 +18,7 @@ class Cpu {
      * */
 public:
 
-    Cpu();
+    Cpu(port_handle &, Interrupt_Controller_8259a &, Interval_Timer_8253 &);
     //~Cpu();
     /*set reg*/
     void SetAX(uint16_t value);
@@ -104,7 +106,11 @@ private:
     uint16_t *CalculateSeg16(uint8_t mod_byte);
     uint8_t *CalculateRM(uint8_t mod_byte, uint8_t opcode);
     void Intcall(uint8_t);//for interupt call
-
+    /*for I/O port operate*/
+    uint8_t read8_from_port(uint8_t);
+    uint16_t read16_from_port(uint8_t);
+    void write8_to_port(uint8_t, uint8_t);
+    void write16_to_port(uint8_t, uint16_t);
 
     uint16_t universal_reg_ax, universal_reg_bx, universal_reg_cx, universal_reg_dx,
              universal_reg_sp, universal_reg_bp, universal_reg_si, universal_reg_di;
@@ -118,7 +124,9 @@ private:
     uint8_t if_flag, tf_flag;
 
     /*other devices*/
-    Interrupt_Controller_8259a i8259a;
+    port_handle &ports_operate;
+    Interrupt_Controller_8259a &i8259a;
+    Interval_Timer_8253 &i8253;
 
 };
 

@@ -120,9 +120,9 @@ void Interrupt_Controller_8259a::write_8259a(uint8_t port_num, uint8_t value)
     }
 }
 
-void Interrupt_Controller_8259a::trigger_int(uint8_t int_num)
+void Interrupt_Controller_8259a::trigger_int(uint8_t irq_num)
 {
-    IRR |= (0x1 << (int_num - master_base_vector));
+    IRR |= (0x1 << (irq_num));
 }
 
 uint8_t Interrupt_Controller_8259a::send_int_cpu()

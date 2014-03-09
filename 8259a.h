@@ -14,7 +14,7 @@ private:
     uint8_t master_base_vector;
 public:
     friend class Cpu;
-    Interrupt_Controller_8259a(void);
+    Interrupt_Controller_8259a();
     void init_8259a(void);
     uint8_t read_8259a(uint8_t port_num);
     void write_8259a(uint8_t, uint8_t);

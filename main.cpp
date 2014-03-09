@@ -17,7 +17,10 @@ void print_screen(Cpu  *cpu)
 
 int main(int argc, char **argv)
 {
-    Cpu cpu;
+    Interrupt_Controller_8259a i8259a;
+    Interval_Timer_8253 i8253;
+    port_handle ports_operate(i8259a, i8253);
+    Cpu cpu(ports_operate, i8259a, i8253);
     FILE* binFile = NULL;
     const char* inputFilename = argv[1];
     size_t fileSize = 0;
