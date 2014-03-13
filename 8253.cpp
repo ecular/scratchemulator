@@ -4,7 +4,10 @@ Interval_Timer_8253::Interval_Timer_8253()
 {
     int i;
     for(i = 0; i < 3; i++)
+    {
         rw_step[i] = 0;
+        active[i] = 0;
+    }
 }
 
 uint8_t Interval_Timer_8253::read_8253(uint8_t port_num)
@@ -93,6 +96,8 @@ void Interval_Timer_8253::write_8253(uint8_t port_num, uint8_t value)
         default:
             break;
         }
+        counter[channel_tmp] = (init_data_high[channel_tmp] << 8) + init_data_low[channel_tmp];
+        active[channel_tmp] = channel_tmp;
     }
 
     case(0x43):/*mode control*/
