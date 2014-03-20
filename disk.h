@@ -9,7 +9,7 @@
 using namespace std;
 
 class Disk {
-    friend class diskOperator;
+    friend class disk_handle;
 private:
     void writedisk(uint16_t sector_count, uint16_t cylinder, uint16_t sector, uint8_t head, uint8_t dirver_num, uint16_t mem_seg, uint16_t mem_offset);
     void readdisk(uint16_t sector_count, uint16_t cylinder, uint16_t sector, uint8_t head, uint8_t dirver_num, uint16_t mem_seg, uint16_t mem_offset);
@@ -20,8 +20,10 @@ private:
     uint8_t sectors;
     uint8_t heads;
 
+    uint8_t lastAH, lastCF;
     Cpu &cpu;
 public:
+    Disk();
     Disk(Cpu &, string, uint8_t);
     ~Disk();
 };
