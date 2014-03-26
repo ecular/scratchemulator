@@ -1,11 +1,18 @@
 #include "disk_handle.h"
 
 disk_handle::disk_handle(Cpu &cpu_arg): cpu(cpu_arg)
-{}
+{
+    hard_count = 0;
+    floppy_count = 0;
+}
+
 void disk_handle::insert_disk(uint8_t disk_num, Disk *disk)
 {
+    if(disk_num < 0x80)
+        floppy_count++;
+    else
+        hard_count++;
     disk_map.insert(map<uint8_t, Disk *>::value_type(disk_num, disk));
-    //disk_map[disk_num] = disk;
 }
 
 void disk_handle::disk_operator()
@@ -57,7 +64,7 @@ void disk_handle::disk_operator()
         }
         else
         {
-            ;//hard disk count
+            cpu.SetDL(hard_count);//hard disk count
         }
         break;
     }

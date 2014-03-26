@@ -8,6 +8,7 @@
 class disk_handle {
 private:
     Cpu &cpu;
+    uint8_t hard_count, floppy_count;
     map<uint8_t, Disk *> disk_map;
 public:
     void insert_disk(uint8_t , Disk *);

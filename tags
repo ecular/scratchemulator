@@ -13,10 +13,15 @@ CalculateReg8	./cpu.cpp	/^uint8_t *Cpu::CalculateReg8(uint8_t mod_byte)$/;"	f	cl
 CalculateSeg16	./cpu.cpp	/^uint16_t *Cpu::CalculateSeg16(uint8_t mod_byte)$/;"	f	class:Cpu
 Cpu	./cpu.cpp	/^Cpu::Cpu(port_handle &ports_operate_arg, Interrupt_Controller_8259a &i8259a_arg, Interval_Timer_8253 &i8253_arg): ports_operate(ports_operate_arg), i8259a(i8259a_arg), i8253(i8253_arg)$/;"	f	class:Cpu
 Cpu	./cpu.h	/^class Cpu {$/;"	c
+Disk	./disk.cpp	/^Disk::Disk(Cpu &cpu_arg, string filename, uint8_t driver_num): cpu(cpu_arg)$/;"	f	class:Disk
+Disk	./disk.h	/^class Disk {$/;"	c
 EMU_8253_H	./8253.h	2;"	d
 EMU_8259A_H_	./8259a.h	2;"	d
 EMU_CPU_H_	./cpu.h	2;"	d
+EMU_DISK_H	./disk.h	2;"	d
+EMU_DISK_HANDLE_H	./disk_handle.h	2;"	d
 EMU_PORT_HANDLE_H	./port_handle.h	2;"	d
+EMU_TIMER_H	./timer.h	2;"	d
 Exec	./cpu.cpp	/^void Cpu::Exec()$/;"	f	class:Cpu
 GetAH	./cpu.cpp	/^inline uint8_t Cpu::GetAH()$/;"	f	class:Cpu
 GetAL	./cpu.cpp	/^inline uint8_t Cpu::GetAL()$/;"	f	class:Cpu
@@ -85,6 +90,7 @@ SetSP	./cpu.cpp	/^inline void Cpu::SetSP(uint16_t value)$/;"	f	class:Cpu
 SetSS	./cpu.cpp	/^inline void Cpu::SetSS(uint16_t value)$/;"	f	class:Cpu
 WriteRam16	./cpu.cpp	/^inline void Cpu::WriteRam16(unsigned int location, uint16_t value)$/;"	f	class:Cpu
 WriteRam8	./cpu.cpp	/^inline void Cpu::WriteRam8(unsigned int location, uint8_t value)$/;"	f	class:Cpu
+active	./8253.h	/^    uint8_t rw_mode[3], rw_step[3], active[3];$/;"	m	class:Interval_Timer_8253
 ascii_loop	./testasm/codegolf.asm	/^ascii_loop:$/;"	l
 boxloop	./testasm/codegolf.asm	/^boxloop:$/;"	l
 boxloop2	./testasm/codegolf.asm	/^boxloop2:$/;"	l
@@ -98,21 +104,41 @@ cont2	./testasm/codegolf.asm	/^cont2:$/;"	l
 control_reg_flag	./cpu.h	/^    uint16_t control_reg_ip, control_reg_flag;$/;"	m	class:Cpu
 control_reg_ip	./cpu.h	/^    uint16_t control_reg_ip, control_reg_flag;$/;"	m	class:Cpu
 counter	./8253.h	/^    uint16_t counter[3];$/;"	m	class:Interval_Timer_8253
+cpu	./disk.h	/^    Cpu &cpu;$/;"	m	class:Disk
+cpu	./disk_handle.h	/^    Cpu &cpu;$/;"	m	class:disk_handle
 cursor	./testasm/codegolf.asm	/^cursor:$/;"	l
+cylinders	./disk.h	/^    uint16_t cylinders;$/;"	m	class:Disk
+disk_handle	./disk_handle.cpp	/^disk_handle::disk_handle(Cpu &cpu_arg): cpu(cpu_arg)$/;"	f	class:disk_handle
+disk_handle	./disk_handle.h	/^class disk_handle {$/;"	c
+disk_map	./disk_handle.h	/^    map<uint8_t, Disk *> disk_map;$/;"	m	class:disk_handle
+disk_operator	./disk_handle.cpp	/^void disk_handle::disk_operator()$/;"	f	class:disk_handle
 fibloop	./testasm/codegolf.asm	/^fibloop:$/;"	l
+filesize	./disk.h	/^    uint32_t filesize;$/;"	m	class:Disk
+floppy_count	./disk_handle.h	/^    uint8_t hard_count, floppy_count;$/;"	m	class:disk_handle
 halt	./cpu.h	/^    int halt;$/;"	m	class:Cpu
+hard_count	./disk_handle.h	/^    uint8_t hard_count, floppy_count;$/;"	m	class:disk_handle
+heads	./disk.h	/^    uint8_t heads;$/;"	m	class:Disk
 hello	./testasm/codegolf.asm	/^hello:$/;"	l
 hlt	./testasm/codegolf.asm	/^hlt:$/;"	l
 i8253	./cpu.h	/^    Interval_Timer_8253 &i8253;$/;"	m	class:Cpu
 i8253	./port_handle.h	/^    Interval_Timer_8253 &i8253;$/;"	m	class:port_handle
+i8253	./timer.h	/^    Interval_Timer_8253 &i8253;$/;"	m	class:timer
+i8253_tick_gap	./timer.h	/^    double irq0_timegap, i8253_tick_gap;$/;"	m	class:timer
 i8259a	./cpu.h	/^    Interrupt_Controller_8259a &i8259a;$/;"	m	class:Cpu
 i8259a	./port_handle.h	/^    Interrupt_Controller_8259a &i8259a;$/;"	m	class:port_handle
+i8259a	./timer.h	/^    Interrupt_Controller_8259a &i8259a;$/;"	m	class:timer
 if_flag	./cpu.h	/^    uint8_t if_flag, tf_flag;$/;"	m	class:Cpu
 inc	./testasm/codegolf.asm	/^	inc di$/;"	d
 init_8259a	./8259a.cpp	/^void Interrupt_Controller_8259a::init_8259a()$/;"	f	class:Interrupt_Controller_8259a
-init_data_high	./8253.h	/^    uint16_t init_data_high[3], init_data_low[3];$/;"	m	class:Interval_Timer_8253
-init_data_low	./8253.h	/^    uint16_t init_data_high[3], init_data_low[3];$/;"	m	class:Interval_Timer_8253
+init_data_high	./8253.h	/^    uint8_t init_data_high[3], init_data_low[3];$/;"	m	class:Interval_Timer_8253
+init_data_low	./8253.h	/^    uint8_t init_data_high[3], init_data_low[3];$/;"	m	class:Interval_Timer_8253
 init_order	./8259a.h	/^    int8_t init_order;$/;"	m	class:Interrupt_Controller_8259a
+insert_disk	./disk_handle.cpp	/^void disk_handle::insert_disk(uint8_t disk_num, Disk *disk)$/;"	f	class:disk_handle
+irq0_timegap	./timer.h	/^    double irq0_timegap, i8253_tick_gap;$/;"	m	class:timer
+lastAH	./disk.h	/^    uint8_t lastAH, lastCF;$/;"	m	class:Disk
+lastCF	./disk.h	/^    uint8_t lastAH, lastCF;$/;"	m	class:Disk
+last_8253_count	./timer.h	/^    uint64_t last_8253_count, last_irq0;$/;"	m	class:timer
+last_irq0	./timer.h	/^    uint64_t last_8253_count, last_irq0;$/;"	m	class:timer
 locked_data	./8253.h	/^    uint16_t locked_data[3], *locked_data_pointer[3];$/;"	m	class:Interval_Timer_8253
 locked_data_pointer	./8253.h	/^    uint16_t locked_data[3], *locked_data_pointer[3];$/;"	m	class:Interval_Timer_8253
 main	./main.cpp	/^int main(int argc, char **argv)$/;"	f
@@ -148,9 +174,12 @@ read16_from_port	./cpu.cpp	/^uint16_t Cpu::read16_from_port(uint8_t port_num)$/;
 read8_from_port	./cpu.cpp	/^uint8_t Cpu::read8_from_port(uint8_t port_num)$/;"	f	class:Cpu
 read_8253	./8253.cpp	/^uint8_t Interval_Timer_8253::read_8253(uint8_t port_num)$/;"	f	class:Interval_Timer_8253
 read_8259a	./8259a.cpp	/^uint8_t Interrupt_Controller_8259a::read_8259a(uint8_t port_num)$/;"	f	class:Interrupt_Controller_8259a
+read_write	./disk.h	/^    fstream read_write;$/;"	m	class:Disk
+readdisk	./disk.cpp	/^void Disk::readdisk(uint16_t sector_count, uint16_t cylinder, uint16_t sector, uint8_t head, uint8_t dirver_num, uint16_t mem_seg, uint16_t mem_offset)$/;"	f	class:Disk
 rettest	./testasm/codegolf.asm	/^rettest:$/;"	l
-rw_mode	./8253.h	/^    uint8_t rw_mode[3], rw_step[3];$/;"	m	class:Interval_Timer_8253
-rw_step	./8253.h	/^    uint8_t rw_mode[3], rw_step[3];$/;"	m	class:Interval_Timer_8253
+rw_mode	./8253.h	/^    uint8_t rw_mode[3], rw_step[3], active[3];$/;"	m	class:Interval_Timer_8253
+rw_step	./8253.h	/^    uint8_t rw_mode[3], rw_step[3], active[3];$/;"	m	class:Interval_Timer_8253
+sectors	./disk.h	/^    uint8_t sectors;$/;"	m	class:Disk
 seg_reg_cs	./cpu.h	/^    uint16_t seg_reg_cs, seg_reg_ds, seg_reg_ss, seg_reg_es;$/;"	m	class:Cpu
 seg_reg_ds	./cpu.h	/^    uint16_t seg_reg_cs, seg_reg_ds, seg_reg_ss, seg_reg_es;$/;"	m	class:Cpu
 seg_reg_es	./cpu.h	/^    uint16_t seg_reg_cs, seg_reg_ds, seg_reg_ss, seg_reg_es;$/;"	m	class:Cpu
@@ -161,6 +190,10 @@ send_int_cpu	./8259a.cpp	/^uint8_t Interrupt_Controller_8259a::send_int_cpu()$/;
 squareloop	./testasm/codegolf.asm	/^squareloop:$/;"	l
 start	./testasm/codegolf.asm	/^start:$/;"	l
 tf_flag	./cpu.h	/^    uint8_t if_flag, tf_flag;$/;"	m	class:Cpu
+timer	./timer.cpp	/^timer::timer(Interval_Timer_8253 &i8253_arg, Interrupt_Controller_8259a &i8259a_arg): i8253(i8253_arg), i8259a(i8259a_arg)$/;"	f	class:timer
+timer	./timer.h	/^class timer {$/;"	c
+timer_init	./timer.cpp	/^void timer::timer_init()$/;"	f	class:timer
+timer_tick	./timer.cpp	/^inline void timer::timer_tick()$/;"	f	class:timer
 trigger_int	./8259a.cpp	/^void Interrupt_Controller_8259a::trigger_int(uint8_t irq_num)$/;"	f	class:Interrupt_Controller_8259a
 universal_reg_ah	./cpu.h	/^    uint8_t *universal_reg_ah, *universal_reg_al;$/;"	m	class:Cpu
 universal_reg_al	./cpu.h	/^    uint8_t *universal_reg_ah, *universal_reg_al;$/;"	m	class:Cpu
@@ -182,3 +215,5 @@ write16_to_port	./cpu.cpp	/^void Cpu::write16_to_port(uint8_t port_num, uint16_t
 write8_to_port	./cpu.cpp	/^void Cpu::write8_to_port(uint8_t port_num, uint8_t value)$/;"	f	class:Cpu
 write_8253	./8253.cpp	/^void Interval_Timer_8253::write_8253(uint8_t port_num, uint8_t value)$/;"	f	class:Interval_Timer_8253
 write_8259a	./8259a.cpp	/^void Interrupt_Controller_8259a::write_8259a(uint8_t port_num, uint8_t value)$/;"	f	class:Interrupt_Controller_8259a
+writedisk	./disk.cpp	/^void Disk::writedisk(uint16_t sector_count, uint16_t cylinder, uint16_t sector, uint8_t head, uint8_t dirver_num, uint16_t mem_seg, uint16_t mem_offset)$/;"	f	class:Disk
+~Disk	./disk.cpp	/^Disk::~Disk()$/;"	f	class:Disk
