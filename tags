@@ -4,15 +4,23 @@
 !_TAG_PROGRAM_NAME	Exuberant Ctags	//
 !_TAG_PROGRAM_URL	http://ctags.sourceforge.net	/official site/
 !_TAG_PROGRAM_VERSION	5.9~svn20110310	//
+Attribute_Control_Reg	./video.h	/^    uint8_t CRT_Control_Reg[25], Sequence_Reg[5], Graphic_Control_Reg[9], Attribute_Control_Reg[20], Feature_Control_Reg, Input_Status_Reg0;$/;"	m	class:video
+Attribute_Control_Reg_Flag	./video.h	/^    uint8_t Attribute_Control_Reg_Flag\/*0:index.1:data*\/, Graphic_Mode_Flag, Colorful_Flag, Video_Mode, Mode_Change_Flag;$/;"	m	class:video
+Attribute_Control_Reg_Index	./video.h	/^    uint8_t CRT_Control_Reg_Index, Sequence_Reg_Index, Graphic_Control_Reg_Index, Attribute_Control_Reg_Index;$/;"	m	class:video
 BIN	./Makefile	/^BIN  = emu$/;"	m
 CC	./Makefile	/^CC = g++ -g -Wall -O0 -m32$/;"	m
 CFLAG	./Makefile	/^CFLAG = -c -fkeep-inline-functions$/;"	m
+CGApalette	./video.h	/^    uint32_t CGApalette[16], Table_Data_Reg[256], VGA_Memory[262144], Video_Buffer_Address;$/;"	m	class:video
+CRT_Control_Reg	./video.h	/^    uint8_t CRT_Control_Reg[25], Sequence_Reg[5], Graphic_Control_Reg[9], Attribute_Control_Reg[20], Feature_Control_Reg, Input_Status_Reg0;$/;"	m	class:video
+CRT_Control_Reg_Index	./video.h	/^    uint8_t CRT_Control_Reg_Index, Sequence_Reg_Index, Graphic_Control_Reg_Index, Attribute_Control_Reg_Index;$/;"	m	class:video
 CalculateRM	./cpu.cpp	/^uint8_t *Cpu::CalculateRM(uint8_t mod_byte, uint8_t opcode)$/;"	f	class:Cpu
 CalculateReg16	./cpu.cpp	/^uint16_t *Cpu::CalculateReg16(uint8_t mod_byte)$/;"	f	class:Cpu
 CalculateReg8	./cpu.cpp	/^uint8_t *Cpu::CalculateReg8(uint8_t mod_byte)$/;"	f	class:Cpu
 CalculateSeg16	./cpu.cpp	/^uint16_t *Cpu::CalculateSeg16(uint8_t mod_byte)$/;"	f	class:Cpu
+Colorful_Flag	./video.h	/^    uint8_t Attribute_Control_Reg_Flag\/*0:index.1:data*\/, Graphic_Mode_Flag, Colorful_Flag, Video_Mode, Mode_Change_Flag;$/;"	m	class:video
 Cpu	./cpu.cpp	/^Cpu::Cpu(port_handle &ports_operate_arg, Interrupt_Controller_8259a &i8259a_arg, Interval_Timer_8253 &i8253_arg): ports_operate(ports_operate_arg), i8259a(i8259a_arg), i8253(i8253_arg)$/;"	f	class:Cpu
 Cpu	./cpu.h	/^class Cpu {$/;"	c
+DAC_Status_Reg	./video.h	/^    uint8_t DAC_Status_Reg, Table_Index_Reg_Read, Table_Index_Reg_Write, Plane_Lock[4];$/;"	m	class:video
 Disk	./disk.cpp	/^Disk::Disk(Cpu &cpu_arg, string filename, uint8_t driver_num): cpu(cpu_arg)$/;"	f	class:Disk
 Disk	./disk.h	/^class Disk {$/;"	c
 EMU_8253_H	./8253.h	2;"	d
@@ -22,7 +30,9 @@ EMU_DISK_H	./disk.h	2;"	d
 EMU_DISK_HANDLE_H	./disk_handle.h	2;"	d
 EMU_PORT_HANDLE_H	./port_handle.h	2;"	d
 EMU_TIMER_H	./timer.h	2;"	d
+EMU_VIDEO_H	./video.h	2;"	d
 Exec	./cpu.cpp	/^void Cpu::Exec()$/;"	f	class:Cpu
+Feature_Control_Reg	./video.h	/^    uint8_t CRT_Control_Reg[25], Sequence_Reg[5], Graphic_Control_Reg[9], Attribute_Control_Reg[20], Feature_Control_Reg, Input_Status_Reg0;$/;"	m	class:video
 GetAH	./cpu.cpp	/^inline uint8_t Cpu::GetAH()$/;"	f	class:Cpu
 GetAL	./cpu.cpp	/^inline uint8_t Cpu::GetAL()$/;"	f	class:Cpu
 GetAX	./cpu.cpp	/^inline uint16_t Cpu::GetAX()$/;"	f	class:Cpu
@@ -45,20 +55,26 @@ GetIP	./cpu.cpp	/^inline uint16_t Cpu::GetIP()$/;"	f	class:Cpu
 GetSI	./cpu.cpp	/^inline uint16_t Cpu::GetSI()$/;"	f	class:Cpu
 GetSP	./cpu.cpp	/^inline uint16_t Cpu::GetSP()$/;"	f	class:Cpu
 GetSS	./cpu.cpp	/^inline uint16_t Cpu::GetSS()$/;"	f	class:Cpu
+Graphic_Control_Reg	./video.h	/^    uint8_t CRT_Control_Reg[25], Sequence_Reg[5], Graphic_Control_Reg[9], Attribute_Control_Reg[20], Feature_Control_Reg, Input_Status_Reg0;$/;"	m	class:video
+Graphic_Control_Reg_Index	./video.h	/^    uint8_t CRT_Control_Reg_Index, Sequence_Reg_Index, Graphic_Control_Reg_Index, Attribute_Control_Reg_Index;$/;"	m	class:video
+Graphic_Mode_Flag	./video.h	/^    uint8_t Attribute_Control_Reg_Flag\/*0:index.1:data*\/, Graphic_Mode_Flag, Colorful_Flag, Video_Mode, Mode_Change_Flag;$/;"	m	class:video
 ICW	./8259a.h	/^    uint8_t ICW[5];$/;"	m	class:Interrupt_Controller_8259a
 IMR	./8259a.h	/^    uint8_t IMR;$/;"	m	class:Interrupt_Controller_8259a
 IPStep	./cpu.cpp	/^inline void Cpu::IPStep(unsigned int steps)$/;"	f	class:Cpu
 IRR	./8259a.h	/^    uint8_t IRR;$/;"	m	class:Interrupt_Controller_8259a
 ISR	./8259a.h	/^    uint8_t ISR;$/;"	m	class:Interrupt_Controller_8259a
 Init	./cpu.cpp	/^int Cpu::Init(unsigned int ram_size)$/;"	f	class:Cpu
+Input_Status_Reg0	./video.h	/^    uint8_t CRT_Control_Reg[25], Sequence_Reg[5], Graphic_Control_Reg[9], Attribute_Control_Reg[20], Feature_Control_Reg, Input_Status_Reg0;$/;"	m	class:video
 Intcall	./cpu.cpp	/^void Cpu::Intcall(uint8_t int_num)$/;"	f	class:Cpu
 Interrupt_Controller_8259a	./8259a.cpp	/^Interrupt_Controller_8259a::Interrupt_Controller_8259a()$/;"	f	class:Interrupt_Controller_8259a
 Interrupt_Controller_8259a	./8259a.h	/^class Interrupt_Controller_8259a {$/;"	c
 Interval_Timer_8253	./8253.cpp	/^Interval_Timer_8253::Interval_Timer_8253()$/;"	f	class:Interval_Timer_8253
 Interval_Timer_8253	./8253.h	/^class Interval_Timer_8253 {$/;"	c
 LDFLAG	./Makefile	/^LDFLAG = $/;"	m
+Mode_Change_Flag	./video.h	/^    uint8_t Attribute_Control_Reg_Flag\/*0:index.1:data*\/, Graphic_Mode_Flag, Colorful_Flag, Video_Mode, Mode_Change_Flag;$/;"	m	class:video
 OBJ	./Makefile	/^OBJ = $(patsubst %.cpp,%.o,$(wildcard *.cpp)) $/;"	m
 OCW	./8259a.h	/^    uint8_t OCW[4];$/;"	m	class:Interrupt_Controller_8259a
+Plane_Lock	./video.h	/^    uint8_t DAC_Status_Reg, Table_Index_Reg_Read, Table_Index_Reg_Write, Plane_Lock[4];$/;"	m	class:video
 Pop	./cpu.cpp	/^inline uint16_t Cpu::Pop()$/;"	f	class:Cpu
 Push	./cpu.cpp	/^inline void Cpu::Push(uint16_t data)$/;"	f	class:Cpu
 ReadData16InExe	./cpu.cpp	/^inline uint16_t Cpu::ReadData16InExe()$/;"	f	class:Cpu
@@ -66,6 +82,8 @@ ReadData8InExe	./cpu.cpp	/^inline uint8_t Cpu::ReadData8InExe()$/;"	f	class:Cpu
 ReadRam16	./cpu.cpp	/^inline uint16_t Cpu::ReadRam16(unsigned int location)$/;"	f	class:Cpu
 ReadRam8	./cpu.cpp	/^inline uint8_t Cpu::ReadRam8(unsigned int location)$/;"	f	class:Cpu
 Reset	./cpu.cpp	/^int Cpu::Reset()$/;"	f	class:Cpu
+Sequence_Reg	./video.h	/^    uint8_t CRT_Control_Reg[25], Sequence_Reg[5], Graphic_Control_Reg[9], Attribute_Control_Reg[20], Feature_Control_Reg, Input_Status_Reg0;$/;"	m	class:video
+Sequence_Reg_Index	./video.h	/^    uint8_t CRT_Control_Reg_Index, Sequence_Reg_Index, Graphic_Control_Reg_Index, Attribute_Control_Reg_Index;$/;"	m	class:video
 SetAH	./cpu.cpp	/^inline void Cpu::SetAH(uint8_t value)$/;"	f	class:Cpu
 SetAL	./cpu.cpp	/^inline void Cpu::SetAL(uint8_t value)$/;"	f	class:Cpu
 SetAX	./cpu.cpp	/^inline void Cpu::SetAX(uint16_t value)$/;"	f	class:Cpu
@@ -88,6 +106,14 @@ SetIP	./cpu.cpp	/^inline void Cpu::SetIP(uint16_t value)$/;"	f	class:Cpu
 SetSI	./cpu.cpp	/^inline void Cpu::SetSI(uint16_t value)$/;"	f	class:Cpu
 SetSP	./cpu.cpp	/^inline void Cpu::SetSP(uint16_t value)$/;"	f	class:Cpu
 SetSS	./cpu.cpp	/^inline void Cpu::SetSS(uint16_t value)$/;"	f	class:Cpu
+Table_Data_Reg	./video.h	/^    uint32_t CGApalette[16], Table_Data_Reg[256], VGA_Memory[262144], Video_Buffer_Address;$/;"	m	class:video
+Table_Index_Reg_Read	./video.h	/^    uint8_t DAC_Status_Reg, Table_Index_Reg_Read, Table_Index_Reg_Write, Plane_Lock[4];$/;"	m	class:video
+Table_Index_Reg_Write	./video.h	/^    uint8_t DAC_Status_Reg, Table_Index_Reg_Read, Table_Index_Reg_Write, Plane_Lock[4];$/;"	m	class:video
+Table_Read_Step	./video.h	/^    uint8_t Table_Read_Step, Table_Write_Step; \/*1:Red 2:Green 3:Blue*\/$/;"	m	class:video
+Table_Write_Step	./video.h	/^    uint8_t Table_Read_Step, Table_Write_Step; \/*1:Red 2:Green 3:Blue*\/$/;"	m	class:video
+VGA_Memory	./video.h	/^    uint32_t CGApalette[16], Table_Data_Reg[256], VGA_Memory[262144], Video_Buffer_Address;$/;"	m	class:video
+Video_Buffer_Address	./video.h	/^    uint32_t CGApalette[16], Table_Data_Reg[256], VGA_Memory[262144], Video_Buffer_Address;$/;"	m	class:video
+Video_Mode	./video.h	/^    uint8_t Attribute_Control_Reg_Flag\/*0:index.1:data*\/, Graphic_Mode_Flag, Colorful_Flag, Video_Mode, Mode_Change_Flag;$/;"	m	class:video
 WriteRam16	./cpu.cpp	/^inline void Cpu::WriteRam16(unsigned int location, uint16_t value)$/;"	f	class:Cpu
 WriteRam8	./cpu.cpp	/^inline void Cpu::WriteRam8(unsigned int location, uint8_t value)$/;"	f	class:Cpu
 active	./8253.h	/^    uint8_t rw_mode[3], rw_step[3], active[3];$/;"	m	class:Interval_Timer_8253
@@ -98,6 +124,7 @@ calcsq	./testasm/codegolf.asm	/^calcsq:$/;"	l
 calcsqfinish	./testasm/codegolf.asm	/^calcsqfinish:$/;"	l
 calcsqloop	./testasm/codegolf.asm	/^calcsqloop:$/;"	l
 calltest	./testasm/codegolf.asm	/^calltest:$/;"	l
+columns	./video.h	/^    uint8_t columns, rows;$/;"	m	class:video
 cont	./testasm/codegolf.asm	/^cont:$/;"	l
 cont1	./testasm/codegolf.asm	/^cont1:$/;"	l
 cont2	./testasm/codegolf.asm	/^cont2:$/;"	l
@@ -106,7 +133,10 @@ control_reg_ip	./cpu.h	/^    uint16_t control_reg_ip, control_reg_flag;$/;"	m	cl
 counter	./8253.h	/^    uint16_t counter[3];$/;"	m	class:Interval_Timer_8253
 cpu	./disk.h	/^    Cpu &cpu;$/;"	m	class:Disk
 cpu	./disk_handle.h	/^    Cpu &cpu;$/;"	m	class:disk_handle
+cpu	./video.h	/^    Cpu &cpu;$/;"	m	class:video
 cursor	./testasm/codegolf.asm	/^cursor:$/;"	l
+cursor_x	./video.h	/^    uint16_t cursor_x, cursor_y, width, high;$/;"	m	class:video
+cursor_y	./video.h	/^    uint16_t cursor_x, cursor_y, width, high;$/;"	m	class:video
 cylinders	./disk.h	/^    uint16_t cylinders;$/;"	m	class:Disk
 disk_handle	./disk_handle.cpp	/^disk_handle::disk_handle(Cpu &cpu_arg): cpu(cpu_arg)$/;"	f	class:disk_handle
 disk_handle	./disk_handle.h	/^class disk_handle {$/;"	c
@@ -119,6 +149,7 @@ halt	./cpu.h	/^    int halt;$/;"	m	class:Cpu
 hard_count	./disk_handle.h	/^    uint8_t hard_count, floppy_count;$/;"	m	class:disk_handle
 heads	./disk.h	/^    uint8_t heads;$/;"	m	class:Disk
 hello	./testasm/codegolf.asm	/^hello:$/;"	l
+high	./video.h	/^    uint16_t cursor_x, cursor_y, width, high;$/;"	m	class:video
 hlt	./testasm/codegolf.asm	/^hlt:$/;"	l
 i8253	./cpu.h	/^    Interval_Timer_8253 &i8253;$/;"	m	class:Cpu
 i8253	./port_handle.h	/^    Interval_Timer_8253 &i8253;$/;"	m	class:port_handle
@@ -134,6 +165,7 @@ init_data_high	./8253.h	/^    uint8_t init_data_high[3], init_data_low[3];$/;"	m
 init_data_low	./8253.h	/^    uint8_t init_data_high[3], init_data_low[3];$/;"	m	class:Interval_Timer_8253
 init_order	./8259a.h	/^    int8_t init_order;$/;"	m	class:Interrupt_Controller_8259a
 insert_disk	./disk_handle.cpp	/^void disk_handle::insert_disk(uint8_t disk_num, Disk *disk)$/;"	f	class:disk_handle
+interrupt	./video.cpp	/^void video::interrupt()$/;"	f	class:video
 irq0_timegap	./timer.h	/^    double irq0_timegap, i8253_tick_gap;$/;"	m	class:timer
 lastAH	./disk.h	/^    uint8_t lastAH, lastCF;$/;"	m	class:Disk
 lastCF	./disk.h	/^    uint8_t lastAH, lastCF;$/;"	m	class:Disk
@@ -141,6 +173,7 @@ last_8253_count	./timer.h	/^    uint64_t last_8253_count, last_irq0;$/;"	m	class
 last_irq0	./timer.h	/^    uint64_t last_8253_count, last_irq0;$/;"	m	class:timer
 locked_data	./8253.h	/^    uint16_t locked_data[3], *locked_data_pointer[3];$/;"	m	class:Interval_Timer_8253
 locked_data_pointer	./8253.h	/^    uint16_t locked_data[3], *locked_data_pointer[3];$/;"	m	class:Interval_Timer_8253
+logic_operate	./video.cpp	/^inline uint8_t video::logic_operate(uint8_t value, uint8_t plane_lock)$/;"	f	class:video
 main	./main.cpp	/^int main(int argc, char **argv)$/;"	f
 master_base_vector	./8259a.h	/^    uint8_t master_base_vector;$/;"	m	class:Interrupt_Controller_8259a
 memory	./testasm/codegolf.asm	/^memory:$/;"	l
@@ -174,9 +207,13 @@ read16_from_port	./cpu.cpp	/^uint16_t Cpu::read16_from_port(uint8_t port_num)$/;
 read8_from_port	./cpu.cpp	/^uint8_t Cpu::read8_from_port(uint8_t port_num)$/;"	f	class:Cpu
 read_8253	./8253.cpp	/^uint8_t Interval_Timer_8253::read_8253(uint8_t port_num)$/;"	f	class:Interval_Timer_8253
 read_8259a	./8259a.cpp	/^uint8_t Interrupt_Controller_8259a::read_8259a(uint8_t port_num)$/;"	f	class:Interrupt_Controller_8259a
+read_video	./video.cpp	/^uint8_t video::read_video(uint16_t port_num)$/;"	f	class:video
+read_video_memory	./video.cpp	/^uint8_t video::read_video_memory(uint32_t addr_offset)$/;"	f	class:video
 read_write	./disk.h	/^    fstream read_write;$/;"	m	class:Disk
 readdisk	./disk.cpp	/^void Disk::readdisk(uint16_t sector_count, uint16_t cylinder, uint16_t sector, uint8_t head, uint8_t dirver_num, uint16_t mem_seg, uint16_t mem_offset)$/;"	f	class:Disk
 rettest	./testasm/codegolf.asm	/^rettest:$/;"	l
+rotate_right	./video.cpp	/^inline uint8_t video::rotate_right(uint8_t value, uint8_t shift_bits)$/;"	f	class:video
+rows	./video.h	/^    uint8_t columns, rows;$/;"	m	class:video
 rw_mode	./8253.h	/^    uint8_t rw_mode[3], rw_step[3], active[3];$/;"	m	class:Interval_Timer_8253
 rw_step	./8253.h	/^    uint8_t rw_mode[3], rw_step[3], active[3];$/;"	m	class:Interval_Timer_8253
 sectors	./disk.h	/^    uint8_t sectors;$/;"	m	class:Disk
@@ -211,9 +248,14 @@ universal_reg_dl	./cpu.h	/^    uint8_t *universal_reg_dh, *universal_reg_dl;$/;"
 universal_reg_dx	./cpu.h	/^    uint16_t universal_reg_ax, universal_reg_bx, universal_reg_cx, universal_reg_dx,$/;"	m	class:Cpu
 universal_reg_si	./cpu.h	/^             universal_reg_sp, universal_reg_bp, universal_reg_si, universal_reg_di;$/;"	m	class:Cpu
 universal_reg_sp	./cpu.h	/^             universal_reg_sp, universal_reg_bp, universal_reg_si, universal_reg_di;$/;"	m	class:Cpu
+video	./video.cpp	/^video::video(Cpu &cpu_arg): cpu(cpu_arg)$/;"	f	class:video
+video	./video.h	/^class video {$/;"	c
+width	./video.h	/^    uint16_t cursor_x, cursor_y, width, high;$/;"	m	class:video
 write16_to_port	./cpu.cpp	/^void Cpu::write16_to_port(uint8_t port_num, uint16_t value)$/;"	f	class:Cpu
 write8_to_port	./cpu.cpp	/^void Cpu::write8_to_port(uint8_t port_num, uint8_t value)$/;"	f	class:Cpu
 write_8253	./8253.cpp	/^void Interval_Timer_8253::write_8253(uint8_t port_num, uint8_t value)$/;"	f	class:Interval_Timer_8253
 write_8259a	./8259a.cpp	/^void Interrupt_Controller_8259a::write_8259a(uint8_t port_num, uint8_t value)$/;"	f	class:Interrupt_Controller_8259a
+write_video	./video.cpp	/^void video::write_video(uint16_t port_num, uint8_t value)$/;"	f	class:video
+write_video_memory	./video.cpp	/^void video::write_video_memory(uint32_t addr_offset, uint8_t value)$/;"	f	class:video
 writedisk	./disk.cpp	/^void Disk::writedisk(uint16_t sector_count, uint16_t cylinder, uint16_t sector, uint8_t head, uint8_t dirver_num, uint16_t mem_seg, uint16_t mem_offset)$/;"	f	class:Disk
 ~Disk	./disk.cpp	/^Disk::~Disk()$/;"	f	class:Disk
