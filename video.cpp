@@ -1,16 +1,36 @@
 #include "video.h"
 #include <stdint.h>
 #include <string.h>
+#include "cpu.h"
 
-video::video(Cpu &cpu_arg): cpu(cpu_arg)
+Video::Video()
 {
+    screen_update_flag = 1;
+    Graphic_Mode_Flag = 0;
     for(int i = 0; i < 262144; ++i)
         VGA_Memory[i] = 0;
     columns = 80;
     rows = 25;
-
     width = 640;
     high = 400;
+
+    // ifstream cgaasc("./asciivga.dat", ios::in | ios::binary);
+    // if(cgaasc.is_open())
+    // {
+    //     cgaasc.read((char *)(&CGA_ascii_table[0]), 0x8000);
+    //     cgaasc.close();
+    // }
+    FILE *binFile = fopen("asciivga.dat", "rb");
+    if(binFile)
+    {
+        fread((char *)(&CGA_ascii_table[0]), 1, 0x8000, binFile);
+    }
+    else
+    {
+        printf("can't open file.");
+    }
+
+
 
     CGApalette[0] = 0x000000; /*black*/
     CGApalette[1] = 0x0000AA; /*blue*/
@@ -29,12 +49,13 @@ video::video(Cpu &cpu_arg): cpu(cpu_arg)
     CGApalette[14] = 0xFFFF55; /*yellow*/
     CGApalette[15] = 0xFFFFFF; /*white*/
 }
-inline uint8_t video::rotate_right(uint8_t value, uint8_t shift_bits)
+
+inline uint8_t Video::rotate_right(uint8_t value, uint8_t shift_bits)
 {
     return (value >> shift_bits) | ((value << (8 - shift_bits)) & 0xFF);
 }
 
-inline uint8_t video::logic_operate(uint8_t value, uint8_t plane_lock)
+inline uint8_t Video::logic_operate(uint8_t value, uint8_t plane_lock)
 {
     switch((Graphic_Control_Reg[3] >> 3) & 0x3)
     {
@@ -62,7 +83,7 @@ inline uint8_t video::logic_operate(uint8_t value, uint8_t plane_lock)
 }
 
 
-void video::write_video(uint16_t port_num, uint8_t value)
+void Video::write_video(uint16_t port_num, uint8_t value)
 {
     static uint32_t Color_Data_Tmp;
     static uint16_t Cursor_Position;
@@ -193,7 +214,7 @@ void video::write_video(uint16_t port_num, uint8_t value)
     }
 }
 
-uint8_t video::read_video(uint16_t port_num)
+uint8_t Video::read_video(uint16_t port_num)
 {
     switch(port_num)
     {
@@ -246,14 +267,14 @@ uint8_t video::read_video(uint16_t port_num)
     case(0x3DA):/*Input status reg_0*/
     {
         Attribute_Control_Reg_Flag = 0;
-        return Input_Status_Reg0;
+        return Input_Status_Reg1;
     }
     }
-    return 0;
+    return 0x00;
 }
 
 
-void video::write_video_memory(uint32_t addr_offset, uint8_t value)
+void Video::write_video_memory(uint32_t addr_offset, uint8_t value)
 {
     uint8_t write_value;
     uint32_t plane_size = 0x10000;
@@ -449,7 +470,7 @@ void video::write_video_memory(uint32_t addr_offset, uint8_t value)
 }
 
 /*may have some error.may no use*/
-uint8_t video::read_video_memory(uint32_t addr_offset)
+uint8_t Video::read_video_memory(uint32_t addr_offset)
 {
     uint32_t plane_size = 0x10000;
     Plane_Lock[0] = VGA_Memory[addr_offset + plane_size * 0];
@@ -479,16 +500,17 @@ uint8_t video::read_video_memory(uint32_t addr_offset)
         return Plane_Lock[3];
     }
     }
-    return 0;
+    return 0xFF;
 }
 
-void video::interrupt()
+void Video::interrupt()
 {
-    switch(cpu.GetAH())
+    switch(cpu->GetAH())
     {
     case(0):/*set video mode*/
     {
-        switch(cpu.GetAL() & 0x10)
+//               printf("Set video mode %x\n",cpu->GetAL()&0x7F);
+        switch(cpu->GetAL() & 0x7F)
         {
         case(0):/*Text 40x25 16gray 0xB8000*/
         {
@@ -499,8 +521,8 @@ void video::interrupt()
             Graphic_Mode_Flag = 0;/*text mode*/
             for(uint32_t tmp_addr = Video_Buffer_Address; tmp_addr < Video_Buffer_Address + 0x4000; tmp_addr += 2)
             {
-                cpu.ram[tmp_addr] = 0;/*ascii*/
-                cpu.ram[tmp_addr + 1] = 7;/*text attribute*/
+                cpu->ram[tmp_addr] = 0;/*ascii*/
+                cpu->ram[tmp_addr + 1] = 7;/*text attribute*/
             }
             break;
         }
@@ -514,8 +536,8 @@ void video::interrupt()
             Graphic_Mode_Flag = 0;/*text mode*/
             for(uint32_t tmp_addr = Video_Buffer_Address; tmp_addr < Video_Buffer_Address + 0x4000; tmp_addr += 2)
             {
-                cpu.ram[tmp_addr] = 0;/*ascii*/
-                cpu.ram[tmp_addr + 1] = 7;/*text attribute*/
+                cpu->ram[tmp_addr] = 0;/*ascii*/
+                cpu->ram[tmp_addr + 1] = 7;/*text attribute*/
             }
             break;
         }
@@ -529,8 +551,8 @@ void video::interrupt()
             Graphic_Mode_Flag = 0;/*text mode*/
             for(uint32_t tmp_addr = Video_Buffer_Address; tmp_addr < Video_Buffer_Address + 0x4000; tmp_addr += 2)
             {
-                cpu.ram[tmp_addr] = 0;/*ascii*/
-                cpu.ram[tmp_addr + 1] = 7;/*text attribute*/
+                cpu->ram[tmp_addr] = 0;/*ascii*/
+                cpu->ram[tmp_addr + 1] = 7;/*text attribute*/
             }
             break;
         }
@@ -544,8 +566,8 @@ void video::interrupt()
             Graphic_Mode_Flag = 0;/*text mode*/
             for(uint32_t tmp_addr = Video_Buffer_Address; tmp_addr < Video_Buffer_Address + 0x4000; tmp_addr += 2)
             {
-                cpu.ram[tmp_addr] = 0;/*ascii*/
-                cpu.ram[tmp_addr + 1] = 7;/*text attribute*/
+                cpu->ram[tmp_addr] = 0;/*ascii*/
+                cpu->ram[tmp_addr + 1] = 7;/*text attribute*/
             }
             break;
         }
@@ -559,8 +581,8 @@ void video::interrupt()
             Graphic_Mode_Flag = 0;/*text mode*/
             for(uint32_t tmp_addr = Video_Buffer_Address; tmp_addr < Video_Buffer_Address + 0x4000; tmp_addr += 2)
             {
-                cpu.ram[tmp_addr] = 0;/*ascii*/
-                cpu.ram[tmp_addr + 1] = 7;/*text attribute*/
+                cpu->ram[tmp_addr] = 0;/*ascii*/
+                cpu->ram[tmp_addr + 1] = 7;/*text attribute*/
             }
             break;
         }
@@ -574,10 +596,10 @@ void video::interrupt()
             rows = 25;
             Colorful_Flag = 1;/*colorful*/
             Graphic_Mode_Flag = 1;/*graphic mode*/
-            memset(cpu.ram + Video_Buffer_Address, 0, 0xFFFF);
+            memset(cpu->ram + Video_Buffer_Address, 0, 0xFFFF);
         }
         }
-        Video_Mode = cpu.GetAL() & 0x10;
+        Video_Mode = cpu->GetAL() & 0x7F;
         cursor_x = cursor_y = 0;
         switch(Video_Mode)
         {
@@ -606,20 +628,20 @@ void video::interrupt()
 
     case(0x10):/*SET DAC REGISTER*/
     {
-        switch(cpu.GetAL())
+        switch(cpu->GetAL())
         {
         case(0x10):/*SET INDIVIDUAL DAC REGISTER (VGA/MCGA)*/
         {
-            Table_Data_Reg[cpu.GetBX()] = (((cpu.GetDH() & 0x3F) << 2) | (((cpu.GetCL() & 0x3F) << 2) << 8) | (((cpu.GetCH() & 0x3F) << 2) << 16));
+            Table_Data_Reg[cpu->GetBX()] = (((cpu->GetDH() & 0x3F) << 2) | (((cpu->GetCL() & 0x3F) << 2) << 8) | (((cpu->GetCH() & 0x3F) << 2) << 16));
             break;
         }
         case(0x12):/*SET BLOCK OF DAC REGISTERS (VGA/MCGA)*/
         {
-            uint32_t start_index = cpu.GetBX();
-            uint32_t start_addr = (cpu.GetES() << 4) + cpu.GetDX();
-            for(uint32_t i = 0; i < cpu.GetCX(); ++i)
+            uint32_t start_index = cpu->GetBX();
+            uint32_t start_addr = (cpu->GetES() << 4) + cpu->GetDX();
+            for(uint32_t i = 0; i < cpu->GetCX(); ++i)
             {
-                Table_Data_Reg[start_index + i] = (((cpu.ReadRam8(start_addr) & 0x3F) << 2) | (((cpu.ReadRam8(start_addr + 1) & 0x3F) << 2) << 8) | (((cpu.ReadRam8(start_addr + 2) & 0x3F) << 2) << 16));
+                Table_Data_Reg[start_index + i] = (((cpu->ReadRam8(start_addr) & 0x3F) << 2) | (((cpu->ReadRam8(start_addr + 1) & 0x3F) << 2) << 8) | (((cpu->ReadRam8(start_addr + 2) & 0x3F) << 2) << 16));
                 start_addr += 3;
             }
             break;
@@ -629,9 +651,14 @@ void video::interrupt()
     }
     case(0x1A):/*GET DISPLAY COMBINATION CODE (PS,VGA/MCGA)*/
     {
-        cpu.SetAL(0x1A);
-        cpu.SetBL(0x8);
+        cpu->SetAL(0x1A);
+        cpu->SetBL(0x8);
         break;
     }
     }
+}
+
+void Video::setcpu(Cpu *arg)
+{
+    cpu = arg;
 }

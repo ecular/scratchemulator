@@ -1,4 +1,5 @@
 #include "8259a.h"
+#include <stdio.h>
 
 Interrupt_Controller_8259a::Interrupt_Controller_8259a()
 {
@@ -23,7 +24,7 @@ uint8_t Interrupt_Controller_8259a::read_8259a(uint8_t port_num)
 {
     switch(port_num)
     {
-    case(0x20):
+    case(0x20):/*A0 = 0*/
     {
         switch(OCW[3] & 0x3)
         {
@@ -33,7 +34,7 @@ uint8_t Interrupt_Controller_8259a::read_8259a(uint8_t port_num)
             return ISR;/*read ISR*/
         }
     }
-    case(0x21): /* read IMR */
+    case(0x21): /* A0 = 1 read IMR */
         return IMR;
     }
     return 0;
@@ -43,7 +44,7 @@ void Interrupt_Controller_8259a::write_8259a(uint8_t port_num, uint8_t value)
 {
     switch(port_num)
     {
-    case(0x20):/*for master ICW1 OCW2 OCW3*/
+    case(0x20):/*A0 = 0 for master ICW1 OCW2 OCW3*/
     {
         if(value & 0x10) /*ICW1*/
         {
@@ -56,14 +57,19 @@ void Interrupt_Controller_8259a::write_8259a(uint8_t port_num, uint8_t value)
         if((value & 0x18) == 0) /* OCW2 */
         {
             OCW[2] = value;
-            if((value >> 5) == 0x1)/*send a EOI*/
+            if(((value >> 5) & 0x1) == 0x1) /*send a EOI*/
             {
-                ISR = 0x0;
+                for(int i = 0; i < 8; i++)
+                    if((ISR >> i) & 1)
+                    {
+                        ISR ^= (1 << i);
+                        return;
+                    }
             }
             return;
         }
 
-        if((value & 0x18) == 0x8) /* OCW3 */
+        if((value & 0x98) == 0x8) /* OCW3 */
         {
             OCW[3] = value;
             switch(value & 0x3)
@@ -83,7 +89,8 @@ void Interrupt_Controller_8259a::write_8259a(uint8_t port_num, uint8_t value)
         }
         break;
     }
-    case(0x21):/*for master ICW2 ICW3 ICW4 OCW1*/
+
+    case(0x21):/*A0 = 1 for master ICW2 ICW3 ICW4 OCW1*/
     {
         switch(init_order)
         {
@@ -91,30 +98,39 @@ void Interrupt_Controller_8259a::write_8259a(uint8_t port_num, uint8_t value)
         {
             if((value & 0x7) == 0)
             {
+                //          printf("Step %d,value %x\n",init_order,value);
                 ICW[init_order++] = value;
                 master_base_vector = value;
             }
+            else
+                init_order++;
             return;
         }
         case(3):/* ICW3 */
         {
             if(ICW[1] & 0x2) /*if single 8259A,then skip ICW3*/
-            {
                 init_order++;
+            else
+            {
+                //            printf("Step %d,value %x\n",init_order,value);
+                ICW[init_order++] = value;
                 return;
             }
-            ICW[init_order++] = value;
-            return;
         }
         case(4):/* ICW4 */
         {
             if(ICW[1] & 0x1)/*ICW4 need to set*/
+            {
+                //              printf("Step %d,value %x\n",init_order,value);
                 ICW[init_order++] = value;
-            init_order++;
+            }
+            else
+                init_order++;
             return;
         }
         }
         IMR = value;/* init_order > 4 OCW1 */
+        //printf("IMR chaned %x\n", value);
         break;
     }
     }
@@ -134,9 +150,8 @@ uint8_t Interrupt_Controller_8259a::send_int_cpu()
         {
             ISR = 0x1 << i;
             IRR = IRR ^ (0x1 << i);
-            return ICW[2] + i;
+            return ICW[2] & 0xF8 + i;
         }
     }
     return 0;
-
 }

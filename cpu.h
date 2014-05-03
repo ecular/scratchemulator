@@ -2,10 +2,15 @@
 #define EMU_CPU_H_
 
 #include <stdint.h>
+#include <string>
 
 #include "port_handle.h"
 #include "8259a.h"
 #include "8253.h"
+#include "video.h"
+#include "disk_handle.h"
+#include "disk.h"
+#include "timer.h"
 
 class Cpu {
     /* 声明次序
@@ -18,8 +23,15 @@ class Cpu {
      * */
 public:
 
-    Cpu(port_handle &, Interrupt_Controller_8259a &, Interval_Timer_8253 &);
-    //~Cpu();
+    //Cpu(port_handle &, Interrupt_Controller_8259a &, Interval_Timer_8253 &, Video &, disk_handle &);
+    Cpu();
+    /*set device*/
+    void setports_operate(port_handle *);
+    void seti8259a(Interrupt_Controller_8259a *);
+    void seti8253(Interval_Timer_8253 *);
+    void setvideo(Video *);
+    void setDisk_handle(disk_handle *);
+    void settimer(timer *);
     /*set reg*/
     void SetAX(uint16_t value);
     void SetAH(uint8_t value);
@@ -94,12 +106,19 @@ public:
 
     int Init(unsigned int ram_size);
     int Reset();
-    void Exec();
+    void Exec(uint32_t);
+
+    /*load BOIS*/
+    bool LoadBIOS(string);
+    /*load rom*/
+    bool LoadRom(uint32_t, string);
 
     uint8_t *ram;
     /*debug*/
     int halt;
 private:
+
+    uint32_t count_code;
 
     uint8_t *CalculateReg8(uint8_t mod_byte);
     uint16_t *CalculateReg16(uint8_t mod_byte);
@@ -124,10 +143,15 @@ private:
     uint8_t if_flag, tf_flag;
 
     /*other devices*/
-    port_handle &ports_operate;
-    Interrupt_Controller_8259a &i8259a;
-    Interval_Timer_8253 &i8253;
+    port_handle *ports_operate;
+    Interrupt_Controller_8259a *i8259a;
+    Interval_Timer_8253 *i8253;
+    Video *video;
+    disk_handle *Disk_handle;
+    timer *timing;
 
+    /*debug fuction*/
+    void printdebug(uint8_t, uint32_t, uint32_t);
 };
 
 #endif

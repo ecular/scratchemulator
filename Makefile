@@ -1,6 +1,6 @@
 CC = g++ -g -Wall -O0 -m32
 CFLAG = -c -fkeep-inline-functions
-LDFLAG = 
+LDFLAG = -lSDL -lpthread
 
 BIN  = emu
 OBJ = $(patsubst %.cpp,%.o,$(wildcard *.cpp)) 

@@ -1,6 +1,7 @@
 #include "disk.h"
+#include "cpu.h"
 
-Disk::Disk(Cpu &cpu_arg, string filename, uint8_t driver_num): cpu(cpu_arg)
+Disk::Disk(string filename, uint8_t driver_num)
 {
     read_write.open(filename.c_str(), ios::in | ios::out | ios::binary); //open file
     if(!read_write.is_open())
@@ -24,6 +25,11 @@ Disk::Disk(Cpu &cpu_arg, string filename, uint8_t driver_num): cpu(cpu_arg)
     }
 }
 
+void Disk::setcpu(Cpu *arg)
+{
+    cpu = arg;
+}
+
 Disk::~Disk()
 {
     read_write.close();
@@ -41,14 +47,14 @@ void Disk::writedisk(uint16_t sector_count, uint16_t cylinder, uint16_t sector, 
         buffer_offset = 0;
         while(buffer_offset < 512)
         {
-            sector_buffer[buffer_offset++] = cpu.ReadRam8(mem_address++);
+            sector_buffer[buffer_offset++] = cpu->ReadRam8(mem_address++);
         }
         read_write.write(sector_buffer, 512);
         read_write.sync();
     }
-    cpu.SetAL(sector_count);
-    cpu.SetAH(0);
-    cpu.SetFlag(cpu.GetFlag() & 0xFFFE);//CF = 0
+    cpu->SetAL(sector_count);
+    cpu->SetAH(0);
+    cpu->SetFlag(cpu->GetFlag() & 0xFFFE);//CF = 0
 }
 
 void Disk::readdisk(uint16_t sector_count, uint16_t cylinder, uint16_t sector, uint8_t head, uint8_t dirver_num, uint16_t mem_seg, uint16_t mem_offset)
@@ -65,11 +71,11 @@ void Disk::readdisk(uint16_t sector_count, uint16_t cylinder, uint16_t sector, u
         buffer_offset = 0;
         while(buffer_offset < 512)
         {
-            cpu.WriteRam8(mem_address++, sector_buffer[buffer_offset++]);
+            cpu->WriteRam8(mem_address++, sector_buffer[buffer_offset++]);
         }
     }
-    cpu.SetAL(sector_count);
-    cpu.SetAH(0);
-    cpu.SetFlag(cpu.GetFlag() & 0xFFFE);//CF = 0
+    cpu->SetAL(sector_count);
+    cpu->SetAH(0);
+    cpu->SetFlag(cpu->GetFlag() & 0xFFFE);//CF = 0
 }
 

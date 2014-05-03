@@ -2,18 +2,21 @@
 #define EMU_DISK_HANDLE_H
 
 #include <map>
-#include "cpu.h"
 #include "disk.h"
 
+class Cpu;
+
 class disk_handle {
+    friend class Cpu;
 private:
-    Cpu &cpu;
-    uint8_t hard_count, floppy_count;
+    Cpu *cpu;
     map<uint8_t, Disk *> disk_map;
 public:
+    uint8_t hard_count, floppy_count;
     void insert_disk(uint8_t , Disk *);
-    disk_handle(Cpu &);
+    disk_handle();
     void disk_operator(void);
+    void setcpu(Cpu *);
 };
 
 #endif

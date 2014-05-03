@@ -4,11 +4,12 @@
 #include <fstream>
 #include <string>
 
-#include "cpu.h"
-
 using namespace std;
 
+class Cpu;
+
 class Disk {
+    friend class Cpu;
     friend class disk_handle;
 private:
     void writedisk(uint16_t sector_count, uint16_t cylinder, uint16_t sector, uint8_t head, uint8_t dirver_num, uint16_t mem_seg, uint16_t mem_offset);
@@ -21,10 +22,11 @@ private:
     uint8_t heads;
 
     uint8_t lastAH, lastCF;
-    Cpu &cpu;
+    Cpu *cpu;
 public:
     Disk();
-    Disk(Cpu &, string, uint8_t);
+    Disk(string, uint8_t);
+    void setcpu(Cpu *);
     ~Disk();
 };
 
