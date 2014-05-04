@@ -659,11 +659,6 @@ void Cpu::Exec(uint32_t loops)
         else
             one_step_mode = 0;
 
-        if(count_code == 586751)
-        {
-            printf("at %ld .irr %x imr %x\n", count_code, i8259a->IRR, i8259a->IMR);
-        }
-
         /*get int_num from 8259a*/
         if(if_flag && (i8259a->IRR & (~i8259a->IMR)))
             Intcall(i8259a->send_int_cpu());
@@ -5671,10 +5666,10 @@ void Cpu::Exec(uint32_t loops)
 
         // if(count_code >= 500000 && count_code <= 800000)
         {
-            if(count_code <= 700000 && count_code > 600000)
-                printdebug(opcode, count_code, ip_tmp);
-            //printf("%x\n",opcode);
-            fflush(stdout);
+    ///        if(count_code <= 7000000 && count_code > 600000)
+    ///            printdebug(opcode, count_code, ip_tmp);
+    ///        //printf("%x\n",opcode);
+    ///        fflush(stdout);
         }
     }
 }
