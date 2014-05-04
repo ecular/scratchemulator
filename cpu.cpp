@@ -5666,10 +5666,10 @@ void Cpu::Exec(uint32_t loops)
 
         // if(count_code >= 500000 && count_code <= 800000)
         {
-    ///        if(count_code <= 7000000 && count_code > 600000)
-    ///            printdebug(opcode, count_code, ip_tmp);
-    ///        //printf("%x\n",opcode);
-    ///        fflush(stdout);
+            ///        if(count_code <= 7000000 && count_code > 600000)
+            ///            printdebug(opcode, count_code, ip_tmp);
+            ///        //printf("%x\n",opcode);
+            ///        fflush(stdout);
         }
     }
 }
