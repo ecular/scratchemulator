@@ -264,7 +264,7 @@ uint8_t Video::read_video(uint16_t port_num)
         }
         }
     }
-    case(0x3DA):/*Input status reg_0*/
+    case(0x3DA):/*Input status reg_1*/
     {
         Attribute_Control_Reg_Flag = 0;
         return Input_Status_Reg1;
@@ -509,7 +509,7 @@ void Video::interrupt()
     {
     case(0):/*set video mode*/
     {
-//               printf("Set video mode %x\n",cpu->GetAL()&0x7F);
+        //               printf("Set video mode %x\n",cpu->GetAL()&0x7F);
         switch(cpu->GetAL() & 0x7F)
         {
         case(0):/*Text 40x25 16gray 0xB8000*/

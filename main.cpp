@@ -267,7 +267,7 @@ int main(int argc, char **argv)
     //     fread(cpu.ram, 1, fileSize, binFile);
     // }
 
-    if(cpu.LoadBIOS("./pcxtbios.bin"))
+    if(cpu.LoadBIOS("./bios.bin"))
         std::cout << "BIOS load success..." << std::endl;
     if(cpu.LoadRom(0xF6000, "./rombasic.bin"))
         std::cout << "rombasic load success..." << std::endl;

@@ -86,10 +86,10 @@ void Display::draw(void *tmp)
                 draw_pixel = p->video->CGA_ascii_table[char_current * 128 + (y % 16) * 8 + (x % 8)]; /*a font in this table ,size is 8(x) * 16 (y). */
                 if(p->video->Colorful_Flag)
                 {
-                    if(draw_pixel)
-                        draw_pixel = p->video->CGApalette[p->cpu->ram[char_addr] >> 4];//background
+                    if(!draw_pixel)
+                        draw_pixel = p->video->CGApalette[p->cpu->ram[char_addr + 1] >> 4]; //background
                     else
-                        draw_pixel = p->video->CGApalette[p->cpu->ram[char_addr] & 0xF]; //text color
+                        draw_pixel = p->video->CGApalette[p->cpu->ram[char_addr + 1] & 0xF]; //text color
                 }
                 else
                 {
@@ -141,9 +141,9 @@ void Display::SDL_Screen_Draw(void *tmp)
         {
             pixelrgb = p->display_buffer[y][x];
             //printf("pixelrgb %x\n",pixelrgb);
-            red = pixelrgb & 0xFF;
+            blue = pixelrgb & 0xFF;
             green = (pixelrgb & 0xFF00) >> 8;
-            blue = (pixelrgb & 0xFF0000) >> 16;
+            red = (pixelrgb & 0xFF0000) >> 16;
             //printf("pix:%x red:%x green:%x blue:%x\n",pixelrgb,red,green,blue);
             ((uint32_t *)(p->screen_p->pixels))[offset_of_screen + x] = SDL_MapRGB(p->screen_p->format, red, green, blue);
             //((uint32_t *)(p->screen_p->pixels))[offset_of_screen + x] = SDL_MapRGB(p->screen_p->format, 255, 255, 255);

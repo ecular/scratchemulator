@@ -47,13 +47,14 @@ inline void timer::timer_tick()
     if(current_time >= (last_scan_tick + scan_gap))
     {
         current_scan = (current_scan + 1) % 525;
-        if(current_scan > 479)
-            video->Input_Status_Reg1 = 0x8;
+        if(current_scan >= 480)
+            video->Input_Status_Reg1 = 0x8;// vertical retrace
         else
             video->Input_Status_Reg1 = 0;
-        if(current_scan & 1)
-            video->Input_Status_Reg1 |= 1;
-        last_scan_tick = current_scan;
+
+        if(current_scan & 0x01)// horizontal scan
+            video->Input_Status_Reg1 = video->Input_Status_Reg1 | 0x1;
+        last_scan_tick = current_time;
     }
 
     if(i8253->active[0]) //irq0 is running
