@@ -32,7 +32,7 @@ void timer::timer_init()
     uint64_t current_time;
     gettimeofday(&tv, NULL);
     current_time = tv.tv_sec * 1000000 + tv.tv_usec;
-    last_8253_count = last_irq0 = current_time;
+    last_scan_tick = last_8253_count = last_irq0 = current_time;
 }
 
 
@@ -53,7 +53,7 @@ inline void timer::timer_tick()
             video->Input_Status_Reg1 = 0;
 
         if(current_scan & 0x01)// horizontal scan
-            video->Input_Status_Reg1 = video->Input_Status_Reg1 | 0x1;
+            video->Input_Status_Reg1 |= 0x1;
         last_scan_tick = current_time;
     }
 

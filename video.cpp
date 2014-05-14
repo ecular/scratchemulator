@@ -99,26 +99,25 @@ void Video::write_video(uint16_t port_num, uint8_t value)
         CRT_Control_Reg[CRT_Control_Reg_Index] = value & 0xFF;
         switch(CRT_Control_Reg_Index)
         {
-        case(0x6):/*Vertical total*/
-        {
-            break;
-        }
         case(0xE):/*cursor position high bits*/
         {
-            Cursor_Position &= 0x00FF;
-            Cursor_Position |= (value << 8);
+            Cursor_Position = (Cursor_Position & 0xFF) | (value << 8);
+            cursor_y = Cursor_Position / columns;
+            cursor_x = Cursor_Position % columns;
             break;
         }
         case(0xF):/*cursor positon low bits*/
         {
-            Cursor_Position &= 0xFF00;
-            Cursor_Position |= value;
+            Cursor_Position = (Cursor_Position & 0xFF00) | value;
+            cursor_y = Cursor_Position / columns;
+            cursor_x = Cursor_Position % columns;
+            break;
+        }
+        case(0x6):/*Vertical total*/
+        {
             break;
         }
         }
-        cursor_y = Cursor_Position / columns;
-        cursor_x = Cursor_Position % columns;
-        //printf("x:%d,y:%d Cursor_Position=%ld\n",cursor_x,cursor_y,Cursor_Position);
         break;
     }
 

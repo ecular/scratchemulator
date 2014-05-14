@@ -150,7 +150,7 @@ uint8_t Interrupt_Controller_8259a::send_int_cpu()
         {
             ISR = 0x1 << i;
             IRR = IRR ^ (0x1 << i);
-            return ICW[2] & 0xF8 + i;
+            return (ICW[2] & 0xF8) + i;
         }
     }
     return 0;

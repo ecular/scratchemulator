@@ -152,6 +152,9 @@ private:
 
     /*debug fuction*/
     void printdebug(uint8_t, uint32_t, uint32_t);
+    void change_print_8bit(uint8_t *p);
+    void change_print_16bit(uint16_t *p);
+    void printf_my(uint16_t);
 };
 
 #endif

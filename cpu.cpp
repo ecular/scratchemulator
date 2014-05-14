@@ -1,4 +1,7 @@
 #define CPU_80186
+#define DEBUG 1
+#define MAX 100000000
+#define MIN 7000000
 
 #include "cpu.h"
 
@@ -8,6 +11,11 @@
 #include <fstream>
 #include "8259a.h"
 #include "8253.h"
+/*debug*/
+#include <vector>
+#include <algorithm>
+using namespace std;
+/**/
 
 Cpu::Cpu()
 {
@@ -320,7 +328,7 @@ inline uint8_t Cpu::ReadRam8(uint32_t location)
             return ram[location];
     }
     ram[0x410] = 0x41;/*we have an EGA?VGA card installed*/
-    ram[0x475] = Disk_handle->hard_count;
+    //ram[0x475] = Disk_handle->hard_count;
     return ram[location];
 }
 
@@ -555,10 +563,8 @@ void Cpu::Intcall(uint8_t int_num)
 
     // fprintf(stdout,"int call1 %x\n",int_num);
     // fprintf(stdout,"int call2 %x\n",int_num);
-    if(count_code == 586751 || count_code == 588913 || count_code == 590112)
-        printf("intcall at %ld num %d\n", count_code, int_num);
-
     uint16_t oldax;
+    //printf("intcall at %ld num %x\n",count_code,int_num);
     switch(int_num)
     {
     case(0x10):
@@ -574,8 +580,10 @@ void Cpu::Intcall(uint8_t int_num)
         }
         break;
     }
+
     case(0x19):
     {
+        printf("int 0x19\n");
         *universal_reg_dl = 0x0;
         Disk_handle->disk_map[GetDL()]->readdisk(1, 0, 1, 0, *universal_reg_dl, 0x07C0, 0x0000);
         seg_reg_cs = 0x0000;
@@ -595,12 +603,13 @@ void Cpu::Intcall(uint8_t int_num)
         Push(control_reg_flag & 0xFDFF);
 
     if_flag = 0;//set IF = 0
+    tf_flag = 0;
     control_reg_flag = control_reg_flag & 0xFEFF;//set TF = 0
 
     Push(seg_reg_cs);//push cs
     Push(control_reg_ip);//push ip
-    seg_reg_cs = ReadRam16((0 << 4) + int_num * 4 + 2);//read cs from Interrupt vector table
-    control_reg_ip = ReadRam16((0 << 4) + int_num * 4);//read ip from INterrupt vector table
+    seg_reg_cs = ReadRam16((uint16_t)int_num * 4 + 2);//read cs from Interrupt vector table
+    control_reg_ip = ReadRam16((uint16_t)int_num * 4);//read ip from INterrupt vector table
 }
 
 uint8_t Cpu::read8_from_port(uint8_t port_num)
@@ -623,6 +632,75 @@ void Cpu::write16_to_port(uint8_t port_num, uint16_t value)
     ports_operate->port_handle_write16(port_num, value);
 }
 
+/*debug function*/
+void Cpu::change_print_8bit(uint8_t *p)
+{
+    if(count_code <= MAX && count_code >= MIN)
+    {
+        if(p == universal_reg_ah)
+            printf("Changed AH from 0x%x => ", *p);
+        else if(p == universal_reg_al)
+            printf("Changed AL from 0x%x => ", *p);
+        else if(p == universal_reg_bh)
+            printf("Changed BH from 0x%x => ", *p);
+        else if(p == universal_reg_bl)
+            printf("Changed BL from 0x%x => ", *p);
+        else if(p == universal_reg_ch)
+            printf("Changed CH from 0x%x => ", *p);
+        else if(p == universal_reg_cl)
+            printf("Changed CL from 0x%x => ", *p);
+        else if(p == universal_reg_dh)
+            printf("Changed DH from 0x%x => ", *p);
+        else if(p == universal_reg_dl)
+            printf("Changed DL from 0x%x => ", *p);
+        else
+            printf("changed RAM[0x%x] from 0x%x => ", p - ram, *p);
+    }
+}
+void Cpu::change_print_16bit(uint16_t *p)
+{
+    if(count_code <= MAX && count_code >= MIN)
+    {
+        if(p == &universal_reg_ax)
+            printf("Changed AX from 0x%x => ", *p);
+        else if(p == &universal_reg_bx)
+            printf("Changed BX from 0x%x => ", *p);
+        else if(p == &universal_reg_cx)
+            printf("Changed CX from 0x%x => ", *p);
+        else if(p == &universal_reg_dx)
+            printf("Changed DX from 0x%x => ", *p);
+        else if(p == &universal_reg_sp)
+            printf("Changed SP from 0x%x => ", *p);
+        else if(p == &universal_reg_bp)
+            printf("Changed BP from 0x%x => ", *p);
+        else if(p == &universal_reg_si)
+            printf("Changed SI from 0x%x => ", *p);
+        else if(p == &universal_reg_di)
+            printf("Changed DI from 0x%x => ", *p);
+        else if(p == &control_reg_ip)
+            printf("Changed IP from 0x%x => ", *p);
+        else if(p == &seg_reg_cs)
+            printf("Changed CS from 0x%x => ", *p);
+        else if(p == &seg_reg_ds)
+            printf("Changed DS from 0x%x => ", *p);
+        else if(p == &seg_reg_ss)
+            printf("Changed SS from 0x%x => ", *p);
+        else if(p == &seg_reg_es)
+            printf("Changed ES from 0x%x => ", *p);
+        else
+            printf("changed RAM[0x%x] from 0x%x => ", ((uint8_t *)p) - ram, *p);
+    }
+}
+
+void Cpu::printf_my(uint16_t cotent)
+{
+    if(count_code <= MAX && count_code >= MIN)
+    {
+        printf("%x\n", cotent);
+    }
+}
+
+/**/
 void Cpu::Exec(uint32_t loops)
 {
     uint8_t opcode;
@@ -636,6 +714,10 @@ void Cpu::Exec(uint32_t loops)
     FILE *fp = fopen("/home/ecular/opcodemy.txt", "at");
     /*debug*/
     uint32_t ip_tmp;
+    static uint16_t old70 = 0;
+    static std::vector<uint8_t> my;
+    vector<uint8_t>::iterator found;
+    static uint32_t lo = 1000000000;
     /**/
 #ifdef CPU_80186
     uint8_t rep = 0;
@@ -643,6 +725,48 @@ void Cpu::Exec(uint32_t loops)
 
     for(uint32_t loopscounts = 0; loopscounts < loops; ++loopscounts, ++Instruction_counts)
     {
+        /*debug*/
+//        if(*(uint16_t *)(&ram[0x70])!=old70)
+//        {
+//            //printf("Here %ld,opcode=%x change from %x => %x\n",count_code,opcode,old70,*(uint16_t *)(&ram[0x70]));
+//            old70 = *(uint16_t *)(&ram[0x70]);
+//            //printdebug(opcode, count_code, ip_tmp);
+//            if(old70 == 0x5744)
+//                lo = count_code;
+//
+//        }
+//
+//        {
+//            found = find( my.begin(), my.end(), opcode);
+//            if(count_code <=554347)
+//            {
+//                if (found != my.end())
+//                {
+//                    ;//do nothing
+//                }
+//                else
+//                {
+//                    my.push_back(opcode);
+//                }
+//            }
+//            else
+//                if(count_code <= lo)
+//                {
+//                    if (found != my.end())
+//                    {
+//                        ;//do nothing
+//                    }
+//                    else
+//                    {
+//                        my.push_back(opcode);
+//                        printf("%x\n",opcode);
+//                    }
+//                }
+//            fflush(stdout);
+//
+//        }
+//
+        /**/
         seg_reg_replace_ds = &seg_reg_ds;
         seg_reg_replace_ss = &seg_reg_ss;
 
@@ -661,8 +785,11 @@ void Cpu::Exec(uint32_t loops)
 
         /*get int_num from 8259a*/
         if(if_flag && (i8259a->IRR & (~i8259a->IMR)))
-            Intcall(i8259a->send_int_cpu());
-
+        {
+            uint8_t tmp_intnum = i8259a->send_int_cpu();
+            //       printf("call int %d\n",tmp_intnum);
+            Intcall(tmp_intnum);
+        }
         /*read a opcode from Memory via CS:IP*/
         firstip = control_reg_ip;
         ip_tmp = (seg_reg_cs << 4) + control_reg_ip;
@@ -734,6 +861,9 @@ void Cpu::Exec(uint32_t loops)
             mod_byte = ReadData8InExe();
             opt1_8bit = CalculateRM(mod_byte, opcode);
             opt2_8bit = CalculateReg8(mod_byte);
+#if DEBUG
+            change_print_8bit(opt1_8bit);
+#endif
             control_reg_flag &= 0xFEFF;
             __asm__
             (
@@ -747,6 +877,9 @@ void Cpu::Exec(uint32_t loops)
                 :"r"(*opt2_8bit), "r"(control_reg_flag)      /* input */
                 :"eax"
             );
+#if DEBUG
+            printf_my(*opt1_8bit);
+#endif
             break;
         }
 
@@ -755,6 +888,9 @@ void Cpu::Exec(uint32_t loops)
             mod_byte = ReadData8InExe();
             opt1_16bit = reinterpret_cast<uint16_t  *>(CalculateRM(mod_byte, opcode));
             opt2_16bit = CalculateReg16(mod_byte);
+#if DEBUG
+            change_print_16bit(opt1_16bit);
+#endif
             control_reg_flag &= 0xFEFF;
             __asm__
             (
@@ -768,6 +904,9 @@ void Cpu::Exec(uint32_t loops)
                 :"r"(*opt2_16bit)       , "r"(control_reg_flag) /* input */
                 :"eax"
             );
+#if DEBUG
+            printf_my(*opt1_16bit);
+#endif
             break;
         }
 
@@ -776,6 +915,9 @@ void Cpu::Exec(uint32_t loops)
             mod_byte = ReadData8InExe();
             opt1_8bit = CalculateReg8(mod_byte);
             opt2_8bit = CalculateRM(mod_byte, opcode);
+#if DEBUG
+            change_print_8bit(opt1_8bit);
+#endif
             control_reg_flag &= 0xFEFF;
             __asm__
             (
@@ -789,6 +931,9 @@ void Cpu::Exec(uint32_t loops)
                 :"r"(*opt2_8bit)       , "r"(control_reg_flag) /* input */
                 :"eax"
             );
+#if DEBUG
+            printf_my(*opt1_8bit);
+#endif
             break;
         }
 
@@ -797,6 +942,9 @@ void Cpu::Exec(uint32_t loops)
             mod_byte = ReadData8InExe();
             opt1_16bit = CalculateReg16(mod_byte);
             opt2_16bit = reinterpret_cast<uint16_t  *>(CalculateRM(mod_byte, opcode));
+#if DEBUG
+            change_print_16bit(opt1_16bit);
+#endif
             control_reg_flag &= 0xFEFF;
             __asm__
             (
@@ -810,6 +958,9 @@ void Cpu::Exec(uint32_t loops)
                 :"r"(*opt2_16bit)       , "r"(control_reg_flag) /* input */
                 :"eax"
             );
+#if DEBUG
+            printf_my(*opt1_16bit);
+#endif
             break;
         }
 
@@ -866,6 +1017,9 @@ void Cpu::Exec(uint32_t loops)
             mod_byte = ReadData8InExe();
             opt1_8bit = CalculateRM(mod_byte, opcode);
             opt2_8bit = CalculateReg8(mod_byte);
+#if DEBUG
+            change_print_8bit(opt1_8bit);
+#endif
             control_reg_flag &= 0xFEFF;
             __asm__
             (
@@ -879,6 +1033,9 @@ void Cpu::Exec(uint32_t loops)
                 :"r"(*opt2_8bit)       , "r"(control_reg_flag) /* input */
                 :"eax"
             );
+#if DEBUG
+            printf_my(*opt1_8bit);
+#endif
             break;
         }
 
@@ -887,6 +1044,10 @@ void Cpu::Exec(uint32_t loops)
             mod_byte = ReadData8InExe();
             opt1_16bit = reinterpret_cast<uint16_t  *>(CalculateRM(mod_byte, opcode));
             opt2_16bit = CalculateReg16(mod_byte);
+#if DEBUG
+            change_print_16bit(opt1_16bit);
+#endif
+
             control_reg_flag &= 0xFEFF;
             __asm__
             (
@@ -900,6 +1061,9 @@ void Cpu::Exec(uint32_t loops)
                 :"r"(*opt2_16bit)       , "r"(control_reg_flag) /* input */
                 :"eax"
             );
+#if DEBUG
+            printf_my(*opt1_16bit);
+#endif
             break;
         }
 
@@ -908,6 +1072,9 @@ void Cpu::Exec(uint32_t loops)
             mod_byte = ReadData8InExe();
             opt1_8bit = CalculateReg8(mod_byte);
             opt2_8bit = CalculateRM(mod_byte, opcode);
+#if DEBUG
+            change_print_8bit(opt1_8bit);
+#endif
             control_reg_flag &= 0xFEFF;
             __asm__
             (
@@ -921,6 +1088,9 @@ void Cpu::Exec(uint32_t loops)
                 :"r"(*opt2_8bit)       , "r"(control_reg_flag) /* input */
                 :"eax"
             );
+#if DEBUG
+            printf_my(*opt1_8bit);
+#endif
             break;
         }
 
@@ -999,6 +1169,9 @@ void Cpu::Exec(uint32_t loops)
             mod_byte = ReadData8InExe();
             opt1_8bit = CalculateRM(mod_byte, opcode);
             opt2_8bit = CalculateReg8(mod_byte);
+#if DEBUG
+            change_print_8bit(opt1_8bit);
+#endif
             control_reg_flag &= 0xFEFF;
             __asm__
             (
@@ -1012,6 +1185,9 @@ void Cpu::Exec(uint32_t loops)
                 :"r"(*opt2_8bit)       , "r"(control_reg_flag) /* input */
                 :"eax"
             );
+#if DEBUG
+            printf_my(*opt1_8bit);
+#endif
             break;
         }
 
@@ -1020,6 +1196,9 @@ void Cpu::Exec(uint32_t loops)
             mod_byte = ReadData8InExe();
             opt1_16bit = reinterpret_cast<uint16_t  *>(CalculateRM(mod_byte, opcode));
             opt2_16bit = CalculateReg16(mod_byte);
+#if DEBUG
+            change_print_16bit(opt1_16bit);
+#endif
             control_reg_flag &= 0xFEFF;
             __asm__
             (
@@ -1033,6 +1212,9 @@ void Cpu::Exec(uint32_t loops)
                 :"r"(*opt2_16bit)       , "r"(control_reg_flag) /* input */
                 :"eax"
             );
+#if DEBUG
+            printf_my(*opt1_16bit);
+#endif
             break;
         }
 
@@ -1041,6 +1223,9 @@ void Cpu::Exec(uint32_t loops)
             mod_byte = ReadData8InExe();
             opt1_8bit = CalculateReg8(mod_byte);
             opt2_8bit = CalculateRM(mod_byte, opcode);
+#if DEBUG
+            change_print_8bit(opt1_8bit);
+#endif
             control_reg_flag &= 0xFEFF;
             __asm__
             (
@@ -1054,6 +1239,9 @@ void Cpu::Exec(uint32_t loops)
                 :"r"(*opt2_8bit)       , "r"(control_reg_flag) /* input */
                 :"eax"
             );
+#if DEBUG
+            printf_my(*opt1_8bit);
+#endif
             break;
         }
 
@@ -1062,6 +1250,9 @@ void Cpu::Exec(uint32_t loops)
             mod_byte = ReadData8InExe();
             opt1_16bit = CalculateReg16(mod_byte);
             opt2_16bit = reinterpret_cast<uint16_t  *>(CalculateRM(mod_byte, opcode));
+#if DEBUG
+            change_print_16bit(opt1_16bit);
+#endif
             control_reg_flag &= 0xFEFF;
             __asm__
             (
@@ -1075,6 +1266,9 @@ void Cpu::Exec(uint32_t loops)
                 :"r"(*opt2_16bit)       , "r"(control_reg_flag) /* input */
                 :"eax"
             );
+#if DEBUG
+            printf_my(*opt1_16bit);
+#endif
             break;
         }
 
@@ -1131,6 +1325,9 @@ void Cpu::Exec(uint32_t loops)
             mod_byte = ReadData8InExe();
             opt1_8bit = CalculateRM(mod_byte, opcode);
             opt2_8bit = CalculateReg8(mod_byte);
+#if DEBUG
+            change_print_8bit(opt1_8bit);
+#endif
             control_reg_flag &= 0xFEFF;
             __asm__
             (
@@ -1144,6 +1341,9 @@ void Cpu::Exec(uint32_t loops)
                 :"r"(*opt2_8bit)       , "r"(control_reg_flag) /* input */
                 :"eax"
             );
+#if DEBUG
+            printf_my(*opt1_8bit);
+#endif
             break;
         }
 
@@ -1152,6 +1352,9 @@ void Cpu::Exec(uint32_t loops)
             mod_byte = ReadData8InExe();
             opt1_16bit = reinterpret_cast<uint16_t  *>(CalculateRM(mod_byte, opcode));
             opt2_16bit = CalculateReg16(mod_byte);
+#if DEBUG
+            change_print_16bit(opt1_16bit);
+#endif
             control_reg_flag &= 0xFEFF;
             __asm__
             (
@@ -1165,6 +1368,9 @@ void Cpu::Exec(uint32_t loops)
                 :"r"(*opt2_16bit)       , "r"(control_reg_flag) /* input */
                 :"eax"
             );
+#if DEBUG
+            printf_my(*opt1_16bit);
+#endif
             break;
         }
 
@@ -1173,6 +1379,9 @@ void Cpu::Exec(uint32_t loops)
             mod_byte = ReadData8InExe();
             opt1_8bit = CalculateReg8(mod_byte);
             opt2_8bit = CalculateRM(mod_byte, opcode);
+#if DEBUG
+            change_print_8bit(opt1_8bit);
+#endif
             control_reg_flag &= 0xFEFF;
             __asm__
             (
@@ -1186,6 +1395,9 @@ void Cpu::Exec(uint32_t loops)
                 :"r"(*opt2_8bit)       , "r"(control_reg_flag) /* input */
                 :"eax"
             );
+#if DEBUG
+            printf_my(*opt1_8bit);
+#endif
             break;
         }
 
@@ -1194,6 +1406,9 @@ void Cpu::Exec(uint32_t loops)
             mod_byte = ReadData8InExe();
             opt1_16bit = CalculateReg16(mod_byte);
             opt2_16bit = reinterpret_cast<uint16_t  *>(CalculateRM(mod_byte, opcode));
+#if DEBUG
+            change_print_16bit(opt1_16bit);
+#endif
             control_reg_flag &= 0xFEFF;
             __asm__
             (
@@ -1207,6 +1422,9 @@ void Cpu::Exec(uint32_t loops)
                 :"r"(*opt2_16bit)       , "r"(control_reg_flag) /* input */
                 :"eax"
             );
+#if DEBUG
+            printf_my(*opt1_16bit);
+#endif
             break;
         }
 
@@ -1264,6 +1482,9 @@ void Cpu::Exec(uint32_t loops)
             mod_byte = ReadData8InExe();
             opt1_8bit = CalculateRM(mod_byte, opcode);
             opt2_8bit = CalculateReg8(mod_byte);
+#if DEBUG
+            change_print_8bit(opt1_8bit);
+#endif
             control_reg_flag &= 0xFEFF;
             __asm__
             (
@@ -1277,6 +1498,9 @@ void Cpu::Exec(uint32_t loops)
                 :"r"(*opt2_8bit)       , "r"(control_reg_flag) /* input */
                 :"eax"
             );
+#if DEBUG
+            printf_my(*opt1_8bit);
+#endif
             break;
         }
 
@@ -1285,6 +1509,9 @@ void Cpu::Exec(uint32_t loops)
             mod_byte = ReadData8InExe();
             opt1_16bit = reinterpret_cast<uint16_t  *>(CalculateRM(mod_byte, opcode));
             opt2_16bit = CalculateReg16(mod_byte);
+#if DEBUG
+            change_print_16bit(opt1_16bit);
+#endif
             control_reg_flag &= 0xFEFF;
             __asm__
             (
@@ -1298,6 +1525,9 @@ void Cpu::Exec(uint32_t loops)
                 :"r"(*opt2_16bit)       , "r"(control_reg_flag) /* input */
                 :"eax"
             );
+#if DEBUG
+            printf_my(*opt1_16bit);
+#endif
             break;
         }
 
@@ -1306,6 +1536,9 @@ void Cpu::Exec(uint32_t loops)
             mod_byte = ReadData8InExe();
             opt1_8bit = CalculateReg8(mod_byte);
             opt2_8bit = CalculateRM(mod_byte, opcode);
+#if DEBUG
+            change_print_8bit(opt1_8bit);
+#endif
             control_reg_flag &= 0xFEFF;
             __asm__
             (
@@ -1319,6 +1552,9 @@ void Cpu::Exec(uint32_t loops)
                 :"r"(*opt2_8bit)       , "r"(control_reg_flag) /* input */
                 :"eax"
             );
+#if DEBUG
+            printf_my(*opt1_8bit);
+#endif
             break;
         }
 
@@ -1327,6 +1563,9 @@ void Cpu::Exec(uint32_t loops)
             mod_byte = ReadData8InExe();
             opt1_16bit = CalculateReg16(mod_byte);
             opt2_16bit = reinterpret_cast<uint16_t  *>(CalculateRM(mod_byte, opcode));
+#if DEBUG
+            change_print_16bit(opt1_16bit);
+#endif
             control_reg_flag &= 0xFEFF;
             __asm__
             (
@@ -1340,6 +1579,9 @@ void Cpu::Exec(uint32_t loops)
                 :"r"(*opt2_16bit)       , "r"(control_reg_flag) /* input */
                 :"eax"
             );
+#if DEBUG
+            printf_my(*opt1_16bit);
+#endif
             break;
         }
 
@@ -1407,6 +1649,9 @@ void Cpu::Exec(uint32_t loops)
             mod_byte = ReadData8InExe();
             opt1_8bit = CalculateRM(mod_byte, opcode);
             opt2_8bit = CalculateReg8(mod_byte);
+#if DEBUG
+            change_print_8bit(opt1_8bit);
+#endif
             control_reg_flag &= 0xFEFF;
             __asm__
             (
@@ -1420,6 +1665,9 @@ void Cpu::Exec(uint32_t loops)
                 :"r"(*opt2_8bit)       , "r"(control_reg_flag) /* input */
                 :"eax"
             );
+#if DEBUG
+            printf_my(*opt1_8bit);
+#endif
             break;
         }
 
@@ -1428,6 +1676,9 @@ void Cpu::Exec(uint32_t loops)
             mod_byte = ReadData8InExe();
             opt1_16bit = reinterpret_cast<uint16_t  *>(CalculateRM(mod_byte, opcode));
             opt2_16bit = CalculateReg16(mod_byte);
+#if DEBUG
+            change_print_16bit(opt1_16bit);
+#endif
             control_reg_flag &= 0xFEFF;
             __asm__
             (
@@ -1441,6 +1692,9 @@ void Cpu::Exec(uint32_t loops)
                 :"r"(*opt2_16bit)       , "r"(control_reg_flag) /* input */
                 :"eax"
             );
+#if DEBUG
+            printf_my(*opt1_16bit);
+#endif
             break;
         }
 
@@ -1449,6 +1703,9 @@ void Cpu::Exec(uint32_t loops)
             mod_byte = ReadData8InExe();
             opt1_8bit = CalculateReg8(mod_byte);
             opt2_8bit = CalculateRM(mod_byte, opcode);
+#if DEBUG
+            change_print_8bit(opt1_8bit);
+#endif
             control_reg_flag &= 0xFEFF;
             __asm__
             (
@@ -1462,6 +1719,9 @@ void Cpu::Exec(uint32_t loops)
                 :"r"(*opt2_8bit)       , "r"(control_reg_flag) /* input */
                 :"eax"
             );
+#if DEBUG
+            printf_my(*opt1_8bit);
+#endif
             break;
         }
 
@@ -1470,6 +1730,9 @@ void Cpu::Exec(uint32_t loops)
             mod_byte = ReadData8InExe();
             opt1_16bit = CalculateReg16(mod_byte);
             opt2_16bit = reinterpret_cast<uint16_t  *>(CalculateRM(mod_byte, opcode));
+#if DEBUG
+            change_print_16bit(opt1_16bit);
+#endif
             control_reg_flag &= 0xFEFF;
             __asm__
             (
@@ -1483,6 +1746,9 @@ void Cpu::Exec(uint32_t loops)
                 :"r"(*opt2_16bit)       , "r"(control_reg_flag) /* input */
                 :"eax"
             );
+#if DEBUG
+            printf_my(*opt1_16bit);
+#endif
             break;
         }
 
@@ -1550,6 +1816,9 @@ void Cpu::Exec(uint32_t loops)
             mod_byte = ReadData8InExe();
             opt1_8bit = CalculateRM(mod_byte, opcode);
             opt2_8bit = CalculateReg8(mod_byte);
+#if DEBUG
+            change_print_8bit(opt1_8bit);
+#endif
             control_reg_flag &= 0xFEFF;
             __asm__
             (
@@ -1563,6 +1832,9 @@ void Cpu::Exec(uint32_t loops)
                 :"r"(*opt2_8bit)       , "r"(control_reg_flag) /* input */
                 :"eax"
             );
+#if DEBUG
+            printf_my(*opt1_8bit);
+#endif
             break;
         }
 
@@ -1571,6 +1843,9 @@ void Cpu::Exec(uint32_t loops)
             mod_byte = ReadData8InExe();
             opt1_16bit = reinterpret_cast<uint16_t  *>(CalculateRM(mod_byte, opcode));
             opt2_16bit = CalculateReg16(mod_byte);
+#if DEBUG
+            change_print_16bit(opt1_16bit);
+#endif
             control_reg_flag &= 0xFEFF;
             __asm__
             (
@@ -1584,6 +1859,9 @@ void Cpu::Exec(uint32_t loops)
                 :"r"(*opt2_16bit)       , "r"(control_reg_flag) /* input */
                 :"eax"
             );
+#if DEBUG
+            printf_my(*opt1_16bit);
+#endif
             break;
         }
 
@@ -1592,6 +1870,9 @@ void Cpu::Exec(uint32_t loops)
             mod_byte = ReadData8InExe();
             opt1_8bit = CalculateReg8(mod_byte);
             opt2_8bit = CalculateRM(mod_byte, opcode);
+#if DEBUG
+            change_print_8bit(opt1_8bit);
+#endif
             control_reg_flag &= 0xFEFF;
             __asm__
             (
@@ -1605,6 +1886,9 @@ void Cpu::Exec(uint32_t loops)
                 :"r"(*opt2_8bit)       , "r"(control_reg_flag) /* input */
                 :"eax"
             );
+#if DEBUG
+            printf_my(*opt1_8bit);
+#endif
             break;
         }
 
@@ -1613,6 +1897,9 @@ void Cpu::Exec(uint32_t loops)
             mod_byte = ReadData8InExe();
             opt1_16bit = CalculateReg16(mod_byte);
             opt2_16bit = reinterpret_cast<uint16_t  *>(CalculateRM(mod_byte, opcode));
+#if DEBUG
+            change_print_16bit(opt1_16bit);
+#endif
             control_reg_flag &= 0xFEFF;
             __asm__
             (
@@ -1626,6 +1913,9 @@ void Cpu::Exec(uint32_t loops)
                 :"r"(*opt2_16bit)       , "r"(control_reg_flag) /* input */
                 :"eax"
             );
+#if DEBUG
+            printf_my(*opt1_16bit);
+#endif
             break;
         }
 
@@ -2295,6 +2585,9 @@ void Cpu::Exec(uint32_t loops)
             mod_byte = ReadData8InExe();
             opt1_16bit = CalculateReg16(mod_byte);
             opt2_16bit = reinterpret_cast<uint16_t  *>(CalculateRM(mod_byte, opcode));
+#if DEBUG
+            change_print_16bit(opt1_16bit);
+#endif
             control_reg_flag &= 0xFEFF;
             __asm__
             (
@@ -2310,6 +2603,9 @@ void Cpu::Exec(uint32_t loops)
                 :"r"(*opt2_16bit), "r"(ReadData16InExe())   , "r"(control_reg_flag) /* input */
                 :"eax"
             );
+#if DEBUG
+            printf_my(*opt1_16bit);
+#endif
             break;
         }
 
@@ -2324,6 +2620,9 @@ void Cpu::Exec(uint32_t loops)
             mod_byte = ReadData8InExe();
             opt1_16bit = CalculateReg16(mod_byte);
             opt2_16bit = reinterpret_cast<uint16_t  *>(CalculateRM(mod_byte, opcode));
+#if DEBUG
+            change_print_16bit(opt1_16bit);
+#endif
             control_reg_flag &= 0xFEFF;
             __asm__
             (
@@ -2339,6 +2638,9 @@ void Cpu::Exec(uint32_t loops)
                 :"r"(*opt2_16bit), "r"(static_cast<uint16_t>(ReadData8InExe())), "r"(control_reg_flag) /* input */
                 :"eax"
             );
+#if DEBUG
+            printf_my(*opt1_16bit);
+#endif
             break;
         }
 
@@ -2348,7 +2650,15 @@ void Cpu::Exec(uint32_t loops)
         {
             if(rep && universal_reg_cx == 0)
                 break;
+#if DEBUG
+            if(count_code <= MAX && count_code >= MIN)
+                printf("Read port 0x%x ,", universal_reg_dx);
+            change_print_8bit(&ram[(seg_reg_es << 4) + universal_reg_si]);
+#endif
             WriteRam8((seg_reg_es << 4) + universal_reg_si, ports_operate->port_handle_read8(universal_reg_dx));
+#if DEBUG
+            printf_my(ram[(seg_reg_es << 4) + universal_reg_si]);
+#endif
             uint8_t flag_df = (control_reg_flag >> 10) & 0x1;
             if(flag_df)
             {
@@ -2381,7 +2691,15 @@ void Cpu::Exec(uint32_t loops)
         {
             if(rep && universal_reg_cx == 0)
                 break;
+#if DEBUG
+            if(count_code <= MAX && count_code >= MIN)
+                printf("Read port 0x%x ,", universal_reg_dx);
+            change_print_16bit((uint16_t *)(&ram[(seg_reg_es << 4) + universal_reg_si]));
+#endif
             WriteRam16((seg_reg_es << 4) + universal_reg_si, ports_operate->port_handle_read16(universal_reg_dx));
+#if DEBUG
+            printf_my(*(uint16_t *)(&ram[(seg_reg_es << 4) + universal_reg_si]));
+#endif
             uint8_t flag_df = (control_reg_flag >> 10) & 0x1;
             if(flag_df) {
                 universal_reg_si = universal_reg_si - 2;
@@ -2411,6 +2729,10 @@ void Cpu::Exec(uint32_t loops)
         {
             if(rep && universal_reg_cx == 0)
                 break;
+#if DEBUG
+            if(count_code <= MAX && count_code >= MIN)
+                printf("Write port 0x%x <= 0x%x\n", universal_reg_dx, ReadRam8((*seg_reg_replace_ds << 4) + universal_reg_si));
+#endif
             ports_operate->port_handle_write8(universal_reg_dx, ReadRam8((*seg_reg_replace_ds << 4) + universal_reg_si));
             uint8_t flag_df = (control_reg_flag >> 10) & 0x1;
             if(flag_df) {
@@ -2441,6 +2763,10 @@ void Cpu::Exec(uint32_t loops)
         {
             if(rep && universal_reg_cx == 0)
                 break;
+#if DEBUG
+            if(count_code <= MAX && count_code >= MIN)
+                printf("Write port 0x%x <= 0x%x\n", universal_reg_dx, ReadRam16((*seg_reg_replace_ds << 4) + universal_reg_si));
+#endif
             ports_operate->port_handle_write16(universal_reg_dx, ReadRam16((*seg_reg_replace_ds << 4) + universal_reg_si));
             uint8_t flag_df = (control_reg_flag >> 10) & 0x1;
             if(flag_df) {
@@ -2626,6 +2952,9 @@ void Cpu::Exec(uint32_t loops)
             {
             case(0x00)://ADD Eb Ib
             {
+#if DEBUG
+                change_print_8bit(opt1_8bit);
+#endif
                 control_reg_flag &= 0xFEFF;
                 __asm__
                 (
@@ -2639,11 +2968,17 @@ void Cpu::Exec(uint32_t loops)
                     :"r"(ReadData8InExe())       , "r"(control_reg_flag) /* input */
                     :"eax"
                 );
+#if DEBUG
+                printf_my(*opt1_8bit);
+#endif
                 break;
             }
 
             case(0x01)://OR Eb Ib
             {
+#if DEBUG
+                change_print_8bit(opt1_8bit);
+#endif
                 control_reg_flag &= 0xFEFF;
                 __asm__
                 (
@@ -2657,11 +2992,17 @@ void Cpu::Exec(uint32_t loops)
                     :"r"(ReadData8InExe())       , "r"(control_reg_flag) /* input */
                     :"eax"
                 );
+#if DEBUG
+                printf_my(*opt1_8bit);
+#endif
                 break;
             }
 
             case(0x02)://ADC Eb Ib
             {
+#if DEBUG
+                change_print_8bit(opt1_8bit);
+#endif
                 control_reg_flag &= 0xFEFF;
                 __asm__
                 (
@@ -2675,11 +3016,17 @@ void Cpu::Exec(uint32_t loops)
                     :"r"(ReadData8InExe())       , "r"(control_reg_flag) /* input */
                     :"eax"
                 );
+#if DEBUG
+                printf_my(*opt1_8bit);
+#endif
                 break;
             }
 
             case(0x03)://SBB Eb Ib
             {
+#if DEBUG
+                change_print_8bit(opt1_8bit);
+#endif
                 control_reg_flag &= 0xFEFF;
                 __asm__
                 (
@@ -2693,11 +3040,17 @@ void Cpu::Exec(uint32_t loops)
                     :"r"(ReadData8InExe())       , "r"(control_reg_flag) /* input */
                     :"eax"
                 );
+#if DEBUG
+                printf_my(*opt1_8bit);
+#endif
                 break;
             }
 
             case(0x04)://AND Eb Ib
             {
+#if DEBUG
+                change_print_8bit(opt1_8bit);
+#endif
                 control_reg_flag &= 0xFEFF;
                 __asm__
                 (
@@ -2711,11 +3064,17 @@ void Cpu::Exec(uint32_t loops)
                     :"r"(ReadData8InExe())       , "r"(control_reg_flag) /* input */
                     :"eax"
                 );
+#if DEBUG
+                printf_my(*opt1_8bit);
+#endif
                 break;
             }
 
             case(0x05)://SUB Eb Ib
             {
+#if DEBUG
+                change_print_8bit(opt1_8bit);
+#endif
                 control_reg_flag &= 0xFEFF;
                 __asm__
                 (
@@ -2729,11 +3088,17 @@ void Cpu::Exec(uint32_t loops)
                     :"r"(ReadData8InExe())       , "r"(control_reg_flag) /* input */
                     :"eax"
                 );
+#if DEBUG
+                printf_my(*opt1_8bit);
+#endif
                 break;
             }
 
             case(0x06)://XOR Eb Ib
             {
+#if DEBUG
+                change_print_8bit(opt1_8bit);
+#endif
                 control_reg_flag &= 0xFEFF;
                 __asm__
                 (
@@ -2747,6 +3112,9 @@ void Cpu::Exec(uint32_t loops)
                     :"r"(ReadData8InExe())       , "r"(control_reg_flag) /* input */
                     :"eax"
                 );
+#if DEBUG
+                printf_my(*opt1_8bit);
+#endif
                 break;
             }
 
@@ -2780,6 +3148,9 @@ void Cpu::Exec(uint32_t loops)
             {
             case(0x00)://ADD Ev Iz
             {
+#if DEBUG
+                change_print_16bit(opt1_16bit);
+#endif
                 control_reg_flag &= 0xFEFF;
                 __asm__
                 (
@@ -2793,11 +3164,17 @@ void Cpu::Exec(uint32_t loops)
                     :"r"(ReadData16InExe())       , "r"(control_reg_flag) /* input */
                     :"eax"
                 );
+#if DEBUG
+                printf_my(*opt1_16bit);
+#endif
                 break;
             }
 
             case(0x01)://OR Ev Iz
             {
+#if DEBUG
+                change_print_16bit(opt1_16bit);
+#endif
                 control_reg_flag &= 0xFEFF;
                 __asm__
                 (
@@ -2811,11 +3188,17 @@ void Cpu::Exec(uint32_t loops)
                     :"r"(ReadData16InExe())       , "r"(control_reg_flag) /* input */
                     :"eax"
                 );
+#if DEBUG
+                printf_my(*opt1_16bit);
+#endif
                 break;
             }
 
             case(0x02)://ADC Ev Iz
             {
+#if DEBUG
+                change_print_16bit(opt1_16bit);
+#endif
                 control_reg_flag &= 0xFEFF;
                 __asm__
                 (
@@ -2829,11 +3212,17 @@ void Cpu::Exec(uint32_t loops)
                     :"r"(ReadData16InExe())       , "r"(control_reg_flag) /* input */
                     :"eax"
                 );
+#if DEBUG
+                printf_my(*opt1_16bit);
+#endif
                 break;
             }
 
             case(0x03)://SBB Ev Iz
             {
+#if DEBUG
+                change_print_16bit(opt1_16bit);
+#endif
                 control_reg_flag &= 0xFEFF;
                 __asm__
                 (
@@ -2847,11 +3236,17 @@ void Cpu::Exec(uint32_t loops)
                     :"r"(ReadData16InExe())       , "r"(control_reg_flag) /* input */
                     :"eax"
                 );
+#if DEBUG
+                printf_my(*opt1_16bit);
+#endif
                 break;
             }
 
             case(0x04)://AND Ev Iz
             {
+#if DEBUG
+                change_print_16bit(opt1_16bit);
+#endif
                 control_reg_flag &= 0xFEFF;
                 __asm__
                 (
@@ -2865,11 +3260,17 @@ void Cpu::Exec(uint32_t loops)
                     :"r"(ReadData16InExe())       , "r"(control_reg_flag) /* input */
                     :"eax"
                 );
+#if DEBUG
+                printf_my(*opt1_16bit);
+#endif
                 break;
             }
 
             case(0x05)://SUB Ev Iz
             {
+#if DEBUG
+                change_print_16bit(opt1_16bit);
+#endif
                 control_reg_flag &= 0xFEFF;
                 __asm__
                 (
@@ -2883,11 +3284,17 @@ void Cpu::Exec(uint32_t loops)
                     :"r"(ReadData16InExe())       , "r"(control_reg_flag) /* input */
                     :"eax"
                 );
+#if DEBUG
+                printf_my(*opt1_16bit);
+#endif
                 break;
             }
 
             case(0x06)://XOR Ev Iz
             {
+#if DEBUG
+                change_print_16bit(opt1_16bit);
+#endif
                 control_reg_flag &= 0xFEFF;
                 __asm__
                 (
@@ -2901,6 +3308,9 @@ void Cpu::Exec(uint32_t loops)
                     :"r"(ReadData16InExe())       , "r"(control_reg_flag) /* input */
                     :"eax"
                 );
+#if DEBUG
+                printf_my(*opt1_16bit);
+#endif
                 break;
             }
 
@@ -2934,6 +3344,9 @@ void Cpu::Exec(uint32_t loops)
             {
             case(0x00)://ADD Ev Ib
             {
+#if DEBUG
+                change_print_16bit(opt1_16bit);
+#endif
                 int16_t tmp_data = static_cast<int16_t>(static_cast<int8_t>((ReadData8InExe())));
                 control_reg_flag &= 0xFEFF;
                 __asm__
@@ -2948,11 +3361,17 @@ void Cpu::Exec(uint32_t loops)
                     :"r"(tmp_data)       , "r"(control_reg_flag) /* input */
                     :"eax"
                 );
+#if DEBUG
+                printf_my(*opt1_16bit);
+#endif
                 break;
             }
 
             case(0x01)://OR Ev Ib
             {
+#if DEBUG
+                change_print_16bit(opt1_16bit);
+#endif
                 int16_t tmp_data = static_cast<int16_t>(static_cast<int8_t>((ReadData8InExe())));
                 control_reg_flag &= 0xFEFF;
                 __asm__
@@ -2967,11 +3386,17 @@ void Cpu::Exec(uint32_t loops)
                     :"r"(tmp_data)       , "r"(control_reg_flag) /* input */
                     :"eax"
                 );
+#if DEBUG
+                printf_my(*opt1_16bit);
+#endif
                 break;
             }
 
             case(0x02)://ADC Ev Ib
             {
+#if DEBUG
+                change_print_16bit(opt1_16bit);
+#endif
                 int16_t tmp_data = static_cast<int16_t>(static_cast<int8_t>((ReadData8InExe())));
                 control_reg_flag &= 0xFEFF;
                 __asm__
@@ -2986,11 +3411,17 @@ void Cpu::Exec(uint32_t loops)
                     :"r"(tmp_data)       , "r"(control_reg_flag) /* input */
                     :"eax"
                 );
+#if DEBUG
+                printf_my(*opt1_16bit);
+#endif
                 break;
             }
 
             case(0x03)://SBB Ev Ib
             {
+#if DEBUG
+                change_print_16bit(opt1_16bit);
+#endif
                 int16_t tmp_data = static_cast<int16_t>(static_cast<int8_t>((ReadData8InExe())));
                 control_reg_flag &= 0xFEFF;
                 __asm__
@@ -3005,11 +3436,17 @@ void Cpu::Exec(uint32_t loops)
                     :"r"(tmp_data)       , "r"(control_reg_flag) /* input */
                     :"eax"
                 );
+#if DEBUG
+                printf_my(*opt1_16bit);
+#endif
                 break;
             }
 
             case(0x04)://AND Ev Ib
             {
+#if DEBUG
+                change_print_16bit(opt1_16bit);
+#endif
                 int16_t tmp_data = static_cast<int16_t>(static_cast<int8_t>((ReadData8InExe())));
                 control_reg_flag &= 0xFEFF;
                 __asm__
@@ -3024,11 +3461,17 @@ void Cpu::Exec(uint32_t loops)
                     :"r"(tmp_data)       , "r"(control_reg_flag) /* input */
                     :"eax"
                 );
+#if DEBUG
+                printf_my(*opt1_16bit);
+#endif
                 break;
             }
 
             case(0x05)://SUB Ev Ib
             {
+#if DEBUG
+                change_print_16bit(opt1_16bit);
+#endif
                 int16_t tmp_data = static_cast<int16_t>(static_cast<int8_t>((ReadData8InExe())));
                 control_reg_flag &= 0xFEFF;
                 __asm__
@@ -3043,11 +3486,17 @@ void Cpu::Exec(uint32_t loops)
                     :"r"(tmp_data)       , "r"(control_reg_flag) /* input */
                     :"eax"
                 );
+#if DEBUG
+                printf_my(*opt1_16bit);
+#endif
                 break;
             }
 
             case(0x06)://XOR Ev Ib
             {
+#if DEBUG
+                change_print_16bit(opt1_16bit);
+#endif
                 int16_t tmp_data = static_cast<int16_t>(static_cast<int8_t>((ReadData8InExe())));
                 control_reg_flag &= 0xFEFF;
                 __asm__
@@ -3062,6 +3511,9 @@ void Cpu::Exec(uint32_t loops)
                     :"r"(tmp_data)       , "r"(control_reg_flag) /* input */
                     :"eax"
                 );
+#if DEBUG
+                printf_my(*opt1_16bit);
+#endif
                 break;
             }
 
@@ -3135,6 +3587,12 @@ void Cpu::Exec(uint32_t loops)
             mod_byte = ReadData8InExe();
             opt1_8bit = CalculateRM(mod_byte, opcode);
             opt2_8bit = CalculateReg8(mod_byte);
+#if DEBUG
+            change_print_8bit(opt1_8bit);
+            printf_my(*opt2_8bit);
+            change_print_8bit(opt2_8bit);
+            printf_my(*opt1_8bit);
+#endif
             tmp_data = *opt1_8bit;
             *opt1_8bit = *opt2_8bit;
             *opt2_8bit = tmp_data;
@@ -3147,9 +3605,17 @@ void Cpu::Exec(uint32_t loops)
             mod_byte = ReadData8InExe();
             opt1_16bit = reinterpret_cast<uint16_t  *>(CalculateRM(mod_byte, opcode));
             opt2_16bit = CalculateReg16(mod_byte);
+#if DEBUG
+            change_print_16bit(opt1_16bit);
+            change_print_16bit(opt2_16bit);
+#endif
             tmp_data = *opt1_16bit;
             *opt1_16bit = *opt2_16bit;
             *opt2_16bit = tmp_data;
+#if DEBUG
+            printf_my(*opt1_16bit);
+            printf_my(*opt2_16bit);
+#endif
             break;
         }
 
@@ -3158,7 +3624,13 @@ void Cpu::Exec(uint32_t loops)
             mod_byte = ReadData8InExe();
             opt1_8bit = CalculateRM(mod_byte, opcode);
             opt2_8bit = CalculateReg8(mod_byte);
+#if DEBUG
+            change_print_8bit(opt1_8bit);
+#endif
             *opt1_8bit = *opt2_8bit;
+#if DEBUG
+            printf_my(*opt1_8bit);
+#endif
             break;
         }
 
@@ -3167,7 +3639,13 @@ void Cpu::Exec(uint32_t loops)
             mod_byte = ReadData8InExe();
             opt1_16bit = reinterpret_cast<uint16_t  *>(CalculateRM(mod_byte, opcode));
             opt2_16bit = CalculateReg16(mod_byte);
+#if DEBUG
+            change_print_16bit(opt1_16bit);
+#endif
             *opt1_16bit = *opt2_16bit;
+#if DEBUG
+            printf_my(*opt1_16bit);
+#endif
             break;
         }
 
@@ -3176,7 +3654,13 @@ void Cpu::Exec(uint32_t loops)
             mod_byte = ReadData8InExe();
             opt1_8bit = CalculateReg8(mod_byte);
             opt2_8bit = CalculateRM(mod_byte, opcode);
+#if DEBUG
+            change_print_8bit(opt1_8bit);
+#endif
             *opt1_8bit = *opt2_8bit;
+#if DEBUG
+            printf_my(*opt1_8bit);
+#endif
             break;
         }
 
@@ -3185,7 +3669,13 @@ void Cpu::Exec(uint32_t loops)
             mod_byte = ReadData8InExe();
             opt1_16bit = CalculateReg16(mod_byte);
             opt2_16bit = reinterpret_cast<uint16_t  *>(CalculateRM(mod_byte, opcode));
+#if DEBUG
+            change_print_16bit(opt1_16bit);
+#endif
             *opt1_16bit = *opt2_16bit;
+#if DEBUG
+            printf_my(*opt1_16bit);
+#endif
             break;
         }
 
@@ -3194,7 +3684,13 @@ void Cpu::Exec(uint32_t loops)
             mod_byte = ReadData8InExe();
             opt1_16bit = reinterpret_cast<uint16_t  *>(CalculateRM(mod_byte, opcode));
             opt2_16bit = CalculateSeg16(mod_byte);
+#if DEBUG
+            change_print_16bit(opt1_16bit);
+#endif
             *opt1_16bit = *opt2_16bit;
+#if DEBUG
+            printf_my(*opt1_16bit);
+#endif
             break;
         }
 
@@ -3205,10 +3701,16 @@ void Cpu::Exec(uint32_t loops)
             uint8_t mod_bit = (mod_byte >> 6) & 0x3;
             opt1_16bit = CalculateReg16(mod_byte);
             opt2_16bit = reinterpret_cast<uint16_t  *>(CalculateRM(mod_byte, opcode));
+#if DEBUG
+            change_print_16bit(opt1_16bit);
+#endif
             if((mod_bit == 0x0 && (rm == 0x2 || rm == 0x3)) || (mod_bit != 0x0 && (rm == 0x2 || rm == 0x3 || rm == 0x6)))
                 *opt1_16bit = (reinterpret_cast<uint8_t  *>(opt2_16bit) - &ram[0]) - (*seg_reg_replace_ss << 4);
             else
                 *opt1_16bit = (reinterpret_cast<uint8_t  *>(opt2_16bit) - &ram[0]) - (*seg_reg_replace_ds << 4);
+#if DEBUG
+            printf_my(*opt1_16bit);
+#endif
             break;
         }
 
@@ -3217,9 +3719,15 @@ void Cpu::Exec(uint32_t loops)
             mod_byte = ReadData8InExe();
             opt1_16bit = CalculateSeg16(mod_byte);
             opt2_16bit = reinterpret_cast<uint16_t  *>(CalculateRM(mod_byte, opcode | 0x1));
+#if DEBUG
+            change_print_16bit(opt1_16bit);
+#endif
             //  if(old == 0x33)
             //      printf("%x<-%x\n",*opt1_16bit,*opt2_16bit);
             *opt1_16bit = *opt2_16bit;
+#if DEBUG
+            printf_my(*opt1_16bit);
+#endif
             break;
         }
 
@@ -3227,7 +3735,13 @@ void Cpu::Exec(uint32_t loops)
         {
             mod_byte = ReadData8InExe();
             opt1_16bit = reinterpret_cast<uint16_t  *>(CalculateRM(mod_byte, opcode));
+#if DEBUG
+            change_print_16bit(opt1_16bit);
+#endif
             *opt1_16bit = Pop();
+#if DEBUG
+            printf_my(*opt1_16bit);
+#endif
             break;
         }
 
@@ -3384,14 +3898,26 @@ void Cpu::Exec(uint32_t loops)
         case(0xA2)://MOV Ob AL
         {
             uint16_t offset = ReadData16InExe();//offset
+#if DEBUG
+            change_print_8bit(&ram[(*seg_reg_replace_ds << 4) + offset]);
+#endif
             WriteRam8((*seg_reg_replace_ds << 4) + offset, *universal_reg_al);
+#if DEBUG
+            printf_my(ram[(*seg_reg_replace_ds << 4) + offset]);
+#endif
             break;
         }
 
         case(0xA3)://MOV Ov eAX
         {
             uint16_t offset = ReadData16InExe();//offset
+#if DEBUG
+            change_print_16bit((uint16_t *)(&ram[(*seg_reg_replace_ds << 4) + offset]));
+#endif
             WriteRam16((*seg_reg_replace_ds << 4) + offset, universal_reg_ax);
+#if DEBUG
+            printf_my(*(uint16_t *)(&ram[(*seg_reg_replace_ds << 4) + offset]));
+#endif
             break;
         }
 
@@ -3403,7 +3929,13 @@ void Cpu::Exec(uint32_t loops)
                 break;
 
             uint8_t df = control_reg_flag >> 10 & 0x1;
+#if DEBUG
+            change_print_8bit(&ram[(seg_reg_es << 4) + universal_reg_di]);
+#endif
             WriteRam8((seg_reg_es << 4) + universal_reg_di, ReadRam8((*seg_reg_replace_ds << 4) + universal_reg_si));
+#if DEBUG
+            printf_my(ram[(seg_reg_es << 4) + universal_reg_di]);
+#endif
 
             if(df)
             {
@@ -3432,7 +3964,13 @@ void Cpu::Exec(uint32_t loops)
                 break;
 
             uint8_t df = control_reg_flag >> 10 & 0x1;
+#if DEBUG
+            change_print_16bit((uint16_t *)(&ram[(seg_reg_es << 4) + universal_reg_di]));
+#endif
             WriteRam16((seg_reg_es << 4) + universal_reg_di, ReadRam16((*seg_reg_replace_ds << 4) + universal_reg_si));
+#if DEBUG
+            printf_my(*(uint16_t *)(&ram[(seg_reg_es << 4) + universal_reg_di]));
+#endif
 
             if(df)
             {
@@ -3596,8 +4134,13 @@ void Cpu::Exec(uint32_t loops)
                 break;
 
             uint8_t df = control_reg_flag >> 10 & 0x1;
+#if DEBUG
+            change_print_8bit(&ram[(seg_reg_es << 4) + universal_reg_di]);
+#endif
             WriteRam8((seg_reg_es << 4) + universal_reg_di, *universal_reg_al);
-
+#if DEBUG
+            printf_my(ram[(seg_reg_es << 4) + universal_reg_di]);
+#endif
             if(df)
             {
                 universal_reg_di = universal_reg_di - 1;
@@ -3622,7 +4165,13 @@ void Cpu::Exec(uint32_t loops)
             if(rep && (universal_reg_cx == 0))
                 break;
             uint8_t df = control_reg_flag >> 10 & 0x1;
+#if DEBUG
+            change_print_16bit((uint16_t *)(&ram[(seg_reg_es << 4) + universal_reg_di]));
+#endif
             WriteRam16((seg_reg_es << 4) + universal_reg_di, universal_reg_ax);
+#if DEBUG
+            printf_my(*(uint16_t *)(&ram[(seg_reg_es << 4) + universal_reg_di]));
+#endif
             if(df)
             {
                 universal_reg_di = universal_reg_di - 2;
@@ -3882,6 +4431,9 @@ void Cpu::Exec(uint32_t loops)
             mod_byte = ReadData8InExe();
             uint8_t group_index = (mod_byte >> 3) & 0x7;
             opt1_8bit = CalculateRM(mod_byte, opcode);
+#if DEBUG
+            change_print_8bit(opt1_8bit);
+#endif
             switch(group_index)
             {
             case(0x00)://ROL Eb Ib
@@ -4028,6 +4580,9 @@ void Cpu::Exec(uint32_t loops)
                 break;
             }
             }
+#if DEBUG
+            printf_my(*opt1_8bit);
+#endif
             break;
         }
 
@@ -4036,6 +4591,9 @@ void Cpu::Exec(uint32_t loops)
             mod_byte = ReadData8InExe();
             uint8_t group_index = (mod_byte >> 3) & 0x7;
             opt1_16bit = reinterpret_cast<uint16_t  *>(CalculateRM(mod_byte, opcode));
+#if DEBUG
+            change_print_16bit(opt1_16bit);
+#endif
             switch(group_index)
             {
             case(0x00)://ROL Ev Ib
@@ -4182,6 +4740,9 @@ void Cpu::Exec(uint32_t loops)
                 break;
             }
             }
+#if DEBUG
+            printf_my(*opt1_16bit);
+#endif
             break;
         }
 
@@ -4204,8 +4765,14 @@ void Cpu::Exec(uint32_t loops)
             mod_byte = ReadData8InExe();
             opt1_16bit = CalculateReg16(mod_byte);
             opt2_16bit = reinterpret_cast<uint16_t  *>(CalculateRM(mod_byte, opcode));
+#if DEBUG
+            change_print_16bit(opt1_16bit);
+#endif
             *opt1_16bit = *opt2_16bit;
             seg_reg_es = *(opt2_16bit + 1);
+#if DEBUG
+            printf_my(*opt1_16bit);
+#endif
             break;
         }
 
@@ -4214,8 +4781,14 @@ void Cpu::Exec(uint32_t loops)
             mod_byte = ReadData8InExe();
             opt1_16bit = CalculateReg16(mod_byte);
             opt2_16bit = reinterpret_cast<uint16_t  *>(CalculateRM(mod_byte, opcode));
+#if DEBUG
+            change_print_16bit(opt1_16bit);
+#endif
             *opt1_16bit = *opt2_16bit;
             seg_reg_ds = *(opt2_16bit + 1);
+#if DEBUG
+            printf_my(*opt1_16bit);
+#endif
             break;
         }
 
@@ -4223,7 +4796,13 @@ void Cpu::Exec(uint32_t loops)
         {
             mod_byte = ReadData8InExe();
             opt1_8bit = CalculateRM(mod_byte, opcode);
+#if DEBUG
+            change_print_8bit(opt1_8bit);
+#endif
             *opt1_8bit = ReadData8InExe();
+#if DEBUG
+            printf_my(*opt1_8bit);
+#endif
             break;
         }
 
@@ -4231,7 +4810,13 @@ void Cpu::Exec(uint32_t loops)
         {
             mod_byte = ReadData8InExe();
             opt1_16bit = reinterpret_cast<uint16_t  *>(CalculateRM(mod_byte, opcode));
+#if DEBUG
+            change_print_16bit(opt1_16bit);
+#endif
             *opt1_16bit = ReadData16InExe();
+#if DEBUG
+            printf_my(*opt1_16bit);
+#endif
             break;
         }
 
@@ -4265,9 +4850,10 @@ void Cpu::Exec(uint32_t loops)
 
         case(0xCA)://RETF Iw
         {
+            uint16_t tmp_data = ReadData16InExe();
             control_reg_ip = Pop();
             seg_reg_cs = Pop();
-            universal_reg_sp = universal_reg_sp + ReadData16InExe();
+            universal_reg_sp = universal_reg_sp + tmp_data;
             break;
         }
 
@@ -4288,7 +4874,9 @@ void Cpu::Exec(uint32_t loops)
         /*remain to fix*/
         case(0xCD)://INT Ib
         {
-            Intcall(ReadData8InExe());
+            uint8_t tmp_intnum = ReadData8InExe();
+            //printf("at cd %x\n",tmp_intnum);
+            Intcall(tmp_intnum);
             break;
         }
 
@@ -4317,6 +4905,9 @@ void Cpu::Exec(uint32_t loops)
             mod_byte = ReadData8InExe();
             uint8_t group_index = (mod_byte >> 3) & 0x7;
             opt1_8bit = CalculateRM(mod_byte, opcode);
+#if DEBUG
+            change_print_8bit(opt1_8bit);
+#endif
             switch(group_index)
             {
             case(0x00)://ROL Eb 1
@@ -4463,6 +5054,9 @@ void Cpu::Exec(uint32_t loops)
                 break;
             }
             }
+#if DEBUG
+            printf_my(*opt1_8bit);
+#endif
             break;
         }
 
@@ -4471,6 +5065,9 @@ void Cpu::Exec(uint32_t loops)
             mod_byte = ReadData8InExe();
             uint8_t group_index = (mod_byte >> 3) & 0x7;
             opt1_16bit = reinterpret_cast<uint16_t  *>(CalculateRM(mod_byte, opcode));
+#if DEBUG
+            change_print_16bit(opt1_16bit);
+#endif
             switch(group_index)
             {
             case(0x00)://ROL Ev 1
@@ -4546,6 +5143,7 @@ void Cpu::Exec(uint32_t loops)
             }
 
             case(0x04)://SHL Ev 1
+            case(0x06):
             {
                 control_reg_flag &= 0xFEFF;
                 __asm__
@@ -4581,23 +5179,23 @@ void Cpu::Exec(uint32_t loops)
                 break;
             }
 
-            case(0x06)://SAL Ev 1
-            {
-                control_reg_flag &= 0xFEFF;
-                __asm__
-                (
-                    "PUSHW %3;\n\t"
-                    "POPFW;\n\t"
-                    "SALW %2,%0;\n\t"
-                    "PUSHF;\n\t"
-                    "POP %%EAX;\n\t"
-                    "MOVW %%AX,%1;\n\t"
-                    :"+r"(*opt1_16bit), "=r"(control_reg_flag) /* output */
-                    :"i"(1)       , "r"(control_reg_flag) /* input */
-                    :"eax"
-                );
-                break;
-            }
+            //    case(0x06)://SAL Ev 1
+            //        {
+            //            control_reg_flag &= 0xFEFF;
+            //            __asm__
+            //                (
+            //                 "PUSHW %3;\n\t"
+            //                 "POPFW;\n\t"
+            //                 "SALW %2,%0;\n\t"
+            //                 "PUSHF;\n\t"
+            //                 "POP %%EAX;\n\t"
+            //                 "MOVW %%AX,%1;\n\t"
+            //                 :"+r"(*opt1_16bit), "=r"(control_reg_flag) /* output */
+            //                 :"i"(1)       , "r"(control_reg_flag) /* input */
+            //                 :"eax"
+            //                );
+            //            break;
+            //        }
 
             case(0x07)://SAR Ev 1
             {
@@ -4617,6 +5215,9 @@ void Cpu::Exec(uint32_t loops)
                 break;
             }
             }
+#if DEBUG
+            printf_my(*opt1_16bit);
+#endif
             break;
         }
 
@@ -4625,6 +5226,9 @@ void Cpu::Exec(uint32_t loops)
             mod_byte = ReadData8InExe();
             uint8_t group_index = (mod_byte >> 3) & 0x7;
             opt1_8bit = CalculateRM(mod_byte, opcode);
+#if DEBUG
+            change_print_8bit(opt1_8bit);
+#endif
             switch(group_index)
             {
             case(0x00)://ROL Eb CL
@@ -4771,6 +5375,9 @@ void Cpu::Exec(uint32_t loops)
                 break;
             }
             }
+#if DEBUG
+            printf_my(*opt1_8bit);
+#endif
             break;
         }
 
@@ -4779,6 +5386,9 @@ void Cpu::Exec(uint32_t loops)
             mod_byte = ReadData8InExe();
             uint8_t group_index = (mod_byte >> 3) & 0x7;
             opt1_16bit = reinterpret_cast<uint16_t  *>(CalculateRM(mod_byte, opcode));
+#if DEBUG
+            change_print_16bit(opt1_16bit);
+#endif
             switch(group_index)
             {
             case(0x00)://ROL Ev CL
@@ -4925,6 +5535,9 @@ void Cpu::Exec(uint32_t loops)
                 break;
             }
             }
+#if DEBUG
+            printf_my(*opt1_16bit);
+#endif
             break;
         }
 
@@ -5062,21 +5675,42 @@ void Cpu::Exec(uint32_t loops)
         /*port IO operate remain to fix*/
         case(0xE4)://IN AL ib
         {
+
             uint8_t tmp_data = ReadData8InExe();
+#if DEBUG
+            if(count_code <= MAX && count_code >= MIN)
+                printf("Read port 0x%x ,", tmp_data);
+            change_print_8bit(universal_reg_al);
+#endif
             *universal_reg_al = read8_from_port(tmp_data);
+#if DEBUG
+            printf_my(*universal_reg_al);
+#endif
             break;
         }
 
         case(0xE5)://IN AX ib
         {
             uint8_t tmp_data = ReadData8InExe();
+#if DEBUG
+            if(count_code <= MAX && count_code >= MIN)
+                printf("Read port 0x%x ,", tmp_data);
+            change_print_16bit(&universal_reg_ax);
+#endif
             universal_reg_ax = read16_from_port(tmp_data);
+#if DEBUG
+            printf_my(universal_reg_ax);
+#endif
             break;
         }
 
         case(0xE6)://OUT Ib AL
         {
             uint8_t tmp_data = ReadData8InExe();
+#if DEBUG
+            if(count_code <= MAX && count_code >= MIN)
+                printf("Write port 0x%x <= 0x%x\n", tmp_data, *universal_reg_al);
+#endif
             write8_to_port(tmp_data, *universal_reg_al);
             break;
         }
@@ -5084,6 +5718,10 @@ void Cpu::Exec(uint32_t loops)
         case(0xE7)://OUT Ib AX
         {
             uint8_t tmp_data = ReadData8InExe();
+#if DEBUG
+            if(count_code <= MAX && count_code >= MIN)
+                printf("Write port 0x%x <= 0x%x\n", tmp_data, universal_reg_ax);
+#endif
             write16_to_port(tmp_data, universal_reg_ax);
             break;
         }
@@ -5122,24 +5760,48 @@ void Cpu::Exec(uint32_t loops)
         /*port IO oprate remain to fix*/
         case(0xEC)://IN AL DX
         {
+#if DEBUG
+            if(count_code <= MAX && count_code >= MIN)
+                printf("Read port 0x%x ,", universal_reg_dx);
+            change_print_8bit(universal_reg_al);
+#endif
             *universal_reg_al = ports_operate->port_handle_read8(universal_reg_dx);
+#if DEBUG
+            printf_my(*universal_reg_al);
+#endif
             break;
         }
 
         case(0xED)://IN AX DX
         {
+#if DEBUG
+            if(count_code <= MAX && count_code >= MIN)
+                printf("Read port 0x%x ,", universal_reg_dx);
+            change_print_16bit(&universal_reg_ax);
+#endif
             universal_reg_ax = ports_operate->port_handle_read16(universal_reg_dx);
+#if DEBUG
+            printf_my(universal_reg_ax);
+#endif
             break;
         }
 
         case(0xEE)://OUT DX AL
         {
+#if DEBUG
+            if(count_code <= MAX && count_code >= MIN)
+                printf("Write port 0x%x <= 0x%x\n", universal_reg_dx, *universal_reg_al);
+#endif
             ports_operate->port_handle_write8(universal_reg_dx, *universal_reg_al);
             break;
         }
 
         case(0xEF)://OUT DX AX
         {
+#if DEBUG
+            if(count_code <= MAX && count_code >= MIN)
+                printf("Write port 0x%x <= 0x%x\n", universal_reg_dx, universal_reg_ax);
+#endif
             ports_operate->port_handle_write16(universal_reg_dx, universal_reg_ax);
             break;
         }
@@ -5207,12 +5869,21 @@ void Cpu::Exec(uint32_t loops)
 
             case(0x02)://NOT Eb
             {
+#if DEBUG
+                change_print_8bit(opt1_8bit);
+#endif
                 *opt1_8bit = ~(*opt1_8bit);
+#if DEBUG
+                printf_my(*opt1_8bit);
+#endif
                 break;
             }
 
             case(0x03)://NEG Eb
             {
+#if DEBUG
+                change_print_8bit(opt1_8bit);
+#endif
                 control_reg_flag &= 0xFEFF;
                 __asm__
                 (
@@ -5226,6 +5897,10 @@ void Cpu::Exec(uint32_t loops)
                     : "r"(control_reg_flag) /* input */
                     :"eax"
                 );
+
+#if DEBUG
+                printf_my(*opt1_8bit);
+#endif
                 break;
             }
 
@@ -5367,12 +6042,21 @@ void Cpu::Exec(uint32_t loops)
 
             case(0x02)://NOT Ev
             {
+#if DEBUG
+                change_print_16bit(opt1_16bit);
+#endif
                 *opt1_16bit = ~(*opt1_16bit);
+#if DEBUG
+                printf_my(*opt1_16bit);
+#endif
                 break;
             }
 
             case(0x03)://NEG Ev
             {
+#if DEBUG
+                change_print_16bit(opt1_16bit);
+#endif
                 control_reg_flag &= 0xFEFF;
                 __asm__
                 (
@@ -5386,6 +6070,9 @@ void Cpu::Exec(uint32_t loops)
                     :    "r"(control_reg_flag) /* input */
                     :"eax"
                 );
+#if DEBUG
+                printf_my(*opt1_16bit);
+#endif
                 break;
             }
 
@@ -5534,6 +6221,9 @@ void Cpu::Exec(uint32_t loops)
             {
             case(0x00)://INC Eb
             {
+#if DEBUG
+                change_print_8bit(opt1_8bit);
+#endif
                 control_reg_flag &= 0xFEFF;
                 __asm__
                 (
@@ -5547,11 +6237,17 @@ void Cpu::Exec(uint32_t loops)
                     :      "r"(control_reg_flag) /* input */
                     :"eax"
                 );
+#if DEBUG
+                printf_my(*opt1_8bit);
+#endif
                 break;
             }
 
             case(0x01)://DEC Eb
             {
+#if DEBUG
+                change_print_8bit(opt1_8bit);
+#endif
                 control_reg_flag &= 0xFEFF;
                 __asm__
                 (
@@ -5565,6 +6261,9 @@ void Cpu::Exec(uint32_t loops)
                     :      "r"(control_reg_flag) /* input */
                     :"eax"
                 );
+#if DEBUG
+                printf_my(*opt1_8bit);
+#endif
                 break;
             }
 
@@ -5583,6 +6282,9 @@ void Cpu::Exec(uint32_t loops)
             {
             case(0x00)://INC Ev
             {
+#if DEBUG
+                change_print_16bit(opt1_16bit);
+#endif
                 control_reg_flag &= 0xFEFF;
                 __asm__
                 (
@@ -5596,11 +6298,17 @@ void Cpu::Exec(uint32_t loops)
                     :       "r"(control_reg_flag) /* input */
                     :"eax"
                 );
+#if DEBUG
+                printf_my(*opt1_16bit);
+#endif
                 break;
             }
 
             case(0x01)://DEC Ev
             {
+#if DEBUG
+                change_print_16bit(opt1_16bit);
+#endif
                 control_reg_flag &= 0xFEFF;
                 __asm__
                 (
@@ -5614,6 +6322,9 @@ void Cpu::Exec(uint32_t loops)
                     :       "r"(control_reg_flag) /* input */
                     :"eax"
                 );
+#if DEBUG
+                printf_my(*opt1_16bit);
+#endif
                 break;
             }
 
@@ -5664,6 +6375,11 @@ void Cpu::Exec(uint32_t loops)
         rep = 0;
         continue_check = 1;
 
+
+#if DEBUG
+        if(count_code <= MAX && count_code >= MIN)
+            printdebug(opcode, count_code, ip_tmp);
+#endif
         // if(count_code >= 500000 && count_code <= 800000)
         {
             ///        if(count_code <= 7000000 && count_code > 600000)

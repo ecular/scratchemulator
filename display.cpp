@@ -115,11 +115,11 @@ void Display::draw(void *tmp)
         cursor_pixel_x = p->video->cursor_x * cursor_width;
         //printf("cursor_x:%d,cursor_width:%d,cursor_pixel_x:%d\n",p->video->cursor_x,cursor_width,cursor_pixel_x);
         cursor_pixel_y = (p->video->cursor_y + 1) * 8 - cursor_heigh;
-        for(int y = cursor_pixel_y * 2; y < cursor_pixel_y * 2  + cursor_heigh; ++y)
-            for(int x = cursor_pixel_x; x < cursor_pixel_x + cursor_width; ++x)
+        for(uint16_t y = cursor_pixel_y * 2; y < cursor_pixel_y * 2  + cursor_heigh; ++y)
+            for(uint16_t x = cursor_pixel_x; x < cursor_pixel_x + cursor_width; ++x)
             {
                 draw_pixel = p->video->CGApalette[p->cpu->ram[p->video->Video_Buffer_Address + p->video->cursor_y * p->video->columns * 2 + p->video->cursor_x * 2 - 1] & 0xF];//cursor color
-                p->display_buffer[y][x] = draw_pixel;
+                p->display_buffer[y & 0x3FF][x & 0x3FF] = draw_pixel;
             }
     }
     /*prepare data (display_buffer[][]) finished,draw now*/

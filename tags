@@ -24,6 +24,7 @@ Colorful_Flag	./video.h	/^    uint8_t Attribute_Control_Reg_Flag\/*0:index.1:dat
 Cpu	./cpu.cpp	/^Cpu::Cpu()$/;"	f	class:Cpu
 Cpu	./cpu.h	/^class Cpu {$/;"	c
 DAC_Status_Reg	./video.h	/^    uint8_t DAC_Status_Reg, Table_Index_Reg_Read, Table_Index_Reg_Write, Plane_Lock[4];$/;"	m	class:Video
+DEBUG	./cpu.cpp	2;"	d	file:
 Disk	./disk.cpp	/^Disk::Disk(string filename, uint8_t driver_num)$/;"	f	class:Disk
 Disk	./disk.h	/^class Disk {$/;"	c
 Disk_handle	./cpu.h	/^    disk_handle *Disk_handle;$/;"	m	class:Cpu
@@ -138,6 +139,8 @@ calcsq	./testasm/codegolf.asm	/^calcsq:$/;"	l
 calcsqfinish	./testasm/codegolf.asm	/^calcsqfinish:$/;"	l
 calcsqloop	./testasm/codegolf.asm	/^calcsqloop:$/;"	l
 calltest	./testasm/codegolf.asm	/^calltest:$/;"	l
+change_print_16bit	./cpu.cpp	/^void Cpu::change_print_16bit(uint16_t *p)$/;"	f	class:Cpu
+change_print_8bit	./cpu.cpp	/^void Cpu::change_print_8bit(uint8_t *p)$/;"	f	class:Cpu
 columns	./video.h	/^    uint8_t columns, rows;$/;"	m	class:Video
 cont	./testasm/codegolf.asm	/^cont:$/;"	l
 cont1	./testasm/codegolf.asm	/^cont1:$/;"	l
@@ -218,6 +221,7 @@ print	./testasm/codegolf.asm	/^print:$/;"	l
 print_screen	./main.cpp	/^void print_screen(Cpu  *cpu)$/;"	f
 printchr	./testasm/codegolf.asm	/^printchr:$/;"	l
 printdebug	./cpu.cpp	/^void Cpu::printdebug(uint8_t opcode, uint32_t count, uint32_t ip_addr)$/;"	f	class:Cpu
+printf_my	./cpu.cpp	/^void Cpu::printf_my(uint16_t cotent)$/;"	f	class:Cpu
 printloop	./testasm/codegolf.asm	/^printloop:$/;"	l
 printnl	./testasm/codegolf.asm	/^printnl:$/;"	l
 printnlloop	./testasm/codegolf.asm	/^printnlloop:$/;"	l

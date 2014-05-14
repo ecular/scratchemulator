@@ -26,7 +26,7 @@ void *RunThread(void *cpu_arg)
     Cpu *cpu = (Cpu *)cpu_arg;
     //while(true)
     {
-        cpu->Exec(100000000);
+        cpu->Exec(10000000000000);
     }
 }
 
