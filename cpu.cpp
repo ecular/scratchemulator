@@ -1,6 +1,6 @@
 #define CPU_80186
-#define DEBUG 1
-#define MAX 100000000
+#define DEBUG 0
+#define MAX 100000000000
 #define MIN 7000000
 
 #include "cpu.h"
@@ -328,7 +328,7 @@ inline uint8_t Cpu::ReadRam8(uint32_t location)
             return ram[location];
     }
     ram[0x410] = 0x41;/*we have an EGA?VGA card installed*/
-    //ram[0x475] = Disk_handle->hard_count;
+    ram[0x475] = Disk_handle->hard_count;
     return ram[location];
 }
 
@@ -407,6 +407,7 @@ uint8_t *Cpu::CalculateRM(uint8_t mod_byte, uint8_t opcode)
     uint8_t rm = mod_byte & 0x7;
     uint8_t mod_bit = (mod_byte >> 6) & 0x3;
     opcode = opcode & 0x1;//W bit
+    int16_t tmp_data;
     switch(mod_bit)
     {
     case(0x0):
@@ -431,24 +432,25 @@ uint8_t *Cpu::CalculateRM(uint8_t mod_byte, uint8_t opcode)
         }
 
     case(0x1):
+        tmp_data = static_cast<int16_t>(static_cast<int8_t>(ReadData8InExe()));
         switch(rm)
         {
         case(0x00):
-            return &ram[(*seg_reg_replace_ds << 4) + universal_reg_bx + universal_reg_si + ReadData8InExe()];
+            return &ram[(*seg_reg_replace_ds << 4) + universal_reg_bx + universal_reg_si + tmp_data];
         case(0x01):
-            return &ram[(*seg_reg_replace_ds << 4) + universal_reg_bx + universal_reg_di + ReadData8InExe()];
+            return &ram[(*seg_reg_replace_ds << 4) + universal_reg_bx + universal_reg_di + tmp_data];
         case(0x02):
-            return &ram[(*seg_reg_replace_ss << 4) + universal_reg_bp + universal_reg_si + ReadData8InExe()];
+            return &ram[(*seg_reg_replace_ss << 4) + universal_reg_bp + universal_reg_si + tmp_data];
         case(0x03):
-            return &ram[(*seg_reg_replace_ss << 4) + universal_reg_bp + universal_reg_di + ReadData8InExe()];
+            return &ram[(*seg_reg_replace_ss << 4) + universal_reg_bp + universal_reg_di + tmp_data];
         case(0x04):
-            return &ram[(*seg_reg_replace_ds << 4) + universal_reg_si + ReadData8InExe()];
+            return &ram[(*seg_reg_replace_ds << 4) + universal_reg_si + tmp_data];
         case(0x05):
-            return &ram[(*seg_reg_replace_ds << 4) + universal_reg_di + ReadData8InExe()];
+            return &ram[(*seg_reg_replace_ds << 4) + universal_reg_di + tmp_data];
         case(0x06):
-            return &ram[(*seg_reg_replace_ss << 4) + universal_reg_bp + ReadData8InExe()];
+            return &ram[(*seg_reg_replace_ss << 4) + universal_reg_bp + tmp_data];
         case(0x07):
-            return &ram[(*seg_reg_replace_ds << 4) + universal_reg_bx + ReadData8InExe()];
+            return &ram[(*seg_reg_replace_ds << 4) + universal_reg_bx + tmp_data];
         }
 
     case(0x2):
@@ -584,6 +586,9 @@ void Cpu::Intcall(uint8_t int_num)
     case(0x19):
     {
         printf("int 0x19\n");
+        //  seg_reg_cs = 0xF600;    //start ROM BASIC at bootstrap if requested
+        //  control_reg_ip = 0x0000;
+
         *universal_reg_dl = 0x0;
         Disk_handle->disk_map[GetDL()]->readdisk(1, 0, 1, 0, *universal_reg_dl, 0x07C0, 0x0000);
         seg_reg_cs = 0x0000;
@@ -592,7 +597,7 @@ void Cpu::Intcall(uint8_t int_num)
     }
 
     case(0x13):
-    case(0xFD):
+        //case(0xFD):
         Disk_handle->disk_operator();
         return;
 
@@ -718,6 +723,7 @@ void Cpu::Exec(uint32_t loops)
     static std::vector<uint8_t> my;
     vector<uint8_t>::iterator found;
     static uint32_t lo = 1000000000;
+    uint64_t deg = 10000000000000;
     /**/
 #ifdef CPU_80186
     uint8_t rep = 0;
@@ -725,47 +731,52 @@ void Cpu::Exec(uint32_t loops)
 
     for(uint32_t loopscounts = 0; loopscounts < loops; ++loopscounts, ++Instruction_counts)
     {
+//       if(ram[0x7d42]==0x12)
+//       {
+//           printdebug(opcode, count_code, ip_tmp);
+//           return;
+//       }
         /*debug*/
-//        if(*(uint16_t *)(&ram[0x70])!=old70)
-//        {
-//            //printf("Here %ld,opcode=%x change from %x => %x\n",count_code,opcode,old70,*(uint16_t *)(&ram[0x70]));
-//            old70 = *(uint16_t *)(&ram[0x70]);
-//            //printdebug(opcode, count_code, ip_tmp);
-//            if(old70 == 0x5744)
-//                lo = count_code;
-//
-//        }
-//
-//        {
-//            found = find( my.begin(), my.end(), opcode);
-//            if(count_code <=554347)
-//            {
-//                if (found != my.end())
-//                {
-//                    ;//do nothing
-//                }
-//                else
-//                {
-//                    my.push_back(opcode);
-//                }
-//            }
-//            else
-//                if(count_code <= lo)
-//                {
-//                    if (found != my.end())
-//                    {
-//                        ;//do nothing
-//                    }
-//                    else
-//                    {
-//                        my.push_back(opcode);
-//                        printf("%x\n",opcode);
-//                    }
-//                }
-//            fflush(stdout);
-//
-//        }
-//
+        //        if(*(uint16_t *)(&ram[0x70])!=old70)
+        //        {
+        //            //printf("Here %ld,opcode=%x change from %x => %x\n",count_code,opcode,old70,*(uint16_t *)(&ram[0x70]));
+        //            old70 = *(uint16_t *)(&ram[0x70]);
+        //            //printdebug(opcode, count_code, ip_tmp);
+        //            if(old70 == 0x5744)
+        //                lo = count_code;
+        //
+        //        }
+        //
+        //        {
+        //            found = find( my.begin(), my.end(), opcode);
+        //            if(count_code <=554347)
+        //            {
+        //                if (found != my.end())
+        //                {
+        //                    ;//do nothing
+        //                }
+        //                else
+        //                {
+        //                    my.push_back(opcode);
+        //                }
+        //            }
+        //            else
+        //                if(count_code <= lo)
+        //                {
+        //                    if (found != my.end())
+        //                    {
+        //                        ;//do nothing
+        //                    }
+        //                    else
+        //                    {
+        //                        my.push_back(opcode);
+        //                        printf("%x\n",opcode);
+        //                    }
+        //                }
+        //            fflush(stdout);
+        //
+        //        }
+        //
         /**/
         seg_reg_replace_ds = &seg_reg_ds;
         seg_reg_replace_ss = &seg_reg_ss;
@@ -4876,6 +4887,10 @@ void Cpu::Exec(uint32_t loops)
         {
             uint8_t tmp_intnum = ReadData8InExe();
             //printf("at cd %x\n",tmp_intnum);
+            if(tmp_intnum == 0x13 && *universal_reg_ah == 0)
+                deg = count_code;
+            if(tmp_intnum == 0x13 && *universal_reg_ah == 2)
+                deg = 100000000000;
             Intcall(tmp_intnum);
             break;
         }
@@ -5951,23 +5966,18 @@ void Cpu::Exec(uint32_t loops)
                     Intcall(0);//divid by 0
                     break;
                 }
-                control_reg_flag &= 0xFEFF;
-                __asm__
-                (
-                    "PUSHW %3;\n\t"
-                    "POPFW;\n\t"
-                    "MOVW %0,%%AX;\n\t"
-                    "DIVB %2;\n\t"
-                    "MOVW %%AX,%0;\n\t"
-                    "PUSHF;\n\t"
-                    "POP %%EAX;\n\t"
-                    "MOVW %%AX,%1;\n\t"
-                    :"+r"(universal_reg_ax), "=r"(control_reg_flag) /* output */
-                    :"r"(*opt1_8bit)     , "r"(control_reg_flag) /* input */
-                    :"eax"
-                );
+                if(((universal_reg_ax) / (*opt1_8bit)) > 0xFF)
+                {
+                    Intcall(0);
+                    break;
+                }
+
+                uint16_t tmp_ax = universal_reg_ax;
+                *universal_reg_ah = (tmp_ax) % (*opt1_8bit);
+                *universal_reg_al = (tmp_ax) / (*opt1_8bit);
                 break;
             }
+
 
             case(0x07)://IDIV Eb
             {
@@ -6125,23 +6135,14 @@ void Cpu::Exec(uint32_t loops)
                     Intcall(0);//divid by 0
                     break;
                 }
-                control_reg_flag &= 0xFEFF;
-                __asm__
-                (
-                    "PUSHW %4;\n\t"
-                    "POPFW;\n\t"
-                    "MOVW %0,%%AX;\n\t"
-                    "DIVW %3;\n\t"
-                    "MOVW %%AX,%0;\n\t"
-                    "MOVW %%DX,%2;\n\t"
-                    "PUSHF;\n\t"
-                    "POP %%EAX;\n\t"
-                    "MOVW %%AX,%1;\n\t"
-                    :"+r"(universal_reg_ax), "=r"(control_reg_flag), "=r"(universal_reg_dx) /* output */
-                    :"r"(*opt1_16bit)     , "r"(control_reg_flag) /* input */
-                    :"eax", "edx"
-                );
-                break;
+                if(((((universal_reg_dx) << 16) + universal_reg_ax) / (*opt1_16bit)) > 0xFFFF)
+                {
+                    Intcall(0);
+                    break;
+                }
+                uint16_t tmp_dx = universal_reg_dx;
+                universal_reg_dx = (((universal_reg_dx) << 16) + universal_reg_ax) % (*opt1_16bit);
+                universal_reg_ax = (((tmp_dx) << 16) + universal_reg_ax) / (*opt1_16bit);
                 break;
             }
 
@@ -6374,6 +6375,9 @@ void Cpu::Exec(uint32_t loops)
 
         rep = 0;
         continue_check = 1;
+
+//        if(count_code >= deg)
+//            printdebug(opcode, count_code, ip_tmp);
 
 
 #if DEBUG

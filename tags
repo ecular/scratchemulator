@@ -82,6 +82,8 @@ Interval_Timer_8253	./8253.h	/^class Interval_Timer_8253 {$/;"	c
 LDFLAG	./Makefile	/^LDFLAG = -lSDL -lpthread$/;"	m
 LoadBIOS	./cpu.cpp	/^bool Cpu::LoadBIOS(string filename)$/;"	f	class:Cpu
 LoadRom	./cpu.cpp	/^bool Cpu::LoadRom(uint32_t addr, string filename)$/;"	f	class:Cpu
+MAX	./cpu.cpp	3;"	d	file:
+MIN	./cpu.cpp	4;"	d	file:
 Mode_Change_Flag	./video.h	/^    uint8_t Attribute_Control_Reg_Flag\/*0:index.1:data*\/, Graphic_Mode_Flag, Colorful_Flag, Mode_Change_Flag;$/;"	m	class:Video
 OBJ	./Makefile	/^OBJ = $(patsubst %.cpp,%.o,$(wildcard *.cpp)) $/;"	m
 OCW	./8259a.h	/^    uint8_t OCW[4];$/;"	m	class:Interrupt_Controller_8259a
