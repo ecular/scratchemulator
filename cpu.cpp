@@ -1,7 +1,7 @@
 #define CPU_80186
-#define DEBUG 0
-#define MAX 100000000000
-#define MIN 7000000
+#define DEBUG  0
+#define MAX 2000000
+#define MIN 1000000
 
 #include "cpu.h"
 
@@ -731,7 +731,7 @@ void Cpu::Exec(uint32_t loops)
 
     for(uint32_t loopscounts = 0; loopscounts < loops; ++loopscounts, ++Instruction_counts)
     {
-//       if(ram[0x7d42]==0x12)
+//       if(ram[0x46c]==0x45)
 //       {
 //           printdebug(opcode, count_code, ip_tmp);
 //           return;
@@ -749,7 +749,7 @@ void Cpu::Exec(uint32_t loops)
         //
         //        {
         //            found = find( my.begin(), my.end(), opcode);
-        //            if(count_code <=554347)
+        //            if(count_code <=deg)
         //            {
         //                if (found != my.end())
         //                {
@@ -761,7 +761,7 @@ void Cpu::Exec(uint32_t loops)
         //                }
         //            }
         //            else
-        //                if(count_code <= lo)
+        //                if(count_code > deg)
         //                {
         //                    if (found != my.end())
         //                    {
@@ -776,7 +776,7 @@ void Cpu::Exec(uint32_t loops)
         //            fflush(stdout);
         //
         //        }
-        //
+
         /**/
         seg_reg_replace_ds = &seg_reg_ds;
         seg_reg_replace_ss = &seg_reg_ss;
@@ -3817,8 +3817,7 @@ void Cpu::Exec(uint32_t loops)
 
         case(0x97)://XCHG eDI eAX
         {
-            uint16_t tmp_data;
-            tmp_data = universal_reg_ax;
+            uint16_t tmp_data = universal_reg_ax;
             universal_reg_ax = universal_reg_di;
             universal_reg_di = tmp_data;
             break;
@@ -4092,7 +4091,7 @@ void Cpu::Exec(uint32_t loops)
                 universal_reg_cx = universal_reg_cx - 1;
             if(rep == 1 && zf == 0)
                 break;
-            else if(rep == 2 && zf == 1)
+            if(rep == 2 && zf == 1)
                 break;
             if(rep == 0)
                 break;
@@ -4235,7 +4234,7 @@ void Cpu::Exec(uint32_t loops)
                 break;
 
             uint8_t df = control_reg_flag >> 10 & 0x1;
-            universal_reg_ax = ReadRam16((*seg_reg_replace_ds << 4) + universal_reg_di);
+            universal_reg_ax = ReadRam16((*seg_reg_replace_ds << 4) + universal_reg_si);
 
             if(df)
             {
@@ -4887,10 +4886,10 @@ void Cpu::Exec(uint32_t loops)
         {
             uint8_t tmp_intnum = ReadData8InExe();
             //printf("at cd %x\n",tmp_intnum);
-            if(tmp_intnum == 0x13 && *universal_reg_ah == 0)
+            if(tmp_intnum == 0x13 && *universal_reg_ah == 8)
                 deg = count_code;
-            if(tmp_intnum == 0x13 && *universal_reg_ah == 2)
-                deg = 100000000000;
+            //  if(tmp_intnum == 0x13 && *universal_reg_ah == 8)
+            //      deg = 100000000000000000;
             Intcall(tmp_intnum);
             break;
         }
@@ -6376,8 +6375,8 @@ void Cpu::Exec(uint32_t loops)
         rep = 0;
         continue_check = 1;
 
-//        if(count_code >= deg)
-//            printdebug(opcode, count_code, ip_tmp);
+        //  if(count_code >= deg)
+        //      printdebug(opcode, count_code, ip_tmp);
 
 
 #if DEBUG
@@ -6446,7 +6445,7 @@ void Cpu::printdebug(uint8_t opcode, uint32_t count, uint32_t ip_addr)
     cf = (control_reg_flag >> 0) & 0x1;
 
     /*ax,bx,cx,dx sp,bp,si,di,ip,flag,cs,ds,ss,es*/
-    printf("After %ld opcode :%x\n", count, opcode);
+    printf("After opcode :%x\n",  opcode);
     ip_addr = ip_addr & 0xFFFFF;
     printf("%x %x %x %x %x %x %x %x\n", ram[ip_addr], ram[ip_addr + 1], ram[ip_addr + 2], ram[ip_addr + 3], ram[ip_addr + 4], ram[ip_addr + 5], ram[ip_addr + 6], ram[ip_addr + 7]);
     printf("CS:%x IP:%x DS:%x SS:%x ES:%x\n", GetCS(), GetIP(), GetDS(), GetSS(), GetES());

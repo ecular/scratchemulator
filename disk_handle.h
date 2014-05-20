@@ -2,6 +2,7 @@
 #define EMU_DISK_HANDLE_H
 
 #include <map>
+#include <vector>
 #include "disk.h"
 
 class Cpu;
@@ -11,6 +12,7 @@ class disk_handle {
 private:
     Cpu *cpu;
     map<uint8_t, Disk *> disk_map;
+    vector<uint8_t> inserted_disknum;
 public:
     uint8_t hard_count, floppy_count;
     void insert_disk(uint8_t , Disk *);
