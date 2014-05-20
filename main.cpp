@@ -24,9 +24,9 @@ void print_screen(Cpu  *cpu)
 void *RunThread(void *cpu_arg)
 {
     Cpu *cpu = (Cpu *)cpu_arg;
-    //while(true)
+    while(true)
     {
-        cpu->Exec(10000000000000);
+        cpu->Exec(10000);
     }
 }
 

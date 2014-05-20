@@ -55,9 +55,9 @@ void disk_handle::disk_operator()
         found = find(inserted_disknum.begin(), inserted_disknum.end(), cpu->GetDL());
         if(found != inserted_disknum.end())
         {
-            //   printf("2\n");
-            //       printf("al %x ch %x cl %x dh %x dl %x es %x bx %x\n", cpu->GetAL(), cpu->GetCH(), cpu->GetCL(), cpu->GetDH(), cpu->GetDL(), cpu->GetES(), cpu->GetBX());
-            //     fflush(stdout);
+            //  printf("2\n");
+            //  printf("al %x ch %x cl %x dh %x dl %x es %x bx %x\n", cpu->GetAL(), cpu->GetCH(), cpu->GetCL(), cpu->GetDH(), cpu->GetDL(), cpu->GetES(), cpu->GetBX());
+            //  fflush(stdout);
             disk_map[cpu->GetDL()]->readdisk(cpu->GetAL(), cpu->GetCL() / 64 * 256 + cpu->GetCH(), cpu->GetCL() & 0x3F, cpu->GetDH(), cpu->GetDL(), cpu->GetES(), cpu->GetBX());
             cpu->SetFlag(cpu->GetFlag() & 0xFFFE);//CF = 0
             cpu->SetAH(0);
@@ -101,7 +101,6 @@ void disk_handle::disk_operator()
         found = find(inserted_disknum.begin(), inserted_disknum.end(), cpu->GetDL());
         if(found != inserted_disknum.end())
         {
-            printf("8\n");
             cpu->SetFlag(cpu->GetFlag() & 0xFFFE);//CF = 0
             cpu->SetAH(0);//Return Code
             cpu->SetDH(disk_map[cpu->GetDL()]->heads - 1);//heads_index = heads_count - 1 (start with 0)

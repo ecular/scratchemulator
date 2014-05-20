@@ -1,7 +1,7 @@
 #define CPU_80186
 #define DEBUG  0
-#define MAX 2000000
-#define MIN 1000000
+#define MAX 20000000000000000
+#define MIN 30000000
 
 #include "cpu.h"
 
@@ -585,7 +585,6 @@ void Cpu::Intcall(uint8_t int_num)
 
     case(0x19):
     {
-        printf("int 0x19\n");
         //  seg_reg_cs = 0xF600;    //start ROM BASIC at bootstrap if requested
         //  control_reg_ip = 0x0000;
 
@@ -610,7 +609,6 @@ void Cpu::Intcall(uint8_t int_num)
     if_flag = 0;//set IF = 0
     tf_flag = 0;
     control_reg_flag = control_reg_flag & 0xFEFF;//set TF = 0
-
     Push(seg_reg_cs);//push cs
     Push(control_reg_ip);//push ip
     seg_reg_cs = ReadRam16((uint16_t)int_num * 4 + 2);//read cs from Interrupt vector table
@@ -660,6 +658,7 @@ void Cpu::change_print_8bit(uint8_t *p)
             printf("Changed DL from 0x%x => ", *p);
         else
             printf("changed RAM[0x%x] from 0x%x => ", p - ram, *p);
+        fflush(stdout);
     }
 }
 void Cpu::change_print_16bit(uint16_t *p)
@@ -694,7 +693,9 @@ void Cpu::change_print_16bit(uint16_t *p)
             printf("Changed ES from 0x%x => ", *p);
         else
             printf("changed RAM[0x%x] from 0x%x => ", ((uint8_t *)p) - ram, *p);
+        fflush(stdout);
     }
+
 }
 
 void Cpu::printf_my(uint16_t cotent)
@@ -702,6 +703,7 @@ void Cpu::printf_my(uint16_t cotent)
     if(count_code <= MAX && count_code >= MIN)
     {
         printf("%x\n", cotent);
+        fflush(stdout);
     }
 }
 
@@ -3693,7 +3695,7 @@ void Cpu::Exec(uint32_t loops)
         case(0x8C)://MOV Rw Sw
         {
             mod_byte = ReadData8InExe();
-            opt1_16bit = reinterpret_cast<uint16_t  *>(CalculateRM(mod_byte, opcode));
+            opt1_16bit = reinterpret_cast<uint16_t  *>(CalculateRM(mod_byte, 0x1));
             opt2_16bit = CalculateSeg16(mod_byte);
 #if DEBUG
             change_print_16bit(opt1_16bit);
@@ -4886,8 +4888,8 @@ void Cpu::Exec(uint32_t loops)
         {
             uint8_t tmp_intnum = ReadData8InExe();
             //printf("at cd %x\n",tmp_intnum);
-            if(tmp_intnum == 0x13 && *universal_reg_ah == 8)
-                deg = count_code;
+            // if(tmp_intnum == 0x13 && *universal_reg_ah == 2 && *universal_reg_al == 1 && *universal_reg_ch ==0 && *universal_reg_cl ==2 && *universal_reg_dh == 1 && *universal_reg_dl == 0 && seg_reg_es == 0x8e8e && universal_reg_bx == 0x14)
+            //     deg = count_code;
             //  if(tmp_intnum == 0x13 && *universal_reg_ah == 8)
             //      deg = 100000000000000000;
             Intcall(tmp_intnum);
@@ -6375,8 +6377,8 @@ void Cpu::Exec(uint32_t loops)
         rep = 0;
         continue_check = 1;
 
-        //  if(count_code >= deg)
-        //      printdebug(opcode, count_code, ip_tmp);
+        ///    if(count_code >= deg)
+        ///        printdebug(opcode, count_code, ip_tmp);
 
 
 #if DEBUG
