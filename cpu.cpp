@@ -718,7 +718,6 @@ void Cpu::Exec(uint32_t loops)
     uint8_t continue_check = 1;
     static int32_t Instruction_counts = 0;
     static uint8_t one_step_mode = 0;
-    FILE *fp = fopen("/home/ecular/opcodemy.txt", "at");
     /*debug*/
     uint32_t ip_tmp;
     static uint16_t old70 = 0;

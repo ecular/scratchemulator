@@ -6,6 +6,7 @@
 #include "8259a.h"
 #include "8253.h"
 #include "video.h"
+#include "keyboard.h"
 
 class port_handle {
 private:
@@ -13,6 +14,7 @@ private:
     Interrupt_Controller_8259a *i8259a;
     Interval_Timer_8253 *i8253;
     Video *video;
+    Keyboard *keyboard;
     void port_handle_write8(uint16_t, uint8_t);
     uint8_t port_handle_read8(uint16_t);
     void port_handle_write16(uint8_t, uint16_t);
@@ -22,6 +24,7 @@ public:
     void seti8259a(Interrupt_Controller_8259a *);
     void seti8253(Interval_Timer_8253 *);
     void setvideo(Video *);
+    void setkeyboard(Keyboard *);
 };
 
 #endif

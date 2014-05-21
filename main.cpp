@@ -7,6 +7,7 @@
 #include "disk_handle.h"
 #include "timer.h"
 #include "display.h"
+#include "keyboard.h"
 
 void print_screen(Cpu  *cpu)
 {
@@ -28,6 +29,12 @@ void *RunThread(void *cpu_arg)
     {
         cpu->Exec(10000);
     }
+}
+
+void *InputThread(void *keyboard_arg)
+{
+    Keyboard *keyboard = (Keyboard *)keyboard_arg;
+    keyboard->MonitorInput();
 }
 
 //int main(int argc, char **argv)
@@ -194,6 +201,7 @@ int main(int argc, char **argv)
 {
     SDL_Surface *pScreen = 0;
     pthread_t runthread;
+    pthread_t inputthread;
     try
     {
         if(SDL_Init(SDL_INIT_EVERYTHING) == -1)
@@ -225,6 +233,9 @@ int main(int argc, char **argv)
     display.setcpu(&cpu);
     display.setvideo(&video);
 
+    Keyboard keyboard;
+    keyboard.InitKeyboard(&i8259a);
+
     timer timing;
     timing.seti8259a(&i8259a);
     timing.seti8253(&i8253);
@@ -241,6 +252,7 @@ int main(int argc, char **argv)
     ports_operate.seti8259a(&i8259a);
     ports_operate.seti8253(&i8253);
     ports_operate.setvideo(&video);
+    ports_operate.setkeyboard(&keyboard);
 
     cpu.setports_operate(&ports_operate);
     cpu.seti8259a(&i8259a);
@@ -275,6 +287,7 @@ int main(int argc, char **argv)
         std::cout << "videorom load success..." << std::endl;
 
     pthread_create(&runthread, NULL, RunThread, (void *)(&cpu));
+    pthread_create(&inputthread, NULL, InputThread, (void *)(&keyboard));
     // cpu.SetDS(0);
     // cpu.SetCS(0);
     // cpu.SetSS(0);

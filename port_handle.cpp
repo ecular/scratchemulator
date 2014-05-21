@@ -23,6 +23,11 @@ void port_handle::setvideo(Video *arg)
     video = arg;
 }
 
+void port_handle::setkeyboard(Keyboard *arg)
+{
+    keyboard = arg;
+}
+
 void port_handle::port_handle_write8(uint16_t port_num, uint8_t value)
 {
     switch(port_num)
@@ -158,6 +163,10 @@ uint8_t port_handle::port_handle_read8(uint16_t port_num)
     case(0x3DA):
     {
         return video->read_video(port_num);
+    }
+    case(0x60):
+    {
+        return keyboard->GetKey();
     }
     }
     return 0x00;

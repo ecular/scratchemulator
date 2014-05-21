@@ -97,6 +97,7 @@ void disk_handle::disk_operator()
     }
     case(8): /*Read Drive Parameters*/
     {
+        printf("8\n");
         vector<uint8_t>::iterator found;
         found = find(inserted_disknum.begin(), inserted_disknum.end(), cpu->GetDL());
         if(found != inserted_disknum.end())
