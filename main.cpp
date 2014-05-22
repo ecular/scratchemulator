@@ -27,7 +27,7 @@ void *RunThread(void *cpu_arg)
     Cpu *cpu = (Cpu *)cpu_arg;
     while(true)
     {
-        cpu->Exec(10000);
+        cpu->Exec(1000000000);
     }
 }
 
@@ -281,7 +281,7 @@ int main(int argc, char **argv)
 
     if(cpu.LoadBIOS("./bios.bin"))
         std::cout << "BIOS load success..." << std::endl;
-    if(cpu.LoadRom(0xF6000, "./rombasic.bin"))
+    if(cpu.LoadRom(0xF6000, "./ibm-basic-1.10.rom"))
         std::cout << "rombasic load success..." << std::endl;
     if(cpu.LoadRom(0xC0000, "./videorom.bin"))
         std::cout << "videorom load success..." << std::endl;

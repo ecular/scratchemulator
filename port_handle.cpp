@@ -166,7 +166,9 @@ uint8_t port_handle::port_handle_read8(uint16_t port_num)
     }
     case(0x60):
     {
-        return keyboard->GetKey();
+        uint8_t tmp = keyboard->GetKey();
+        keyboard->SetKey();
+        return tmp;
     }
     }
     return 0x00;

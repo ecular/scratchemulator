@@ -1,7 +1,5 @@
 #define CPU_80186
 #define DEBUG  0
-#define MAX 20000000000000000
-#define MIN 30000000
 
 #include "cpu.h"
 
@@ -408,27 +406,28 @@ uint8_t *Cpu::CalculateRM(uint8_t mod_byte, uint8_t opcode)
     uint8_t mod_bit = (mod_byte >> 6) & 0x3;
     opcode = opcode & 0x1;//W bit
     int16_t tmp_data;
+    uint16_t utmp_data;
     switch(mod_bit)
     {
     case(0x0):
         switch(rm)
         {
         case(0x00):
-            return &ram[(*seg_reg_replace_ds << 4) + universal_reg_bx + universal_reg_si];
+            return &ram[(*seg_reg_replace_ds << 4) + ((universal_reg_bx + universal_reg_si) & 0xFFFF)];
         case(0x01):
-            return &ram[(*seg_reg_replace_ds << 4) + universal_reg_bx + universal_reg_di];
+            return &ram[(*seg_reg_replace_ds << 4) + ((universal_reg_bx + universal_reg_di) & 0xFFFF)];
         case(0x02):
-            return &ram[(*seg_reg_replace_ss << 4) + universal_reg_bp + universal_reg_si];
+            return &ram[(*seg_reg_replace_ss << 4) + ((universal_reg_bp + universal_reg_si) & 0xFFFF)];
         case(0x03):
-            return &ram[(*seg_reg_replace_ss << 4) + universal_reg_bp + universal_reg_di];
+            return &ram[(*seg_reg_replace_ss << 4) + ((universal_reg_bp + universal_reg_di) & 0xFFFF)];
         case(0x04):
-            return &ram[(*seg_reg_replace_ds << 4) + universal_reg_si];
+            return &ram[(*seg_reg_replace_ds << 4) + (universal_reg_si & 0xFFFF)];
         case(0x05):
-            return &ram[(*seg_reg_replace_ds << 4) + universal_reg_di];
+            return &ram[(*seg_reg_replace_ds << 4) + (universal_reg_di & 0xFFFF)];
         case(0x06):
-            return &ram[(*seg_reg_replace_ds << 4) + ReadData16InExe()];
+            return &ram[(*seg_reg_replace_ds << 4) + (ReadData16InExe() & 0xFFFF)];
         case(0x07):
-            return &ram[(*seg_reg_replace_ds << 4) + universal_reg_bx];
+            return &ram[(*seg_reg_replace_ds << 4) + (universal_reg_bx & 0xFFFF)];
         }
 
     case(0x1):
@@ -436,42 +435,42 @@ uint8_t *Cpu::CalculateRM(uint8_t mod_byte, uint8_t opcode)
         switch(rm)
         {
         case(0x00):
-            return &ram[(*seg_reg_replace_ds << 4) + universal_reg_bx + universal_reg_si + tmp_data];
+            return &ram[(*seg_reg_replace_ds << 4) + ((universal_reg_bx + universal_reg_si + tmp_data) & 0xFFFF)];
         case(0x01):
-            return &ram[(*seg_reg_replace_ds << 4) + universal_reg_bx + universal_reg_di + tmp_data];
+            return &ram[(*seg_reg_replace_ds << 4) + ((universal_reg_bx + universal_reg_di + tmp_data) & 0xFFFF)];
         case(0x02):
-            return &ram[(*seg_reg_replace_ss << 4) + universal_reg_bp + universal_reg_si + tmp_data];
+            return &ram[(*seg_reg_replace_ss << 4) + ((universal_reg_bp + universal_reg_si + tmp_data) & 0xFFFF)];
         case(0x03):
-            return &ram[(*seg_reg_replace_ss << 4) + universal_reg_bp + universal_reg_di + tmp_data];
+            return &ram[(*seg_reg_replace_ss << 4) + ((universal_reg_bp + universal_reg_di + tmp_data) & 0xFFFF)];
         case(0x04):
-            return &ram[(*seg_reg_replace_ds << 4) + universal_reg_si + tmp_data];
+            return &ram[(*seg_reg_replace_ds << 4) + ((universal_reg_si + tmp_data) & 0xFFFF)];
         case(0x05):
-            return &ram[(*seg_reg_replace_ds << 4) + universal_reg_di + tmp_data];
+            return &ram[(*seg_reg_replace_ds << 4) + ((universal_reg_di + tmp_data) & 0xFFFF)];
         case(0x06):
-            return &ram[(*seg_reg_replace_ss << 4) + universal_reg_bp + tmp_data];
+            return &ram[(*seg_reg_replace_ss << 4) + ((universal_reg_bp + tmp_data) & 0xFFFF)];
         case(0x07):
-            return &ram[(*seg_reg_replace_ds << 4) + universal_reg_bx + tmp_data];
+            return &ram[(*seg_reg_replace_ds << 4) + ((universal_reg_bx + tmp_data) & 0xFFFF)];
         }
 
     case(0x2):
         switch(rm)
         {
         case(0x00):
-            return &ram[(*seg_reg_replace_ds << 4) + universal_reg_bx + universal_reg_si + ReadData16InExe()];
+            return &ram[(*seg_reg_replace_ds << 4) + ((universal_reg_bx + universal_reg_si + ReadData16InExe()) & 0xFFFF)];
         case(0x01):
-            return &ram[(*seg_reg_replace_ds << 4) + universal_reg_bx + universal_reg_di + ReadData16InExe()];
+            return &ram[(*seg_reg_replace_ds << 4) + ((universal_reg_bx + universal_reg_di + ReadData16InExe()) & 0xFFFF)];
         case(0x02):
-            return &ram[(*seg_reg_replace_ss << 4) + universal_reg_bp + universal_reg_si + ReadData16InExe()];
+            return &ram[(*seg_reg_replace_ss << 4) + ((universal_reg_bp + universal_reg_si + ReadData16InExe()) & 0xFFFF)];
         case(0x03):
-            return &ram[(*seg_reg_replace_ss << 4) + universal_reg_bp + universal_reg_di + ReadData16InExe()];
+            return &ram[(*seg_reg_replace_ss << 4) + ((universal_reg_bp + universal_reg_di + ReadData16InExe()) & 0xFFFF)];
         case(0x04):
-            return &ram[(*seg_reg_replace_ds << 4) + universal_reg_si + ReadData16InExe()];
+            return &ram[(*seg_reg_replace_ds << 4) + ((universal_reg_si + ReadData16InExe()) & 0xFFFF)];
         case(0x05):
-            return &ram[(*seg_reg_replace_ds << 4) + universal_reg_di + ReadData16InExe()];
+            return &ram[(*seg_reg_replace_ds << 4) + ((universal_reg_di + ReadData16InExe()) & 0xFFFF)];
         case(0x06):
-            return &ram[(*seg_reg_replace_ss << 4) + universal_reg_bp + ReadData16InExe()];
+            return &ram[(*seg_reg_replace_ss << 4) + ((universal_reg_bp + ReadData16InExe()) & 0xFFFF)];
         case(0x07):
-            return &ram[(*seg_reg_replace_ds << 4) + universal_reg_bx + ReadData16InExe()];
+            return &ram[(*seg_reg_replace_ds << 4) + ((universal_reg_bx + ReadData16InExe()) & 0xFFFF)];
         }
     case(0x3):
         if(opcode == 0x0)
@@ -617,7 +616,13 @@ void Cpu::Intcall(uint8_t int_num)
 
 uint8_t Cpu::read8_from_port(uint8_t port_num)
 {
-    return ports_operate->port_handle_read8(port_num);
+    uint8_t tmp_data = ports_operate->port_handle_read8(port_num);
+    if(tmp_data == 0x1c && port_num == 0x60)
+    {
+        MAX = 555555555555;
+        MIN = count_code;
+    }
+    return tmp_data;
 }
 
 uint16_t Cpu::read16_from_port(uint8_t port_num)
@@ -724,7 +729,6 @@ void Cpu::Exec(uint32_t loops)
     static std::vector<uint8_t> my;
     vector<uint8_t>::iterator found;
     static uint32_t lo = 1000000000;
-    uint64_t deg = 10000000000000;
     /**/
 #ifdef CPU_80186
     uint8_t rep = 0;
@@ -732,11 +736,12 @@ void Cpu::Exec(uint32_t loops)
 
     for(uint32_t loopscounts = 0; loopscounts < loops; ++loopscounts, ++Instruction_counts)
     {
-//       if(ram[0x46c]==0x45)
-//       {
-//           printdebug(opcode, count_code, ip_tmp);
-//           return;
-//       }
+        //   printf ("MAX = %ld,MIN=%ld\n",MAX,MIN);
+        //       if(ram[0x46c]==0x45)
+        //       {
+        //           printdebug(opcode, count_code, ip_tmp);
+        //           return;
+        //       }
         /*debug*/
         //        if(*(uint16_t *)(&ram[0x70])!=old70)
         //        {
@@ -3694,7 +3699,7 @@ void Cpu::Exec(uint32_t loops)
         case(0x8C)://MOV Rw Sw
         {
             mod_byte = ReadData8InExe();
-            opt1_16bit = reinterpret_cast<uint16_t  *>(CalculateRM(mod_byte, 0x1));
+            opt1_16bit = reinterpret_cast<uint16_t  *>(CalculateRM(mod_byte, opcode | 0x1));
             opt2_16bit = CalculateSeg16(mod_byte);
 #if DEBUG
             change_print_16bit(opt1_16bit);
@@ -3734,8 +3739,6 @@ void Cpu::Exec(uint32_t loops)
 #if DEBUG
             change_print_16bit(opt1_16bit);
 #endif
-            //  if(old == 0x33)
-            //      printf("%x<-%x\n",*opt1_16bit,*opt2_16bit);
             *opt1_16bit = *opt2_16bit;
 #if DEBUG
             printf_my(*opt1_16bit);
@@ -6001,6 +6004,36 @@ void Cpu::Exec(uint32_t loops)
                     :"r"(*opt1_8bit)     , "r"(control_reg_flag) /* input */
                     :"eax"
                 );
+                // {
+                //     uint16_t	s1;
+                //     uint16_t	s2;
+                //     uint16_t	d1;
+                //     uint16_t	d2;
+                //     int	sign;
+                //     if (*opt1_8bit == 0)
+                //     {
+                //         Intcall(0);
+                //         return;
+                //     }
+                //     s1 = universal_reg_ax;
+                //     s2 = *opt1_8bit;
+                //     sign = ( ( (s1 ^ s2) & 0x8000) != 0);
+                //     s1 = (s1 < 0x8000) ? s1 : ( (~s1 + 1) & 0xffff);
+                //     s2 = (s2 < 0x8000) ? s2 : ( (~s2 + 1) & 0xffff);
+                //     d1 = s1 / s2;
+                //     d2 = s1 % s2;
+                //     if (d1 & 0xFF00)
+                //     {
+                //         Intcall(0);
+                //     }
+                //     if (sign)
+                //     {
+                //         d1 = (~d1 + 1) & 0xff;
+                //         d2 = (~d2 + 1) & 0xff;
+                //     }
+                //     *universal_reg_ah = (uint8_t) d2;
+                //     *universal_reg_al = (uint8_t) d1;
+                // }
                 break;
             }
             }
@@ -6169,6 +6202,38 @@ void Cpu::Exec(uint32_t loops)
                     :"r"(*opt1_16bit)     , "r"(control_reg_flag) /* input */
                     :"eax", "edx"
                 );
+                // {
+
+                //     uint32_t	d1;
+                //     uint32_t	d2;
+                //     uint32_t	s1;
+                //     uint32_t	s2;
+                //     int	sign;
+
+                //     if (*opt1_16bit == 0) {
+                //     Intcall(0);//divid by 0
+                //     }
+
+                //     s1 = universal_reg_dx << 16 + universal_reg_ax;
+                //     s2 = *opt1_16bit;
+                //     s2 = (s2 & 0x8000) ? (s2 | 0xffff0000) : s2;
+                //     sign = ( ( (s1 ^ s2) & 0x80000000) != 0);
+                //     s1 = (s1 < 0x80000000) ? s1 : ( (~s1 + 1) & 0xffffffff);
+                //     s2 = (s2 < 0x80000000) ? s2 : ( (~s2 + 1) & 0xffffffff);
+                //     d1 = s1 / s2;
+                //     d2 = s1 % s2;
+                //     if (d1 & 0xFFFF0000) {
+                //     Intcall(0);//divid by 0
+                //     }
+
+                //     if (sign) {
+                //         d1 = (~d1 + 1) & 0xffff;
+                //         d2 = (~d2 + 1) & 0xffff;
+                //     }
+
+                //     universal_reg_ax = d1;
+                //     universal_reg_dx = d2;
+                // }
                 break;
             }
             }
@@ -6376,8 +6441,8 @@ void Cpu::Exec(uint32_t loops)
         rep = 0;
         continue_check = 1;
 
-        ///    if(count_code >= deg)
-        ///        printdebug(opcode, count_code, ip_tmp);
+        // if(count_code >= deg)
+        //     printdebug(opcode, count_code, ip_tmp);
 
 
 #if DEBUG
