@@ -53,7 +53,6 @@ void Display::InitDisplay()
     }
     screen_p = SDL_SetVideoMode(640, 400, 32, SDL_SWSURFACE);
     SDL_WM_SetCaption("Emu", NULL);
-    printf("thread Display!\n");
     pthread_create(&thread_id, NULL, video_fresh, (void *)this);
 }
 

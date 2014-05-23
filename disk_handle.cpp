@@ -90,14 +90,12 @@ void disk_handle::disk_operator()
     case(4): /*Verify Sectors From Drive*/
     case(5): /*Format Track*/
     {
-        printf("4,5\n");
         cpu->SetFlag(cpu->GetFlag() & 0xFFFE);//CF = 0
         cpu->SetAH(0);
         break;
     }
     case(8): /*Read Drive Parameters*/
     {
-        printf("8\n");
         vector<uint8_t>::iterator found;
         found = find(inserted_disknum.begin(), inserted_disknum.end(), cpu->GetDL());
         if(found != inserted_disknum.end())

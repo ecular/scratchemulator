@@ -542,7 +542,7 @@ int Cpu::Init(unsigned int ram_size)
     memset(ram, 0x0, ram_size);
     // memset(ram + 0x8000, ' ', 80 * 25);
     Reset();
-    halt = 0;
+    halt = false;
     return 0;
 }
 
@@ -617,17 +617,6 @@ void Cpu::Intcall(uint8_t int_num)
 uint8_t Cpu::read8_from_port(uint8_t port_num)
 {
     uint8_t tmp_data = ports_operate->port_handle_read8(port_num);
-    if(tmp_data == 0x4B && port_num == 0x60)
-    {
-        MAX = 555555555555;
-        MIN = count_code;
-    }
-
-    if(tmp_data == 0xCB && port_num == 0x60)
-    {
-        MAX = 555555555555;
-        MIN = 10000000000000;
-    }
     return tmp_data;
 }
 
@@ -644,6 +633,16 @@ void Cpu::write8_to_port(uint8_t port_num, uint8_t value)
 void Cpu::write16_to_port(uint8_t port_num, uint16_t value)
 {
     ports_operate->port_handle_write16(port_num, value);
+}
+
+inline bool Cpu::GetStatus(void)
+{
+    return halt;
+}
+
+inline void Cpu::SetStatus(bool flag)
+{
+    halt = flag;
 }
 
 /*debug function*/
@@ -5835,7 +5834,7 @@ void Cpu::Exec(uint32_t loops)
 
         case(0xF4)://HLT
         {
-            halt = 1;
+            halt = true;
             break;
         }
 

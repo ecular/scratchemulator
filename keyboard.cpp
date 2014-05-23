@@ -227,7 +227,9 @@ void Keyboard::MonitorInput(void)
                 break;
             }
             case(SDL_QUIT):
+            {
                 return;
+            }
             }
         }
         usleep(100);

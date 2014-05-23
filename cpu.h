@@ -113,12 +113,11 @@ public:
     /*load rom*/
     bool LoadRom(uint32_t, string);
 
+    /*change/get machine run status*/
+    bool GetStatus(void);
+    void SetStatus(bool);
     uint8_t *ram;
-    /*debug*/
-    int halt;
 private:
-
-    uint32_t count_code;
 
     uint8_t *CalculateReg8(uint8_t mod_byte);
     uint16_t *CalculateReg16(uint8_t mod_byte);
@@ -141,7 +140,7 @@ private:
     uint16_t seg_reg_cs, seg_reg_ds, seg_reg_ss, seg_reg_es;
     uint16_t *seg_reg_replace_ds, *seg_reg_replace_ss;
     uint8_t if_flag, tf_flag;
-
+    bool halt;
     /*other devices*/
     port_handle *ports_operate;
     Interrupt_Controller_8259a *i8259a;
@@ -157,6 +156,8 @@ private:
     void printf_my(uint16_t);
     uint64_t MAX;
     uint64_t MIN;
+    uint32_t count_code;
+
 };
 
 #endif

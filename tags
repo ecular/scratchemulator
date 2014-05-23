@@ -23,6 +23,7 @@ ChangeMode	./display.cpp	/^void Display::ChangeMode()$/;"	f	class:Display
 Colorful_Flag	./video.h	/^    uint8_t Attribute_Control_Reg_Flag\/*0:index.1:data*\/, Graphic_Mode_Flag, Colorful_Flag, Mode_Change_Flag;$/;"	m	class:Video
 Cpu	./cpu.cpp	/^Cpu::Cpu()$/;"	f	class:Cpu
 Cpu	./cpu.h	/^class Cpu {$/;"	c
+Cursor_Position	./video.h	/^    uint16_t Cursor_Position;$/;"	m	class:Video
 DAC_Status_Reg	./video.h	/^    uint8_t DAC_Status_Reg, Table_Index_Reg_Read, Table_Index_Reg_Write, Plane_Lock[4];$/;"	m	class:Video
 DEBUG	./cpu.cpp	2;"	d	file:
 Disk	./disk.cpp	/^Disk::Disk(string filename, uint8_t driver_num)$/;"	f	class:Disk
@@ -36,6 +37,7 @@ EMU_CPU_H_	./cpu.h	2;"	d
 EMU_DISK_H	./disk.h	2;"	d
 EMU_DISK_HANDLE_H	./disk_handle.h	2;"	d
 EMU_DISPLAY_H	./display.h	2;"	d
+EMU_KEYBOARD_H	./keyboard.h	2;"	d
 EMU_PORT_HANDLE_H	./port_handle.h	2;"	d
 EMU_TIMER_H	./timer.h	2;"	d
 EMU_VIDEO_H	./video.h	2;"	d
@@ -60,9 +62,11 @@ GetDX	./cpu.cpp	/^inline uint16_t Cpu::GetDX()$/;"	f	class:Cpu
 GetES	./cpu.cpp	/^inline uint16_t Cpu::GetES()$/;"	f	class:Cpu
 GetFlag	./cpu.cpp	/^inline uint16_t Cpu::GetFlag()$/;"	f	class:Cpu
 GetIP	./cpu.cpp	/^inline uint16_t Cpu::GetIP()$/;"	f	class:Cpu
+GetKey	./keyboard.cpp	/^inline uint8_t Keyboard::GetKey()$/;"	f	class:Keyboard
 GetSI	./cpu.cpp	/^inline uint16_t Cpu::GetSI()$/;"	f	class:Cpu
 GetSP	./cpu.cpp	/^inline uint16_t Cpu::GetSP()$/;"	f	class:Cpu
 GetSS	./cpu.cpp	/^inline uint16_t Cpu::GetSS()$/;"	f	class:Cpu
+GetStatus	./cpu.cpp	/^inline bool Cpu::GetStatus(void)$/;"	f	class:Cpu
 Graphic_Control_Reg	./video.h	/^    uint8_t CRT_Control_Reg[25], Sequence_Reg[5], Graphic_Control_Reg[9], Attribute_Control_Reg[20], Feature_Control_Reg, Input_Status_Reg1;$/;"	m	class:Video
 Graphic_Control_Reg_Index	./video.h	/^    uint8_t CRT_Control_Reg_Index, Sequence_Reg_Index, Graphic_Control_Reg_Index, Attribute_Control_Reg_Index;$/;"	m	class:Video
 Graphic_Mode_Flag	./video.h	/^    uint8_t Attribute_Control_Reg_Flag\/*0:index.1:data*\/, Graphic_Mode_Flag, Colorful_Flag, Mode_Change_Flag;$/;"	m	class:Video
@@ -73,18 +77,22 @@ IRR	./8259a.h	/^    uint8_t IRR;$/;"	m	class:Interrupt_Controller_8259a
 ISR	./8259a.h	/^    uint8_t ISR;$/;"	m	class:Interrupt_Controller_8259a
 Init	./cpu.cpp	/^int Cpu::Init(unsigned int ram_size)$/;"	f	class:Cpu
 InitDisplay	./display.cpp	/^void Display::InitDisplay()$/;"	f	class:Display
+InitKeyboard	./keyboard.cpp	/^void Keyboard::InitKeyboard(Interrupt_Controller_8259a *i8259a_arg)$/;"	f	class:Keyboard
+InputThread	./main.cpp	/^void *InputThread(void *keyboard_arg)$/;"	f
 Input_Status_Reg1	./video.h	/^    uint8_t CRT_Control_Reg[25], Sequence_Reg[5], Graphic_Control_Reg[9], Attribute_Control_Reg[20], Feature_Control_Reg, Input_Status_Reg1;$/;"	m	class:Video
 Intcall	./cpu.cpp	/^void Cpu::Intcall(uint8_t int_num)$/;"	f	class:Cpu
 Interrupt_Controller_8259a	./8259a.cpp	/^Interrupt_Controller_8259a::Interrupt_Controller_8259a()$/;"	f	class:Interrupt_Controller_8259a
 Interrupt_Controller_8259a	./8259a.h	/^class Interrupt_Controller_8259a {$/;"	c
 Interval_Timer_8253	./8253.cpp	/^Interval_Timer_8253::Interval_Timer_8253()$/;"	f	class:Interval_Timer_8253
 Interval_Timer_8253	./8253.h	/^class Interval_Timer_8253 {$/;"	c
+Keyboard	./keyboard.h	/^class Keyboard {$/;"	c
 LDFLAG	./Makefile	/^LDFLAG = -lSDL -lpthread$/;"	m
 LoadBIOS	./cpu.cpp	/^bool Cpu::LoadBIOS(string filename)$/;"	f	class:Cpu
 LoadRom	./cpu.cpp	/^bool Cpu::LoadRom(uint32_t addr, string filename)$/;"	f	class:Cpu
-MAX	./cpu.cpp	3;"	d	file:
-MIN	./cpu.cpp	4;"	d	file:
+MAX	./cpu.h	/^    uint64_t MAX;$/;"	m	class:Cpu
+MIN	./cpu.h	/^    uint64_t MIN;$/;"	m	class:Cpu
 Mode_Change_Flag	./video.h	/^    uint8_t Attribute_Control_Reg_Flag\/*0:index.1:data*\/, Graphic_Mode_Flag, Colorful_Flag, Mode_Change_Flag;$/;"	m	class:Video
+MonitorInput	./keyboard.cpp	/^void Keyboard::MonitorInput(void)$/;"	f	class:Keyboard
 OBJ	./Makefile	/^OBJ = $(patsubst %.cpp,%.o,$(wildcard *.cpp)) $/;"	m
 OCW	./8259a.h	/^    uint8_t OCW[4];$/;"	m	class:Interrupt_Controller_8259a
 Plane_Lock	./video.h	/^    uint8_t DAC_Status_Reg, Table_Index_Reg_Read, Table_Index_Reg_Write, Plane_Lock[4];$/;"	m	class:Video
@@ -118,14 +126,17 @@ SetDX	./cpu.cpp	/^inline void Cpu::SetDX(uint16_t value)$/;"	f	class:Cpu
 SetES	./cpu.cpp	/^inline void Cpu::SetES(uint16_t value)$/;"	f	class:Cpu
 SetFlag	./cpu.cpp	/^inline void Cpu::SetFlag(uint16_t value)$/;"	f	class:Cpu
 SetIP	./cpu.cpp	/^inline void Cpu::SetIP(uint16_t value)$/;"	f	class:Cpu
+SetKey	./keyboard.cpp	/^inline void Keyboard::SetKey()$/;"	f	class:Keyboard
 SetSI	./cpu.cpp	/^inline void Cpu::SetSI(uint16_t value)$/;"	f	class:Cpu
 SetSP	./cpu.cpp	/^inline void Cpu::SetSP(uint16_t value)$/;"	f	class:Cpu
 SetSS	./cpu.cpp	/^inline void Cpu::SetSS(uint16_t value)$/;"	f	class:Cpu
+SetStatus	./cpu.cpp	/^inline void Cpu::SetStatus(bool flag)$/;"	f	class:Cpu
 Table_Data_Reg	./video.h	/^    uint32_t CGApalette[16], Table_Data_Reg[256], VGA_Memory[262144], Video_Buffer_Address;$/;"	m	class:Video
 Table_Index_Reg_Read	./video.h	/^    uint8_t DAC_Status_Reg, Table_Index_Reg_Read, Table_Index_Reg_Write, Plane_Lock[4];$/;"	m	class:Video
 Table_Index_Reg_Write	./video.h	/^    uint8_t DAC_Status_Reg, Table_Index_Reg_Read, Table_Index_Reg_Write, Plane_Lock[4];$/;"	m	class:Video
 Table_Read_Step	./video.h	/^    uint8_t Table_Read_Step, Table_Write_Step; \/*1:Red 2:Green 3:Blue*\/$/;"	m	class:Video
 Table_Write_Step	./video.h	/^    uint8_t Table_Read_Step, Table_Write_Step; \/*1:Red 2:Green 3:Blue*\/$/;"	m	class:Video
+TranslateToScancode	./keyboard.cpp	/^uint8_t Keyboard::TranslateToScancode(uint16_t SDL_code)$/;"	f	class:Keyboard
 VGA_Memory	./video.h	/^    uint32_t CGApalette[16], Table_Data_Reg[256], VGA_Memory[262144], Video_Buffer_Address;$/;"	m	class:Video
 Video	./video.cpp	/^Video::Video()$/;"	f	class:Video
 Video	./video.h	/^class Video {$/;"	c
@@ -161,6 +172,7 @@ cursor_visable	./display.h	/^    uint8_t cursor_visable;$/;"	m	class:Display
 cursor_x	./video.h	/^    uint16_t cursor_x, cursor_y, width, high;$/;"	m	class:Video
 cursor_y	./video.h	/^    uint16_t cursor_x, cursor_y, width, high;$/;"	m	class:Video
 cylinders	./disk.h	/^    uint16_t cylinders;$/;"	m	class:Disk
+data	./keyboard.h	/^    uint8_t data;$/;"	m	class:Keyboard
 disk_handle	./disk_handle.cpp	/^disk_handle::disk_handle()$/;"	f	class:disk_handle
 disk_handle	./disk_handle.h	/^class disk_handle {$/;"	c
 disk_map	./disk_handle.h	/^    map<uint8_t, Disk *> disk_map;$/;"	m	class:disk_handle
@@ -170,7 +182,7 @@ draw	./display.cpp	/^void Display::draw(void *tmp)$/;"	f	class:Display
 fibloop	./testasm/codegolf.asm	/^fibloop:$/;"	l
 filesize	./disk.h	/^    uint32_t filesize;$/;"	m	class:Disk
 floppy_count	./disk_handle.h	/^    uint8_t hard_count, floppy_count;$/;"	m	class:disk_handle
-halt	./cpu.h	/^    int halt;$/;"	m	class:Cpu
+halt	./cpu.h	/^    bool halt;$/;"	m	class:Cpu
 hard_count	./disk_handle.h	/^    uint8_t hard_count, floppy_count;$/;"	m	class:disk_handle
 heads	./disk.h	/^    uint8_t heads;$/;"	m	class:Disk
 hello	./testasm/codegolf.asm	/^hello:$/;"	l
@@ -181,6 +193,7 @@ i8253	./port_handle.h	/^    Interval_Timer_8253 *i8253;$/;"	m	class:port_handle
 i8253	./timer.h	/^    Interval_Timer_8253 *i8253;$/;"	m	class:timer
 i8253_tick_gap	./timer.h	/^    double irq0_timegap, i8253_tick_gap;$/;"	m	class:timer
 i8259a	./cpu.h	/^    Interrupt_Controller_8259a *i8259a;$/;"	m	class:Cpu
+i8259a	./keyboard.h	/^    Interrupt_Controller_8259a *i8259a;$/;"	m	class:Keyboard
 i8259a	./port_handle.h	/^    Interrupt_Controller_8259a *i8259a;$/;"	m	class:port_handle
 i8259a	./timer.h	/^    Interrupt_Controller_8259a *i8259a;$/;"	m	class:timer
 if_flag	./cpu.h	/^    uint8_t if_flag, tf_flag;$/;"	m	class:Cpu
@@ -190,8 +203,10 @@ init_data_high	./8253.h	/^    uint8_t init_data_high[3], init_data_low[3];$/;"	m
 init_data_low	./8253.h	/^    uint8_t init_data_high[3], init_data_low[3];$/;"	m	class:Interval_Timer_8253
 init_order	./8259a.h	/^    int8_t init_order;$/;"	m	class:Interrupt_Controller_8259a
 insert_disk	./disk_handle.cpp	/^void disk_handle::insert_disk(uint8_t disk_num, Disk *disk)$/;"	f	class:disk_handle
+inserted_disknum	./disk_handle.h	/^    vector<uint8_t> inserted_disknum;$/;"	m	class:disk_handle
 interrupt	./video.cpp	/^void Video::interrupt()$/;"	f	class:Video
 irq0_timegap	./timer.h	/^    double irq0_timegap, i8253_tick_gap;$/;"	m	class:timer
+keyboard	./port_handle.h	/^    Keyboard *keyboard;$/;"	m	class:port_handle
 lastAH	./disk.h	/^    uint8_t lastAH, lastCF;$/;"	m	class:Disk
 lastCF	./disk.h	/^    uint8_t lastAH, lastCF;$/;"	m	class:Disk
 last_8253_count	./timer.h	/^    uint64_t last_8253_count, last_irq0, scan_gap, last_scan_tick, current_scan;$/;"	m	class:timer
@@ -211,16 +226,15 @@ pop	./testasm/codegolf.asm	/^	pop di$/;"	d
 pop	./testasm/codegolf.asm	/^	pop dx$/;"	d
 port_handle	./port_handle.cpp	/^port_handle::port_handle()$/;"	f	class:port_handle
 port_handle	./port_handle.h	/^class port_handle {$/;"	c
-port_handle_read16	./port_handle.cpp	/^uint16_t port_handle::port_handle_read16(uint8_t port_num)$/;"	f	class:port_handle
+port_handle_read16	./port_handle.cpp	/^uint16_t port_handle::port_handle_read16(uint16_t port_num)$/;"	f	class:port_handle
 port_handle_read8	./port_handle.cpp	/^uint8_t port_handle::port_handle_read8(uint16_t port_num)$/;"	f	class:port_handle
-port_handle_write16	./port_handle.cpp	/^void port_handle::port_handle_write16(uint8_t port_num, uint16_t value)$/;"	f	class:port_handle
+port_handle_write16	./port_handle.cpp	/^void port_handle::port_handle_write16(uint16_t port_num, uint16_t value)$/;"	f	class:port_handle
 port_handle_write8	./port_handle.cpp	/^void port_handle::port_handle_write8(uint16_t port_num, uint8_t value)$/;"	f	class:port_handle
 ports_operate	./cpu.h	/^    port_handle *ports_operate;$/;"	m	class:Cpu
 primecont	./testasm/codegolf.asm	/^primecont:$/;"	l
 primeloop	./testasm/codegolf.asm	/^primeloop:$/;"	l
 primeloop_inner	./testasm/codegolf.asm	/^primeloop_inner:$/;"	l
 print	./testasm/codegolf.asm	/^print:$/;"	l
-print_screen	./main.cpp	/^void print_screen(Cpu  *cpu)$/;"	f
 printchr	./testasm/codegolf.asm	/^printchr:$/;"	l
 printdebug	./cpu.cpp	/^void Cpu::printdebug(uint8_t opcode, uint32_t count, uint32_t ip_addr)$/;"	f	class:Cpu
 printf_my	./cpu.cpp	/^void Cpu::printf_my(uint16_t cotent)$/;"	f	class:Cpu
@@ -247,6 +261,7 @@ rw_step	./8253.h	/^    uint8_t rw_mode[3], rw_step[3], active[3];$/;"	m	class:In
 scan_gap	./timer.h	/^    uint64_t last_8253_count, last_irq0, scan_gap, last_scan_tick, current_scan;$/;"	m	class:timer
 screen_lock	./display.h	/^    pthread_mutex_t screen_lock;$/;"	m	class:Display
 screen_p	./display.h	/^    SDL_Surface *screen_p;$/;"	m	class:Display
+screen_p	./keyboard.h	/^    SDL_Surface *screen_p;$/;"	m	class:Keyboard
 screen_update_flag	./video.h	/^    uint8_t screen_update_flag, Video_Mode;$/;"	m	class:Video
 sectors	./disk.h	/^    uint8_t sectors;$/;"	m	class:Disk
 seg_reg_cs	./cpu.h	/^    uint16_t seg_reg_cs, seg_reg_ds, seg_reg_ss, seg_reg_es;$/;"	m	class:Cpu
@@ -267,6 +282,7 @@ seti8253	./timer.cpp	/^void timer::seti8253(Interval_Timer_8253 *arg)$/;"	f	clas
 seti8259a	./cpu.cpp	/^void Cpu::seti8259a(Interrupt_Controller_8259a *arg)$/;"	f	class:Cpu
 seti8259a	./port_handle.cpp	/^void port_handle::seti8259a(Interrupt_Controller_8259a *arg)$/;"	f	class:port_handle
 seti8259a	./timer.cpp	/^void timer::seti8259a(Interrupt_Controller_8259a *arg)$/;"	f	class:timer
+setkeyboard	./port_handle.cpp	/^void port_handle::setkeyboard(Keyboard *arg)$/;"	f	class:port_handle
 setports_operate	./cpu.cpp	/^void Cpu::setports_operate(port_handle *arg)$/;"	f	class:Cpu
 settimer	./cpu.cpp	/^void Cpu::settimer(timer *arg)$/;"	f	class:Cpu
 setvideo	./cpu.cpp	/^void Cpu::setvideo(Video *arg)$/;"	f	class:Cpu
