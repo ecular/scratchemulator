@@ -174,13 +174,13 @@ uint8_t port_handle::port_handle_read8(uint16_t port_num)
     return 0x00;
 }
 
-void port_handle::port_handle_write16(uint8_t port_num, uint16_t value)
+void port_handle::port_handle_write16(uint16_t port_num, uint16_t value)
 {
     port_handle_write8(port_num, value & 0x00FF);
-    port_handle_write8(port_num, value >> 4);
+    port_handle_write8(port_num + 1, value >> 8);
 }
 
-uint16_t port_handle::port_handle_read16(uint8_t port_num)
+uint16_t port_handle::port_handle_read16(uint16_t port_num)
 {
     uint16_t result;
     result = port_handle_read8(port_num);

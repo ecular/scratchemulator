@@ -1,5 +1,5 @@
 #define CPU_80186
-#define DEBUG  0
+#define DEBUG 0
 
 #include "cpu.h"
 
@@ -617,10 +617,16 @@ void Cpu::Intcall(uint8_t int_num)
 uint8_t Cpu::read8_from_port(uint8_t port_num)
 {
     uint8_t tmp_data = ports_operate->port_handle_read8(port_num);
-    if(tmp_data == 0x1c && port_num == 0x60)
+    if(tmp_data == 0x4B && port_num == 0x60)
     {
         MAX = 555555555555;
         MIN = count_code;
+    }
+
+    if(tmp_data == 0xCB && port_num == 0x60)
+    {
+        MAX = 555555555555;
+        MIN = 10000000000000;
     }
     return tmp_data;
 }

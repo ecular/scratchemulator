@@ -86,7 +86,6 @@ inline uint8_t Video::logic_operate(uint8_t value, uint8_t plane_lock)
 void Video::write_video(uint16_t port_num, uint8_t value)
 {
     static uint32_t Color_Data_Tmp;
-    static uint16_t Cursor_Position;
     switch(port_num)
     {
     case(0x3D4):/*CRT Control reg index*/
@@ -101,16 +100,12 @@ void Video::write_video(uint16_t port_num, uint8_t value)
         {
         case(0xE):/*cursor position high bits*/
         {
-            Cursor_Position = (Cursor_Position & 0xFF) | (value << 8);
-            cursor_y = Cursor_Position / columns;
-            cursor_x = Cursor_Position % columns;
+            Cursor_Position = ((Cursor_Position & 0xFF) | (value << 8));
             break;
         }
         case(0xF):/*cursor positon low bits*/
         {
-            Cursor_Position = (Cursor_Position & 0xFF00) | value;
-            cursor_y = Cursor_Position / columns;
-            cursor_x = Cursor_Position % columns;
+            Cursor_Position = ((Cursor_Position & 0xFF00) | value);
             break;
         }
         case(0x6):/*Vertical total*/
@@ -118,6 +113,8 @@ void Video::write_video(uint16_t port_num, uint8_t value)
             break;
         }
         }
+        cursor_y = Cursor_Position / columns;
+        cursor_x = Cursor_Position % columns;
         break;
     }
 

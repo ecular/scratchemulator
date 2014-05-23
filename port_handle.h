@@ -17,8 +17,8 @@ private:
     Keyboard *keyboard;
     void port_handle_write8(uint16_t, uint8_t);
     uint8_t port_handle_read8(uint16_t);
-    void port_handle_write16(uint8_t, uint16_t);
-    uint16_t port_handle_read16(uint8_t);
+    void port_handle_write16(uint16_t, uint16_t);
+    uint16_t port_handle_read16(uint16_t);
 public:
     port_handle();
     void seti8259a(Interrupt_Controller_8259a *);

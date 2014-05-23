@@ -18,6 +18,7 @@ private:
     uint8_t columns, rows;
     uint8_t Table_Read_Step, Table_Write_Step; /*1:Red 2:Green 3:Blue*/
     uint8_t CGA_ascii_table[0x8000];
+    uint16_t Cursor_Position;
 
     uint8_t rotate_right(uint8_t value, uint8_t shift_bits);
     uint8_t logic_operate(uint8_t value, uint8_t plane_lock);

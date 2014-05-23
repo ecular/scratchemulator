@@ -281,7 +281,7 @@ int main(int argc, char **argv)
 
     if(cpu.LoadBIOS("./bios.bin"))
         std::cout << "BIOS load success..." << std::endl;
-    if(cpu.LoadRom(0xF6000, "./ibm-basic-1.10.rom"))
+    if(cpu.LoadRom(0xF6000, "./ibm-basic-1.00.rom"))
         std::cout << "rombasic load success..." << std::endl;
     if(cpu.LoadRom(0xC0000, "./videorom.bin"))
         std::cout << "videorom load success..." << std::endl;

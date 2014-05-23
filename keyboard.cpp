@@ -178,16 +178,16 @@ uint8_t Keyboard::TranslateToScancode(uint16_t SDL_code)
         return (0x9D);
 
     case(0x111)://up
-        return (0xC8);
+        return (0x48);
 
     case(0x112)://down
-        return (0xD0);
+        return (0x50);
 
     case(0x114)://left
-        return (0xCB);
+        return (0x4B);
 
     case(0x113)://right
-        return (0xCD);
+        return (0x4D);
 
     case(0x118)://pageup
         return (0xC9);
