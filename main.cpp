@@ -1,4 +1,5 @@
 #include <stdio.h>
+#include <sys/time.h>
 #include <pthread.h>
 #include <SDL/SDL.h>
 #include <iostream>
@@ -37,6 +38,9 @@ int main(int argc, char **argv)
     pthread_t runthread;
     pthread_t inputthread;
     struct InputArg arg;
+    struct timeval tv;
+    uint64_t start_time;
+    uint64_t end_time;
     try
     {
         if(SDL_Init(SDL_INIT_EVERYTHING) == -1)
@@ -109,6 +113,8 @@ int main(int argc, char **argv)
     if(cpu.LoadRom(0xC0000, "./videorom.bin"))
         std::cout << "load Videorom Success..." << std::endl;
 
+    gettimeofday(&tv, NULL);
+    start_time = tv.tv_sec * 1000000 + tv.tv_usec;
     /*run CPU*/
     pthread_create(&runthread, NULL, RunThread, (void *)(&cpu));
     /*start SDL event listen*/
@@ -117,5 +123,8 @@ int main(int argc, char **argv)
     pthread_create(&inputthread, NULL, InputThread, (void *)(&arg));
 
     pthread_join(runthread, NULL);
+    gettimeofday(&tv, NULL);
+    end_time = tv.tv_sec * 1000000 + tv.tv_usec;
+    printf("execute %llu opcode in %llu Seconds.\nAverage:%llu/s.\n", cpu.GetCount(), (end_time - start_time) / 1000000, cpu.GetCount() / ((end_time - start_time) / 1000000));
     return 0;
 }

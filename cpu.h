@@ -116,6 +116,10 @@ public:
     /*change/get machine run status*/
     bool GetStatus(void);
     void SetStatus(bool);
+
+    /*get opcode conut*/
+    uint64_t GetCount(void);
+
     uint8_t *ram;
 private:
 
@@ -156,7 +160,7 @@ private:
     void printf_my(uint16_t);
     uint64_t MAX;
     uint64_t MIN;
-    uint32_t count_code;
+    uint64_t count_code;
 
 };
 

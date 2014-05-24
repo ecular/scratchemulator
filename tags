@@ -54,6 +54,7 @@ GetCH	./cpu.cpp	/^inline uint8_t Cpu::GetCH()$/;"	f	class:Cpu
 GetCL	./cpu.cpp	/^inline uint8_t Cpu::GetCL()$/;"	f	class:Cpu
 GetCS	./cpu.cpp	/^inline uint16_t Cpu::GetCS()$/;"	f	class:Cpu
 GetCX	./cpu.cpp	/^inline uint16_t Cpu::GetCX()$/;"	f	class:Cpu
+GetCount	./cpu.cpp	/^uint64_t Cpu::GetCount(void)$/;"	f	class:Cpu
 GetDH	./cpu.cpp	/^inline uint8_t Cpu::GetDH()$/;"	f	class:Cpu
 GetDI	./cpu.cpp	/^inline uint16_t Cpu::GetDI()$/;"	f	class:Cpu
 GetDL	./cpu.cpp	/^inline uint8_t Cpu::GetDL()$/;"	f	class:Cpu
@@ -78,6 +79,7 @@ ISR	./8259a.h	/^    uint8_t ISR;$/;"	m	class:Interrupt_Controller_8259a
 Init	./cpu.cpp	/^int Cpu::Init(unsigned int ram_size)$/;"	f	class:Cpu
 InitDisplay	./display.cpp	/^void Display::InitDisplay()$/;"	f	class:Display
 InitKeyboard	./keyboard.cpp	/^void Keyboard::InitKeyboard(Interrupt_Controller_8259a *i8259a_arg)$/;"	f	class:Keyboard
+InputArg	./main.cpp	/^struct InputArg {$/;"	s	file:
 InputThread	./main.cpp	/^void *InputThread(void *keyboard_arg)$/;"	f
 Input_Status_Reg1	./video.h	/^    uint8_t CRT_Control_Reg[25], Sequence_Reg[5], Graphic_Control_Reg[9], Attribute_Control_Reg[20], Feature_Control_Reg, Input_Status_Reg1;$/;"	m	class:Video
 Intcall	./cpu.cpp	/^void Cpu::Intcall(uint8_t int_num)$/;"	f	class:Cpu
@@ -160,12 +162,13 @@ cont1	./testasm/codegolf.asm	/^cont1:$/;"	l
 cont2	./testasm/codegolf.asm	/^cont2:$/;"	l
 control_reg_flag	./cpu.h	/^    uint16_t control_reg_ip, control_reg_flag;$/;"	m	class:Cpu
 control_reg_ip	./cpu.h	/^    uint16_t control_reg_ip, control_reg_flag;$/;"	m	class:Cpu
-count_code	./cpu.h	/^    uint32_t count_code;$/;"	m	class:Cpu
+count_code	./cpu.h	/^    uint64_t count_code;$/;"	m	class:Cpu
 counter	./8253.h	/^    uint16_t counter[3];$/;"	m	class:Interval_Timer_8253
 cpu	./disk.h	/^    Cpu *cpu;$/;"	m	class:Disk
 cpu	./disk_handle.h	/^    Cpu *cpu;$/;"	m	class:disk_handle
 cpu	./display.h	/^    Cpu *cpu;$/;"	m	class:Display
 cpu	./video.h	/^    Cpu *cpu;$/;"	m	class:Video
+cpu_arg	./main.cpp	/^    Cpu *cpu_arg;$/;"	m	struct:InputArg	file:
 current_scan	./timer.h	/^    uint64_t last_8253_count, last_irq0, scan_gap, last_scan_tick, current_scan;$/;"	m	class:timer
 cursor	./testasm/codegolf.asm	/^cursor:$/;"	l
 cursor_visable	./display.h	/^    uint8_t cursor_visable;$/;"	m	class:Display
@@ -207,6 +210,7 @@ inserted_disknum	./disk_handle.h	/^    vector<uint8_t> inserted_disknum;$/;"	m	c
 interrupt	./video.cpp	/^void Video::interrupt()$/;"	f	class:Video
 irq0_timegap	./timer.h	/^    double irq0_timegap, i8253_tick_gap;$/;"	m	class:timer
 keyboard	./port_handle.h	/^    Keyboard *keyboard;$/;"	m	class:port_handle
+keyboard_arg	./main.cpp	/^    Keyboard *keyboard_arg;$/;"	m	struct:InputArg	file:
 lastAH	./disk.h	/^    uint8_t lastAH, lastCF;$/;"	m	class:Disk
 lastCF	./disk.h	/^    uint8_t lastAH, lastCF;$/;"	m	class:Disk
 last_8253_count	./timer.h	/^    uint64_t last_8253_count, last_irq0, scan_gap, last_scan_tick, current_scan;$/;"	m	class:timer

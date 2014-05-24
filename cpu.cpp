@@ -645,6 +645,10 @@ inline void Cpu::SetStatus(bool flag)
     halt = flag;
 }
 
+uint64_t Cpu::GetCount(void)
+{
+    return count_code;
+}
 /*debug function*/
 void Cpu::change_print_8bit(uint8_t *p)
 {
@@ -726,7 +730,7 @@ void Cpu::Exec(uint32_t loops)
     uint16_t *opt1_16bit, *opt2_16bit;
     static uint16_t firstip;
     uint8_t continue_check = 1;
-    static int32_t Instruction_counts = 0;
+    static int64_t Instruction_counts = 0;
     static uint8_t one_step_mode = 0;
     /*debug*/
     uint32_t ip_tmp;
