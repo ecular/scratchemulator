@@ -1,5 +1,5 @@
 #define CPU_80186
-#define DEBUG 0
+#define DEBUG 1
 
 #include "cpu.h"
 
@@ -25,6 +25,8 @@ Cpu::Cpu()
     universal_reg_ch = universal_reg_cl + 1;
     universal_reg_dl = reinterpret_cast<uint8_t *>(&universal_reg_dx);
     universal_reg_dh = universal_reg_dl + 1;
+    MAX = 50000000000;
+    MIN = 10000000;
 }
 
 /*set device*/
@@ -336,7 +338,7 @@ inline uint16_t Cpu::ReadRam16(uint32_t location)
 }
 
 /*calculate Mod byte*/
-uint8_t *Cpu::CalculateReg8(uint8_t mod_byte)
+inline uint8_t *Cpu::CalculateReg8(uint8_t mod_byte)
 {
     switch((mod_byte >> 3) & 0x7)
     {
@@ -400,7 +402,7 @@ uint16_t *Cpu::CalculateSeg16(uint8_t mod_byte)
     return NULL;//will never be here
 }
 
-uint8_t *Cpu::CalculateRM(uint8_t mod_byte, uint8_t opcode)
+inline uint8_t *Cpu::CalculateRM(uint8_t mod_byte, uint8_t opcode)
 {
     uint8_t rm = mod_byte & 0x7;
     uint8_t mod_bit = (mod_byte >> 6) & 0x3;
@@ -617,6 +619,8 @@ void Cpu::Intcall(uint8_t int_num)
 uint8_t Cpu::read8_from_port(uint8_t port_num)
 {
     uint8_t tmp_data = ports_operate->port_handle_read8(port_num);
+    // if(port_num == 0x60 && tmp_data == 0x1C)
+    //     MIN = count_code;
     return tmp_data;
 }
 
@@ -6520,7 +6524,7 @@ void Cpu::printdebug(uint8_t opcode, uint32_t count, uint32_t ip_addr)
     cf = (control_reg_flag >> 0) & 0x1;
 
     /*ax,bx,cx,dx sp,bp,si,di,ip,flag,cs,ds,ss,es*/
-    printf("After opcode :%x\n",  opcode);
+    printf("After %llu opcode :%x\n", count_code, opcode);
     ip_addr = ip_addr & 0xFFFFF;
     printf("%x %x %x %x %x %x %x %x\n", ram[ip_addr], ram[ip_addr + 1], ram[ip_addr + 2], ram[ip_addr + 3], ram[ip_addr + 4], ram[ip_addr + 5], ram[ip_addr + 6], ram[ip_addr + 7]);
     printf("CS:%x IP:%x DS:%x SS:%x ES:%x\n", GetCS(), GetIP(), GetDS(), GetSS(), GetES());

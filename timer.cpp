@@ -1,7 +1,6 @@
 #include "timer.h"
-
-#include <sys/time.h>
 #include <stdio.h>
+#include <unistd.h>
 
 timer::timer()
 {
@@ -38,12 +37,11 @@ void timer::timer_init()
 
 inline void timer::timer_tick()
 {
-    struct timeval tv;
     uint64_t current_time;
     uint16_t counter_minus;
-    gettimeofday(&tv, NULL);
-    current_time = tv.tv_sec * 1000000 + tv.tv_usec;
-
+    //gettimeofday(&tv, NULL);
+    //current_time = tv.tv_sec * 1000000 + tv.tv_usec;
+    current_time = last_scan_tick + scan_gap + 10;
     if(current_time >= (last_scan_tick + scan_gap))
     {
         current_scan = (current_scan + 1) % 525;

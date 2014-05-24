@@ -1,4 +1,5 @@
 #include <stdio.h>
+#include <iostream>
 #include <sys/time.h>
 #include <pthread.h>
 #include <SDL/SDL.h>
@@ -9,6 +10,8 @@
 #include "timer.h"
 #include "display.h"
 #include "keyboard.h"
+
+using namespace std;
 
 struct InputArg {
     Cpu *cpu_arg;
@@ -108,7 +111,7 @@ int main(int argc, char **argv)
 
     if(cpu.LoadBIOS("./bios.bin"))
         std::cout << "load BIOS Success..." << std::endl;
-    if(cpu.LoadRom(0xF6000, "./ibm-basic-1.00.rom"))
+    if(cpu.LoadRom(0xF6000, "./ibm-basic-1.10.rom"))
         std::cout << "load Basicrom Success..." << std::endl;
     if(cpu.LoadRom(0xC0000, "./videorom.bin"))
         std::cout << "load Videorom Success..." << std::endl;
@@ -125,6 +128,6 @@ int main(int argc, char **argv)
     pthread_join(runthread, NULL);
     gettimeofday(&tv, NULL);
     end_time = tv.tv_sec * 1000000 + tv.tv_usec;
-    printf("execute %llu opcode in %llu Seconds.\nAverage:%llu/s.\n", cpu.GetCount(), (end_time - start_time) / 1000000, cpu.GetCount() / ((end_time - start_time) / 1000000));
+    printf("\n\nExecute %llu Opcode in %lf Seconds.\nAverage:%llu Opcode/S.\n", cpu.GetCount(), (end_time - start_time) / 1000000.0, (uint64_t)(cpu.GetCount() / ((end_time - start_time) / 1000000.0)));
     return 0;
 }
