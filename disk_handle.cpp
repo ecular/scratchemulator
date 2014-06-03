@@ -17,6 +17,7 @@ void disk_handle::insert_disk(uint8_t disk_num, Disk *disk)
         hard_count++;
 
     disk_map.insert(map<uint8_t, Disk *>::value_type(disk_num, disk));
+
     found = find(inserted_disknum.begin(), inserted_disknum.end(), disk_num);
     if(found != inserted_disknum.end())
     {

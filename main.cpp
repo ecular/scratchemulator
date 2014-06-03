@@ -85,12 +85,15 @@ int main(int argc, char **argv)
     timing.setvideo(&video);
     std::cout << "System timer initialized." << std::endl;
 
-    Disk fb("./dos-boot.img", 0);
-    fb.setcpu(&cpu);
+    Disk fd("./dos-boot.img", 0);
+    Disk hd("./drive0.raw", 0x80);
+    fd.setcpu(&cpu);
+    hd.setcpu(&cpu);
 
     disk_handle Disk_handle;
     Disk_handle.setcpu(&cpu);
-    Disk_handle.insert_disk(0, &fb);
+    Disk_handle.insert_disk(0, &fd);
+    Disk_handle.insert_disk(0x80, &hd);
     std::cout << "Disk controller initialized." << std::endl;
 
     port_handle ports_operate;

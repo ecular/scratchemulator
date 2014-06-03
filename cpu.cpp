@@ -1,5 +1,5 @@
 #define CPU_80186
-#define DEBUG 1
+#define DEBUG 0
 
 #include "cpu.h"
 
@@ -10,6 +10,7 @@
 #include "8259a.h"
 #include "8253.h"
 /*debug*/
+#include <map>
 #include <vector>
 #include <algorithm>
 using namespace std;
@@ -25,8 +26,8 @@ Cpu::Cpu()
     universal_reg_ch = universal_reg_cl + 1;
     universal_reg_dl = reinterpret_cast<uint8_t *>(&universal_reg_dx);
     universal_reg_dh = universal_reg_dl + 1;
-    MAX = 50000000000;
-    MIN = 10000000;
+    MAX = 5000000000000;
+    MIN = 500000000000;
 }
 
 /*set device*/
@@ -589,7 +590,7 @@ void Cpu::Intcall(uint8_t int_num)
         //  seg_reg_cs = 0xF600;    //start ROM BASIC at bootstrap if requested
         //  control_reg_ip = 0x0000;
 
-        *universal_reg_dl = 0x0;
+        *universal_reg_dl = 0x80;
         Disk_handle->disk_map[GetDL()]->readdisk(1, 0, 1, 0, *universal_reg_dl, 0x07C0, 0x0000);
         seg_reg_cs = 0x0000;
         control_reg_ip = 0x7C00;
@@ -619,8 +620,8 @@ void Cpu::Intcall(uint8_t int_num)
 uint8_t Cpu::read8_from_port(uint8_t port_num)
 {
     uint8_t tmp_data = ports_operate->port_handle_read8(port_num);
-    // if(port_num == 0x60 && tmp_data == 0x1C)
-    //     MIN = count_code;
+    if(port_num == 0x60 && tmp_data == 0x3f)
+        MAX = count_code;
     return tmp_data;
 }
 
@@ -740,14 +741,18 @@ void Cpu::Exec(uint32_t loops)
     uint32_t ip_tmp;
     static uint16_t old70 = 0;
     static std::vector<uint8_t> my;
+    static uint8_t shuzu[0xff][0xff];
     vector<uint8_t>::iterator found;
+
+    static std::map<uint8_t, uint8_t> you;
     static uint32_t lo = 1000000000;
     /**/
 #ifdef CPU_80186
     uint8_t rep = 0;
 #endif
 
-    for(uint32_t loopscounts = 0; loopscounts < loops; ++loopscounts, ++Instruction_counts)
+    //for(uint32_t loopscounts = 0; loopscounts < loops; ++loopscounts, ++Instruction_counts)
+    while(!halt)
     {
         //   printf ("MAX = %ld,MIN=%ld\n",MAX,MIN);
         //       if(ram[0x46c]==0x45)
@@ -766,41 +771,81 @@ void Cpu::Exec(uint32_t loops)
         //
         //        }
         //
-        //        {
-        //            found = find( my.begin(), my.end(), opcode);
-        //            if(count_code <=deg)
-        //            {
-        //                if (found != my.end())
-        //                {
-        //                    ;//do nothing
-        //                }
-        //                else
-        //                {
-        //                    my.push_back(opcode);
-        //                }
-        //            }
-        //            else
-        //                if(count_code > deg)
-        //                {
-        //                    if (found != my.end())
-        //                    {
-        //                        ;//do nothing
-        //                    }
-        //                    else
-        //                    {
-        //                        my.push_back(opcode);
-        //                        printf("%x\n",opcode);
-        //                    }
-        //                }
-        //            fflush(stdout);
-        //
-        //        }
+//        {
+//            found = find(my.begin(), my.end(), opcode);
+//            if(count_code <= MAX)
+//            {
+//                if(found != my.end())
+//                {
+//                    ;//do nothing
+//                }
+//                else
+//                {
+//                    my.push_back(opcode);
+//                }
+//            }
+//            else if(count_code > MAX)
+//            {
+//                if(found != my.end())
+//                {
+//                    ;//do nothing
+//                }
+//                else
+//                {
+//                    my.push_back(opcode);
+//                    printf("%x\n", opcode);
+//                }
+//            }
+//            fflush(stdout);
+//
+//        }
+
+        if(count_code <= MAX)
+        {
+            if(shuzu[opcode][ReadRam8((seg_reg_cs << 4) + control_reg_ip)] == 0)
+                shuzu[opcode][ReadRam8((seg_reg_cs << 4) + control_reg_ip)] = 1;
+        }
+        else
+        {
+            if(shuzu[opcode][ReadRam8((seg_reg_cs << 4) + control_reg_ip)] == 0)
+            {
+                printf("%x %x\n", opcode, ReadRam8((seg_reg_cs << 4) + control_reg_ip));
+                shuzu[opcode][ReadRam8((seg_reg_cs << 4) + control_reg_ip)] = 1;
+            }
+        }
+
+
+        // for(std::map<uint8_t,uint8_t>::iterator i=you.begin();i!=you.end();i++)
+        // {
+        //     if(count_code <=MAX)
+        //     {
+        //         if(i->first == opcode && i->second == ReadRam8((seg_reg_cs << 4) + control_reg_ip) )//find
+        //         {
+        //             ;//do nothing
+        //         }
+        //         else
+        //             you.insert(std::map<uint8_t,uint8_t>::value_type(opcode,ReadRam8((seg_reg_cs << 4) + control_reg_ip)));
+        //     }
+        //     else
+        //     {
+        //         if(i->first == opcode && i->second == ReadRam8((seg_reg_cs << 4) + control_reg_ip) )//find
+        //         {
+        //             ;//do nothing
+        //         }
+        //         else
+        //         {
+        //             printf("%x %x\n",opcode,ReadRam8((seg_reg_cs << 4) + control_reg_ip));
+        //             you.insert(std::map<uint8_t,uint8_t>::value_type(opcode,ReadRam8((seg_reg_cs << 4) + control_reg_ip)));
+        //         }
+        //     }
+        //     fflush(stdout);
+        // }
 
         /**/
         seg_reg_replace_ds = &seg_reg_ds;
         seg_reg_replace_ss = &seg_reg_ss;
 
-        if((Instruction_counts & 15) == 0)
+        if((Instruction_counts++ & 15) == 0)
             timing->timer_tick();
 
         /*one step mode*/
@@ -4775,8 +4820,9 @@ void Cpu::Exec(uint32_t loops)
 
         case(0xC2)://RETN Iw
         {
+            uint16_t tmp_data = ReadData16InExe();
             control_reg_ip = Pop();
-            universal_reg_sp = universal_reg_sp + ReadData16InExe();
+            universal_reg_sp = universal_reg_sp + tmp_data;
             break;
         }
 
@@ -5997,56 +6043,56 @@ void Cpu::Exec(uint32_t loops)
 
             case(0x07)://IDIV Eb
             {
-                if(!*opt1_8bit)
+                //  if(!*opt1_8bit)
+                //  {
+                //      Intcall(0);//divid by 0
+                //      break;
+                //  }
+                //  control_reg_flag &= 0xFEFF;
+                //  __asm__
+                //  (
+                //      "PUSHW %3;\n\t"
+                //      "POPFW;\n\t"
+                //      "MOVW %0,%%AX;\n\t"
+                //      "IDIVB %2;\n\t"
+                //      "MOVW %%AX,%0;\n\t"
+                //      "PUSHF;\n\t"
+                //      "POP %%EAX;\n\t"
+                //      "MOVW %%AX,%1;\n\t"
+                //      :"+r"(universal_reg_ax), "=r"(control_reg_flag) /* output */
+                //      :"r"(*opt1_8bit)     , "r"(control_reg_flag) /* input */
+                //      :"eax"
+                //  );
                 {
-                    Intcall(0);//divid by 0
-                    break;
+                    uint16_t	s1;
+                    uint16_t	s2;
+                    uint16_t	d1;
+                    uint16_t	d2;
+                    int	sign;
+                    if(*opt1_8bit == 0)
+                    {
+                        Intcall(0);
+                        return;
+                    }
+                    s1 = universal_reg_ax;
+                    s2 = *opt1_8bit;
+                    sign = (((s1 ^ s2) & 0x8000) != 0);
+                    s1 = (s1 < 0x8000) ? s1 : ((~s1 + 1) & 0xffff);
+                    s2 = (s2 < 0x8000) ? s2 : ((~s2 + 1) & 0xffff);
+                    d1 = s1 / s2;
+                    d2 = s1 % s2;
+                    if(d1 & 0xFF00)
+                    {
+                        Intcall(0);
+                    }
+                    if(sign)
+                    {
+                        d1 = (~d1 + 1) & 0xff;
+                        d2 = (~d2 + 1) & 0xff;
+                    }
+                    *universal_reg_ah = (uint8_t) d2;
+                    *universal_reg_al = (uint8_t) d1;
                 }
-                control_reg_flag &= 0xFEFF;
-                __asm__
-                (
-                    "PUSHW %3;\n\t"
-                    "POPFW;\n\t"
-                    "MOVW %0,%%AX;\n\t"
-                    "IDIVB %2;\n\t"
-                    "MOVW %%AX,%0;\n\t"
-                    "PUSHF;\n\t"
-                    "POP %%EAX;\n\t"
-                    "MOVW %%AX,%1;\n\t"
-                    :"+r"(universal_reg_ax), "=r"(control_reg_flag) /* output */
-                    :"r"(*opt1_8bit)     , "r"(control_reg_flag) /* input */
-                    :"eax"
-                );
-                // {
-                //     uint16_t	s1;
-                //     uint16_t	s2;
-                //     uint16_t	d1;
-                //     uint16_t	d2;
-                //     int	sign;
-                //     if (*opt1_8bit == 0)
-                //     {
-                //         Intcall(0);
-                //         return;
-                //     }
-                //     s1 = universal_reg_ax;
-                //     s2 = *opt1_8bit;
-                //     sign = ( ( (s1 ^ s2) & 0x8000) != 0);
-                //     s1 = (s1 < 0x8000) ? s1 : ( (~s1 + 1) & 0xffff);
-                //     s2 = (s2 < 0x8000) ? s2 : ( (~s2 + 1) & 0xffff);
-                //     d1 = s1 / s2;
-                //     d2 = s1 % s2;
-                //     if (d1 & 0xFF00)
-                //     {
-                //         Intcall(0);
-                //     }
-                //     if (sign)
-                //     {
-                //         d1 = (~d1 + 1) & 0xff;
-                //         d2 = (~d2 + 1) & 0xff;
-                //     }
-                //     *universal_reg_ah = (uint8_t) d2;
-                //     *universal_reg_al = (uint8_t) d1;
-                // }
                 break;
             }
             }
@@ -6194,59 +6240,59 @@ void Cpu::Exec(uint32_t loops)
 
             case(0x07)://IDIV Ev
             {
-                if(!*opt1_16bit)
+                //     if(!*opt1_16bit)
+                //     {
+                //         Intcall(0);//divid by 0
+                //         break;
+                //     }
+                //     control_reg_flag &= 0xFEFF;
+                //     __asm__
+                //     (
+                //         "PUSHW %4;\n\t"
+                //         "POPFW;\n\t"
+                //         "MOVW %0,%%AX;\n\t"
+                //         "IDIVW %3;\n\t"
+                //         "MOVW %%AX,%0;\n\t"
+                //         "MOVW %%DX,%2;\n\t"
+                //         "PUSHF;\n\t"
+                //         "POP %%EAX;\n\t"
+                //         "MOVW %%AX,%1;\n\t"
+                //         :"+r"(universal_reg_ax), "=r"(control_reg_flag), "=r"(universal_reg_dx) /* output */
+                //         :"r"(*opt1_16bit)     , "r"(control_reg_flag) /* input */
+                //         :"eax", "edx"
+                //     );
                 {
-                    Intcall(0);//divid by 0
-                    break;
+
+                    uint32_t	d1;
+                    uint32_t	d2;
+                    uint32_t	s1;
+                    uint32_t	s2;
+                    int	sign;
+
+                    if(*opt1_16bit == 0) {
+                        Intcall(0);//divid by 0
+                    }
+
+                    s1 = (universal_reg_dx << 16) + universal_reg_ax;
+                    s2 = *opt1_16bit;
+                    s2 = (s2 & 0x8000) ? (s2 | 0xffff0000) : s2;
+                    sign = (((s1 ^ s2) & 0x80000000) != 0);
+                    s1 = (s1 < 0x80000000) ? s1 : ((~s1 + 1) & 0xffffffff);
+                    s2 = (s2 < 0x80000000) ? s2 : ((~s2 + 1) & 0xffffffff);
+                    d1 = s1 / s2;
+                    d2 = s1 % s2;
+                    if(d1 & 0xFFFF0000) {
+                        Intcall(0);//divid by 0
+                    }
+
+                    if(sign) {
+                        d1 = (~d1 + 1) & 0xffff;
+                        d2 = (~d2 + 1) & 0xffff;
+                    }
+
+                    universal_reg_ax = d1;
+                    universal_reg_dx = d2;
                 }
-                control_reg_flag &= 0xFEFF;
-                __asm__
-                (
-                    "PUSHW %4;\n\t"
-                    "POPFW;\n\t"
-                    "MOVW %0,%%AX;\n\t"
-                    "IDIVW %3;\n\t"
-                    "MOVW %%AX,%0;\n\t"
-                    "MOVW %%DX,%2;\n\t"
-                    "PUSHF;\n\t"
-                    "POP %%EAX;\n\t"
-                    "MOVW %%AX,%1;\n\t"
-                    :"+r"(universal_reg_ax), "=r"(control_reg_flag), "=r"(universal_reg_dx) /* output */
-                    :"r"(*opt1_16bit)     , "r"(control_reg_flag) /* input */
-                    :"eax", "edx"
-                );
-                // {
-
-                //     uint32_t	d1;
-                //     uint32_t	d2;
-                //     uint32_t	s1;
-                //     uint32_t	s2;
-                //     int	sign;
-
-                //     if (*opt1_16bit == 0) {
-                //     Intcall(0);//divid by 0
-                //     }
-
-                //     s1 = universal_reg_dx << 16 + universal_reg_ax;
-                //     s2 = *opt1_16bit;
-                //     s2 = (s2 & 0x8000) ? (s2 | 0xffff0000) : s2;
-                //     sign = ( ( (s1 ^ s2) & 0x80000000) != 0);
-                //     s1 = (s1 < 0x80000000) ? s1 : ( (~s1 + 1) & 0xffffffff);
-                //     s2 = (s2 < 0x80000000) ? s2 : ( (~s2 + 1) & 0xffffffff);
-                //     d1 = s1 / s2;
-                //     d2 = s1 % s2;
-                //     if (d1 & 0xFFFF0000) {
-                //     Intcall(0);//divid by 0
-                //     }
-
-                //     if (sign) {
-                //         d1 = (~d1 + 1) & 0xffff;
-                //         d2 = (~d2 + 1) & 0xffff;
-                //     }
-
-                //     universal_reg_ax = d1;
-                //     universal_reg_dx = d2;
-                // }
                 break;
             }
             }
@@ -6524,12 +6570,13 @@ void Cpu::printdebug(uint8_t opcode, uint32_t count, uint32_t ip_addr)
     cf = (control_reg_flag >> 0) & 0x1;
 
     /*ax,bx,cx,dx sp,bp,si,di,ip,flag,cs,ds,ss,es*/
-    printf("After %llu opcode :%x\n", count_code, opcode);
+    printf("After opcode :%x\n",  opcode);
     ip_addr = ip_addr & 0xFFFFF;
     printf("%x %x %x %x %x %x %x %x\n", ram[ip_addr], ram[ip_addr + 1], ram[ip_addr + 2], ram[ip_addr + 3], ram[ip_addr + 4], ram[ip_addr + 5], ram[ip_addr + 6], ram[ip_addr + 7]);
     printf("CS:%x IP:%x DS:%x SS:%x ES:%x\n", GetCS(), GetIP(), GetDS(), GetSS(), GetES());
     printf("AX:%x BX:%x CX:%x DX:%x\n", GetAX(), GetBX(), GetCX(), GetDX());
     printf("SP:%x BP:%x SI:%x DI:%x\n", GetSP(), GetBP(), GetSI(), GetDI());
+    //  printf("CS:%x IP:%x\n", GetCS(), GetIP());
     printf("next opcode :%x\n", ram[GetCS() * 16 + GetIP()]);
     printf("of:%x df:%x if:%x tf:%x sf:%x zf:%x af:%x pf:%x cf:%x\n", of, df, if_flag, tf_flag, sf, zf, af, pf, cf);
     printf("\n======================\n");

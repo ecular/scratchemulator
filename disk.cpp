@@ -38,7 +38,7 @@ Disk::~Disk()
 void Disk::writedisk(uint16_t sector_count, uint16_t cylinder, uint16_t sector, uint8_t head, uint8_t dirver_num, uint16_t mem_seg, uint16_t mem_offset)
 {
     char sector_buffer[512];
-    uint8_t buffer_offset;
+    uint16_t buffer_offset;
     uint32_t fileoffset = ((cylinder * heads + head) * sectors + sector - 1) * 512;
     uint32_t mem_address = (mem_seg << 4) + mem_offset;
     read_write.seekg(fileoffset, ios::beg);

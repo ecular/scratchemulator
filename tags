@@ -15,9 +15,9 @@ CGApalette	./video.h	/^    uint32_t CGApalette[16], Table_Data_Reg[256], VGA_Mem
 CPU_80186	./cpu.cpp	1;"	d	file:
 CRT_Control_Reg	./video.h	/^    uint8_t CRT_Control_Reg[25], Sequence_Reg[5], Graphic_Control_Reg[9], Attribute_Control_Reg[20], Feature_Control_Reg, Input_Status_Reg1;$/;"	m	class:Video
 CRT_Control_Reg_Index	./video.h	/^    uint8_t CRT_Control_Reg_Index, Sequence_Reg_Index, Graphic_Control_Reg_Index, Attribute_Control_Reg_Index;$/;"	m	class:Video
-CalculateRM	./cpu.cpp	/^uint8_t *Cpu::CalculateRM(uint8_t mod_byte, uint8_t opcode)$/;"	f	class:Cpu
+CalculateRM	./cpu.cpp	/^inline uint8_t *Cpu::CalculateRM(uint8_t mod_byte, uint8_t opcode)$/;"	f	class:Cpu
 CalculateReg16	./cpu.cpp	/^uint16_t *Cpu::CalculateReg16(uint8_t mod_byte)$/;"	f	class:Cpu
-CalculateReg8	./cpu.cpp	/^uint8_t *Cpu::CalculateReg8(uint8_t mod_byte)$/;"	f	class:Cpu
+CalculateReg8	./cpu.cpp	/^inline uint8_t *Cpu::CalculateReg8(uint8_t mod_byte)$/;"	f	class:Cpu
 CalculateSeg16	./cpu.cpp	/^uint16_t *Cpu::CalculateSeg16(uint8_t mod_byte)$/;"	f	class:Cpu
 ChangeMode	./display.cpp	/^void Display::ChangeMode()$/;"	f	class:Display
 Colorful_Flag	./video.h	/^    uint8_t Attribute_Control_Reg_Flag\/*0:index.1:data*\/, Graphic_Mode_Flag, Colorful_Flag, Mode_Change_Flag;$/;"	m	class:Video
@@ -302,6 +302,7 @@ timer_init	./timer.cpp	/^void timer::timer_init()$/;"	f	class:timer
 timer_tick	./timer.cpp	/^inline void timer::timer_tick()$/;"	f	class:timer
 timing	./cpu.h	/^    timer *timing;$/;"	m	class:Cpu
 trigger_int	./8259a.cpp	/^void Interrupt_Controller_8259a::trigger_int(uint8_t irq_num)$/;"	f	class:Interrupt_Controller_8259a
+tv	./timer.h	/^    struct timeval tv;$/;"	m	class:timer	typeref:struct:timer::timeval
 universal_reg_ah	./cpu.h	/^    uint8_t *universal_reg_ah, *universal_reg_al;$/;"	m	class:Cpu
 universal_reg_al	./cpu.h	/^    uint8_t *universal_reg_ah, *universal_reg_al;$/;"	m	class:Cpu
 universal_reg_ax	./cpu.h	/^    uint16_t universal_reg_ax, universal_reg_bx, universal_reg_cx, universal_reg_dx,$/;"	m	class:Cpu
