@@ -166,7 +166,7 @@ uint8_t Keyboard::TranslateToScancode(uint16_t SDL_code)
         return (0xDB);
 
     case(0x134)://Lalt
-        return (0xB8);
+        return (0x38);
 
     case(0x20)://space
         return (0x39);

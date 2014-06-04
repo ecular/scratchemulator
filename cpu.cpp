@@ -620,8 +620,8 @@ void Cpu::Intcall(uint8_t int_num)
 uint8_t Cpu::read8_from_port(uint8_t port_num)
 {
     uint8_t tmp_data = ports_operate->port_handle_read8(port_num);
-    if(port_num == 0x60 && tmp_data == 0x3f)
-        MAX = count_code;
+    if(port_num == 0x60 && tmp_data == 0x1c)
+        MIN = count_code;
     return tmp_data;
 }
 
@@ -761,44 +761,44 @@ void Cpu::Exec(uint32_t loops)
         //           return;
         //       }
         /*debug*/
-        //        if(*(uint16_t *)(&ram[0x70])!=old70)
-        //        {
-        //            //printf("Here %ld,opcode=%x change from %x => %x\n",count_code,opcode,old70,*(uint16_t *)(&ram[0x70]));
-        //            old70 = *(uint16_t *)(&ram[0x70]);
-        //            //printdebug(opcode, count_code, ip_tmp);
-        //            if(old70 == 0x5744)
-        //                lo = count_code;
-        //
-        //        }
-        //
+//        if(ram[0x174bc]!=old70)
 //        {
-//            found = find(my.begin(), my.end(), opcode);
-//            if(count_code <= MAX)
-//            {
-//                if(found != my.end())
-//                {
-//                    ;//do nothing
-//                }
-//                else
-//                {
-//                    my.push_back(opcode);
-//                }
-//            }
-//            else if(count_code > MAX)
-//            {
-//                if(found != my.end())
-//                {
-//                    ;//do nothing
-//                }
-//                else
-//                {
-//                    my.push_back(opcode);
-//                    printf("%x\n", opcode);
-//                }
-//            }
-//            fflush(stdout);
+//            printf("opcode=%x change from %x => %x\n",opcode,old70,ram[0x174bc]);
+//            old70 = ram[0x174bc];
+//            printdebug(opcode, count_code, ip_tmp);
+//            // if(old70 == 0x5744)
+//            //     lo = count_code;
 //
 //        }
+        //
+        //        {
+        //            found = find(my.begin(), my.end(), opcode);
+        //            if(count_code <= MAX)
+        //            {
+        //                if(found != my.end())
+        //                {
+        //                    ;//do nothing
+        //                }
+        //                else
+        //                {
+        //                    my.push_back(opcode);
+        //                }
+        //            }
+        //            else if(count_code > MAX)
+        //            {
+        //                if(found != my.end())
+        //                {
+        //                    ;//do nothing
+        //                }
+        //                else
+        //                {
+        //                    my.push_back(opcode);
+        //                    printf("%x\n", opcode);
+        //                }
+        //            }
+        //            fflush(stdout);
+        //
+        //        }
 
         if(count_code <= MAX)
         {
@@ -807,11 +807,12 @@ void Cpu::Exec(uint32_t loops)
         }
         else
         {
-            if(shuzu[opcode][ReadRam8((seg_reg_cs << 4) + control_reg_ip)] == 0)
-            {
-                printf("%x %x\n", opcode, ReadRam8((seg_reg_cs << 4) + control_reg_ip));
-                shuzu[opcode][ReadRam8((seg_reg_cs << 4) + control_reg_ip)] = 1;
-            }
+            printf("%x\n", opcode);
+            //    if(shuzu[opcode][ReadRam8((seg_reg_cs << 4) + control_reg_ip)] == 0)
+            //    {
+            //        printf("%x %x\n", opcode, ReadRam8((seg_reg_cs << 4) + control_reg_ip));
+            //        shuzu[opcode][ReadRam8((seg_reg_cs << 4) + control_reg_ip)] = 1;
+            //    }
         }
 
 
@@ -5683,7 +5684,7 @@ void Cpu::Exec(uint32_t loops)
 
         case(0xD7)://XLATB
         {
-            *universal_reg_al = ReadRam8(*seg_reg_replace_ds * 16 + universal_reg_bx + *universal_reg_al);
+            *universal_reg_al = ReadRam8((*seg_reg_replace_ds << 4) + universal_reg_bx + *universal_reg_al);
             break;
         }
 
@@ -6493,6 +6494,8 @@ void Cpu::Exec(uint32_t loops)
             }
             break;
         }
+        default:
+            Intcall(6);
         }
         // seg_reg_replace_ds = &seg_reg_ds;
         // seg_reg_replace_ss = &seg_reg_ss;
