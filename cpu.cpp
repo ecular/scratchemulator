@@ -409,7 +409,6 @@ inline uint8_t *Cpu::CalculateRM(uint8_t mod_byte, uint8_t opcode)
     uint8_t mod_bit = (mod_byte >> 6) & 0x3;
     opcode = opcode & 0x1;//W bit
     int16_t tmp_data;
-    uint16_t utmp_data;
     switch(mod_bit)
     {
     case(0x0):
@@ -590,7 +589,7 @@ void Cpu::Intcall(uint8_t int_num)
         //  seg_reg_cs = 0xF600;    //start ROM BASIC at bootstrap if requested
         //  control_reg_ip = 0x0000;
 
-        *universal_reg_dl = 0x0;
+        *universal_reg_dl = boot_device;
         Disk_handle->disk_map[GetDL()]->readdisk(1, 0, 1, 0, *universal_reg_dl, 0x07C0, 0x0000);
         seg_reg_cs = 0x0000;
         control_reg_ip = 0x7C00;
@@ -620,8 +619,8 @@ void Cpu::Intcall(uint8_t int_num)
 uint8_t Cpu::read8_from_port(uint8_t port_num)
 {
     uint8_t tmp_data = ports_operate->port_handle_read8(port_num);
-    if(port_num == 0x60 && tmp_data == 0x1c)
-        MIN = count_code;
+//    if(port_num == 0x60 && tmp_data == 0x1c)
+//        MIN = count_code;
     return tmp_data;
 }
 
@@ -648,6 +647,11 @@ inline bool Cpu::GetStatus(void)
 inline void Cpu::SetStatus(bool flag)
 {
     halt = flag;
+}
+
+inline void Cpu::SetBootDevice(uint16_t bootdevice_id)
+{
+    boot_device = bootdevice_id;
 }
 
 uint64_t Cpu::GetCount(void)
@@ -738,14 +742,14 @@ void Cpu::Exec(uint32_t loops)
     static int64_t Instruction_counts = 0;
     static uint8_t one_step_mode = 0;
     /*debug*/
-    uint32_t ip_tmp;
-    static uint16_t old70 = 0;
-    static std::vector<uint8_t> my;
-    static uint8_t shuzu[0xff][0xff];
-    vector<uint8_t>::iterator found;
+    // uint32_t ip_tmp;
+    // static uint16_t old70 = 0;
+    // static std::vector<uint8_t> my;
+    // static uint8_t shuzu[0xff][0xff];
+    // vector<uint8_t>::iterator found;
 
-    static std::map<uint8_t, uint8_t> you;
-    static uint32_t lo = 1000000000;
+    // static std::map<uint8_t, uint8_t> you;
+    // static uint32_t lo = 1000000000;
     /**/
 #ifdef CPU_80186
     uint8_t rep = 0;
@@ -800,20 +804,20 @@ void Cpu::Exec(uint32_t loops)
         //
         //        }
 
-        if(count_code <= MAX)
-        {
-            if(shuzu[opcode][ReadRam8((seg_reg_cs << 4) + control_reg_ip)] == 0)
-                shuzu[opcode][ReadRam8((seg_reg_cs << 4) + control_reg_ip)] = 1;
-        }
-        else
-        {
-            printf("%x\n", opcode);
-            //    if(shuzu[opcode][ReadRam8((seg_reg_cs << 4) + control_reg_ip)] == 0)
-            //    {
-            //        printf("%x %x\n", opcode, ReadRam8((seg_reg_cs << 4) + control_reg_ip));
-            //        shuzu[opcode][ReadRam8((seg_reg_cs << 4) + control_reg_ip)] = 1;
-            //    }
-        }
+        //   if(count_code <= MAX)
+        //   {
+        //       if(shuzu[opcode][ReadRam8((seg_reg_cs << 4) + control_reg_ip)] == 0)
+        //           shuzu[opcode][ReadRam8((seg_reg_cs << 4) + control_reg_ip)] = 1;
+        //   }
+        //   else
+        //   {
+        //       printf("%x\n", opcode);
+        //       //    if(shuzu[opcode][ReadRam8((seg_reg_cs << 4) + control_reg_ip)] == 0)
+        //       //    {
+        //       //        printf("%x %x\n", opcode, ReadRam8((seg_reg_cs << 4) + control_reg_ip));
+        //       //        shuzu[opcode][ReadRam8((seg_reg_cs << 4) + control_reg_ip)] = 1;
+        //       //    }
+        //   }
 
 
         // for(std::map<uint8_t,uint8_t>::iterator i=you.begin();i!=you.end();i++)
@@ -868,7 +872,7 @@ void Cpu::Exec(uint32_t loops)
         }
         /*read a opcode from Memory via CS:IP*/
         firstip = control_reg_ip;
-        ip_tmp = (seg_reg_cs << 4) + control_reg_ip;
+        //ip_tmp = (seg_reg_cs << 4) + control_reg_ip;
         opcode = ReadData8InExe();
 
         /*segment prefix check*/

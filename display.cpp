@@ -52,7 +52,7 @@ void Display::InitDisplay()
         return;
     }
     screen_p = SDL_SetVideoMode(640, 400, 32, SDL_SWSURFACE);
-    SDL_WM_SetCaption("Emu", NULL);
+    SDL_WM_SetCaption(" ScratchEMU  v 0.0.1 ", NULL);
     pthread_create(&thread_id, NULL, video_fresh, (void *)this);
 }
 

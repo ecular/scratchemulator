@@ -2,7 +2,7 @@ CC = g++ -g -Wall -O0 -m32
 CFLAG = -c -fkeep-inline-functions
 LDFLAG = -lSDL -lpthread
 
-BIN  = emu
+BIN  = semu
 OBJ = $(patsubst %.cpp,%.o,$(wildcard *.cpp)) 
 
 all : $(BIN)

@@ -13,16 +13,7 @@
 #include "timer.h"
 
 class Cpu {
-    /* 声明次序
-     * 1) typedefs 和 enums;
-     * 2) 常量;
-     * 3) 构造函数;
-     * 4) 析构函数;
-     * 5) 成员函数,含静态成员函数;
-     * 6) 数据成员,含静态数据成员。
-     * */
 public:
-
     //Cpu(port_handle &, Interrupt_Controller_8259a &, Interval_Timer_8253 &, Video &, disk_handle &);
     Cpu();
     /*set device*/
@@ -117,6 +108,9 @@ public:
     bool GetStatus(void);
     void SetStatus(bool);
 
+    /*change boot device*/
+    void SetBootDevice(uint16_t);
+
     /*get opcode conut*/
     uint64_t GetCount(void);
 
@@ -145,6 +139,7 @@ private:
     uint16_t *seg_reg_replace_ds, *seg_reg_replace_ss;
     uint8_t if_flag, tf_flag;
     bool halt;
+    uint16_t boot_device;
     /*other devices*/
     port_handle *ports_operate;
     Interrupt_Controller_8259a *i8259a;

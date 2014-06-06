@@ -190,10 +190,10 @@ uint8_t Keyboard::TranslateToScancode(uint16_t SDL_code)
         return (0x4D);
 
     case(0x118)://pageup
-        return (0xC9);
+        return (0x49);
 
     case(0x119)://pagedown
-        return (0xD1);
+        return (0x51);
     default:
         return 0;
     }
