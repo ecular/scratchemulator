@@ -11,9 +11,9 @@ disk_handle::disk_handle()
 void disk_handle::insert_disk(uint8_t disk_num, Disk *disk)
 {
     vector<uint8_t>::iterator found;
-    if(disk_num < 0x80)
+    if(disk_num < 0x80)//it is a floppy disk
         floppy_count++;
-    else
+    else//it is a hard disk
         hard_count++;
 
     disk_map.insert(map<uint8_t, Disk *>::value_type(disk_num, disk));
@@ -27,6 +27,26 @@ void disk_handle::insert_disk(uint8_t disk_num, Disk *disk)
         inserted_disknum.push_back(disk_num);
 
 }
+
+void disk_handle::eject_disk(uint8_t disk_num, Disk *disk)
+{
+    vector<uint8_t>::iterator found;
+    for(map<uint8_t, Disk *>::iterator i = disk_map.begin(); i != disk_map.end(); i++)
+    {
+        if(i->first == disk_num && i->second == disk)
+        {
+            disk_map.erase(i);
+            break;
+        }
+    }
+
+    found = find(inserted_disknum.begin(), inserted_disknum.end(), disk_num);
+    if(found != inserted_disknum.end())
+    {
+        inserted_disknum.erase(found);
+    }
+}
+
 
 void disk_handle::disk_operator()
 {

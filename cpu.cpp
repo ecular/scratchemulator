@@ -590,7 +590,7 @@ void Cpu::Intcall(uint8_t int_num)
         //  seg_reg_cs = 0xF600;    //start ROM BASIC at bootstrap if requested
         //  control_reg_ip = 0x0000;
 
-        *universal_reg_dl = 0x80;
+        *universal_reg_dl = 0x0;
         Disk_handle->disk_map[GetDL()]->readdisk(1, 0, 1, 0, *universal_reg_dl, 0x07C0, 0x0000);
         seg_reg_cs = 0x0000;
         control_reg_ip = 0x7C00;
@@ -3924,13 +3924,13 @@ void Cpu::Exec(uint32_t loops)
         {
             if(if_flag == 1)
                 if(tf_flag == 1)
-                    Push(control_reg_flag | 0x0300);
+                    Push((control_reg_flag | 0x0300) | 0xF002);
                 else
-                    Push((control_reg_flag | 0x0200) & 0xFEFF);
+                    Push(((control_reg_flag | 0x0200) & 0xFEFF) | 0xF002);
             else if(tf_flag == 0)
-                Push(control_reg_flag & 0xFCFF);
+                Push((control_reg_flag & 0xFCFF) | 0xF002);
             else
-                Push((control_reg_flag | 0x0100) & 0xFDFF);
+                Push(((control_reg_flag | 0x0100) & 0xFDFF) | 0xF002);
             break;
         }
 

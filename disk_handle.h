@@ -16,6 +16,7 @@ private:
 public:
     uint8_t hard_count, floppy_count;
     void insert_disk(uint8_t , Disk *);
+    void eject_disk(uint8_t , Disk *);
     disk_handle();
     void disk_operator(void);
     void setcpu(Cpu *);

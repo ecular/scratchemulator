@@ -85,14 +85,14 @@ int main(int argc, char **argv)
     timing.setvideo(&video);
     std::cout << "System timer initialized." << std::endl;
 
-    Disk fd("./dos-boot.img", 0);
+    Disk fd1("./dos1.flp", 0);
     Disk hd("./drive0.raw", 0x80);
-    fd.setcpu(&cpu);
+    fd1.setcpu(&cpu);
     hd.setcpu(&cpu);
 
     disk_handle Disk_handle;
     Disk_handle.setcpu(&cpu);
-    Disk_handle.insert_disk(0, &fd);
+    Disk_handle.insert_disk(0, &fd1);
     Disk_handle.insert_disk(0x80, &hd);
     std::cout << "Disk controller initialized." << std::endl;
 
@@ -128,6 +128,20 @@ int main(int argc, char **argv)
     arg.keyboard_arg = &keyboard;
     pthread_create(&inputthread, NULL, InputThread, (void *)(&arg));
 
+    /*debug*/
+    int a = 0;
+    printf("\ncommand:");
+    scanf("%d", &a);
+    if(a == 1)
+    {
+        printf("now change disk!\n");
+        Disk *fd2 = new Disk("./dos2.flp", 0);
+        fd2->setcpu(&cpu);
+        Disk_handle.eject_disk(0, &fd1);
+        Disk_handle.insert_disk(0, fd2);
+        printf("change finished!\n");
+    }
+    /**/
     pthread_join(runthread, NULL);
     gettimeofday(&tv, NULL);
     end_time = tv.tv_sec * 1000000 + tv.tv_usec;
